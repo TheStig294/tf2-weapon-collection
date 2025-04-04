@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "rj/pyro_pink_border01"
+	"$nocull" 1
+	$translucent 1
+	"$VertexColor" 1
+	"$VertexAlpha" "1"
+}

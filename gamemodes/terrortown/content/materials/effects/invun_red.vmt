@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "effects/invun_red"
+	"$envmap" "effects/invun_red"
+	"$surfaceprop" "metal"
+	"$halflambert" "1"
+}
