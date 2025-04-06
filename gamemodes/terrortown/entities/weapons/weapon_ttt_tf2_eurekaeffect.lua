@@ -116,14 +116,14 @@ function SWEP:Teleport()
     end)
 end
 
-function SWEP:PrimaryAttack()
+function SWEP:SecondaryAttack()
     if not self.HasTeleported then
         self.HasTeleported = true
         self:Teleport()
-
-        return
     end
+end
 
+function SWEP:PrimaryAttack()
     if self.IsTeleporting then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
