@@ -9,8 +9,11 @@ ENT.Damage = 60
 ENT.Force = 100
 ENT.AmmoType = "AirboatGun"
 ENT.Tracer = "AirboatGunTracer"
-ENT.Spread = 0
-ENT.Delay = 0.5
+ENT.Spread = 0.1
+ENT.Delay = 0.2
+ENT.Angle = 45
+ENT.Range = 500
+ENT.Range = ENT.Range * ENT.Range
 
 function ENT:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -19,6 +22,7 @@ function ENT:SetupDataTables()
     self:NetworkVar("Entity", "Target")
     self:NetworkVar("Bool", "Attacking")
     self:NetworkVar("Float", "NextFire")
+    self:NetworkVar("Angle", "OriginalAngles")
 end
 
 function ENT:Initialize()
@@ -31,19 +35,23 @@ function ENT:Initialize()
     self:SetTarget(NULL)
     self:SetAttacking(false)
     self:SetNextFire(CurTime())
+    self:SetOriginalAngles(self:GetAngles())
 end
 
-function ENT:IsValidTarget(target)
+function ENT:IsValidTarget()
+    local target = self:GetTarget()
     if not IsValid(target) or not target:IsPlayer() or not target:Alive() or target:IsSpec() then return false end
+    local targetPos = target:GetPos()
+    local pos = self:GetPos()
     local trace = {}
-    trace.start = self:GetPos()
-    trace.endpos = target:GetPos()
+    trace.start = pos
+    trace.endpos = targetPos
     trace.mask = MASK_SHOT
     trace.filter = self
     local tr = util.TraceLine(trace)
     local hitEnt = tr.Entity
 
-    return IsValid(hitEnt) and hitEnt == target
+    return IsValid(hitEnt) and hitEnt == target and targetPos:DistToSqr(pos) < self.Range
 end
 
 function ENT:Think()
@@ -52,51 +60,40 @@ function ENT:Think()
     if not self:GetIdle() and self:GetIdleTimer() <= CurTime() and not self:GetFullyPlaced() then
         self:SetModel("models/buildables/sentry1.mdl")
         self:SetFullyPlaced(true)
-        -- self:ResetSequence("disabled")
+        self:ResetSequence("aim_nat")
         self:SetIdle(true)
     end
 
     if self:GetFullyPlaced() then
-        -- print("IsIdle:", self:GetIdle())
         if self:GetIdle() then
             self:FindTarget()
-        elseif self:IsValidTarget(self:GetTarget()) then
+        elseif self:IsValidTarget() then
             self:Attack()
+        else
+            self:Reset()
         end
-        -- else
-        --     self:Reset()
     end
 
     return true
 end
 
 function ENT:FindTarget()
-    for _, ent in ipairs(ents.FindInCone(self:GetPos(), self:GetForward(), 1000, math.cos(math.rad(45)))) do
-        if self:IsValidTarget(ent) then
-            -- self:GetOwner():ChatPrint(tostring(ent))
+    for _, ent in ipairs(ents.FindInCone(self:GetPos(), self:GetForward(), self.Range, math.cos(math.rad(self.Angle)))) do
+        if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
             self:SetTarget(ent)
             self:SetIdle(false)
         end
     end
 end
 
-local angleOffset = Angle(0, 90, 90)
+local angleOffset = Angle(0, 90, 80)
 
 function ENT:Attack()
+    local target = self:GetTarget()
+
     if not self:GetAttacking() then
         self:ResetSequence("fire")
         self:GetAttacking(true)
-    end
-
-    local target = self:GetTarget()
-
-    -- print("Attack target:", target)
-    if not self:IsValidTarget(target) then
-        self:SetTarget(NULL)
-        -- self:ResetSequence("disabled")
-        self:SetIdle(true)
-
-        return
     end
 
     if SERVER then
@@ -104,8 +101,6 @@ function ENT:Attack()
     end
 
     if self:GetNextFire() <= CurTime() then
-        -- local forward = self:GetForward()
-        -- forward:Rotate(forwardOffset)
         local bullet = {}
         bullet.Attacker = self:GetOwner() or self
         bullet.Inflictor = self
@@ -116,6 +111,7 @@ function ENT:Attack()
         bullet.Damage = self.Damage
         bullet.AmmoType = self.AmmoType
         bullet.TracerName = self.Tracer
+        bullet.Num = 5
         self:FireBullets(bullet)
         self:SetNextFire(CurTime() + self.Delay)
     end
@@ -126,9 +122,9 @@ function ENT:Attack()
 end
 
 function ENT:Reset()
-    self:ResetSequence("idle")
-    self:SetAngles(self:GetAngles() - angleOffset)
+    self:ResetSequence("aim_nat")
     self:SetAttacking(false)
     self:SetTarget(NULL)
     self:SetIdle(true)
+    self:SetAngles(self:GetOriginalAngles())
 end
