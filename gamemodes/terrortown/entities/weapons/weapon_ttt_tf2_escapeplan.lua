@@ -39,8 +39,8 @@ if CLIENT then
 end
 
 SWEP.Primary.Sound = Sound("Weapon_PickAxe.Swing")
-SWEP.Primary.ClipSize = 1
-SWEP.Primary.DefaultClip = 1
+SWEP.Primary.ClipSize = -1
+SWEP.Primary.DefaultClip = -1
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 48
@@ -51,20 +51,8 @@ SWEP.Primary.Range = 128
 SWEP.Primary.Anims = {"s_swing_a", "s_swing_b", "s_swing_c"}
 
 SWEP.MaxSpeedBoost = 1.3
+SWEP.CurrentSpeedBoost = 1
 SWEP.SpeedBoostActive = false
-
-function SWEP:Equip()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
-
-    -- Add chat message since this weapon's effect is not obvious...
-    if not owner.TF2EscapePlanChatMessage then
-        owner.TF2EscapePlanChatMessage = true
-        owner:ChatPrint("ESCAPE PLAN: Move faster the less health you have!")
-    end
-
-    return self.BaseClass.Equip(self)
-end
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -192,18 +180,26 @@ function SWEP:Think()
         self.Idle = 1
     end
 
-    if SERVER and self.SpeedBoostActive then
+    if self.SpeedBoostActive then
         local healthFraction = owner:Health() / owner:GetMaxHealth()
 
         if healthFraction > 1 then
             healthFraction = 1
         end
 
-        owner:SetLaggedMovementValue(-self.MaxSpeedBoost * healthFraction + 1 + self.MaxSpeedBoost)
+        self.CurrentSpeedBoost = -self.MaxSpeedBoost * healthFraction + 1 + self.MaxSpeedBoost
+
+        if SERVER then
+            owner:SetLaggedMovementValue(self.CurrentSpeedBoost)
+        end
     end
 end
 
 if CLIENT then
+    function SWEP:DrawHUD()
+        draw.WordBox(8, 265, ScrH() - 50, "Health Speed: x" .. math.Round(self.CurrentSpeedBoost, 1), "HealthAmmo", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+    end
+
     function SWEP:ViewModelDrawn(vm)
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
