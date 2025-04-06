@@ -48,19 +48,6 @@ SWEP.Primary.Range = 128
 
 SWEP.Primary.Anims = {"spk_swing_a", "spk_swing_b", "spk_swing_c"}
 
-function SWEP:Equip()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
-
-    -- Add chat message since this weapon's effect is not obvious...
-    if not owner.TF2EurekaEffectChatMessage then
-        owner.TF2EurekaEffectChatMessage = true
-        owner:ChatPrint("EUREKA EFFECT: Press 'Reload' to teleport to a spawn point!")
-    end
-
-    return self.BaseClass.Equip(self)
-end
-
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
@@ -77,7 +64,7 @@ function SWEP:Deploy()
     return self.BaseClass.Deploy(self)
 end
 
-function SWEP:Reload()
+function SWEP:Teleport()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
     if self:Clip1() <= 0 then return end
@@ -130,6 +117,14 @@ function SWEP:Reload()
 end
 
 function SWEP:PrimaryAttack()
+    if not self.HasTeleported then
+        self.HasTeleported = true
+        self:Teleport()
+
+        return
+    end
+
+    if self.IsTeleporting then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
     self:EmitSound(self.Primary.Sound)
