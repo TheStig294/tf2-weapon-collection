@@ -36,22 +36,38 @@ function ENT:Initialize()
     self:SetAttacking(false)
     self:SetNextFire(CurTime())
     self:SetOriginalAngles(self:GetAngles())
+    -- timer.Create("TF2TurretTest", 1, 0, function()
+    --     if not IsValid(self) then return end
+    --     if not self:GetIdle() and self:GetIdleTimer() <= CurTime() and not self:GetFullyPlaced() then
+    --         self:SetModel("models/buildables/sentry1.mdl")
+    --         self:SetFullyPlaced(true)
+    --         self:ResetSequence("aim_nat")
+    --         self:SetIdle(true)
+    --     end
+    --     if self:GetFullyPlaced() then
+    --         if self:GetIdle() then
+    --             self:FindTarget()
+    --         elseif self:IsValidTarget() then
+    --             self:Attack()
+    --         else
+    --             self:Reset()
+    --         end
+    --     end
+    -- end)
 end
 
 function ENT:IsValidTarget()
+    -- print("Is valid target called")
     local target = self:GetTarget()
+    -- print("Is valid:", IsValid(target), "Is player:", target:IsPlayer(), "Alive:", target:Alive(), "IsSpec:", target:IsSpec())
     if not IsValid(target) or not target:IsPlayer() or not target:Alive() or target:IsSpec() then return false end
-    local targetPos = target:GetPos()
-    local pos = self:GetPos()
-    local trace = {}
-    trace.start = pos
-    trace.endpos = targetPos
-    trace.mask = MASK_SHOT
-    trace.filter = self
-    local tr = util.TraceLine(trace)
-    local hitEnt = tr.Entity
+    -- local pos = self:GetPos()
+    -- local targetPos = target:GetPos()
+    -- print("Target Pos:", targetPos)
+    -- print("Target within distance:", targetPos:DistToSqr(pos) < self.Range)
+    -- return targetPos:DistToSqr(pos) < self.Range
 
-    return IsValid(hitEnt) and hitEnt == target and targetPos:DistToSqr(pos) < self.Range
+    return target:GetPos():DistToSqr(self:GetPos()) < self.Range
 end
 
 function ENT:Think()
@@ -78,6 +94,7 @@ function ENT:Think()
 end
 
 function ENT:FindTarget()
+    -- print("Calling FindTarget")
     for _, ent in ipairs(ents.FindInCone(self:GetPos(), self:GetForward(), self.Range, math.cos(math.rad(self.Angle)))) do
         if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
             self:SetTarget(ent)
@@ -89,6 +106,7 @@ end
 local angleOffset = Angle(0, 90, 80)
 
 function ENT:Attack()
+    -- print("Calling Attack")
     local target = self:GetTarget()
 
     if not self:GetAttacking() then
@@ -122,6 +140,7 @@ function ENT:Attack()
 end
 
 function ENT:Reset()
+    -- print("Calling Reset")
     self:ResetSequence("aim_nat")
     self:SetAttacking(false)
     self:SetTarget(NULL)
