@@ -1,29 +1,29 @@
 local UPGRADE = {}
-UPGRADE.id = "turret_placer"
+UPGRADE.id = "sentry_placer"
 UPGRADE.class = "weapon_ttt_tf2_eurekaeffect"
-UPGRADE.name = "Turret Placer"
-UPGRADE.desc = "Press 'R' to place and build a turret!"
+UPGRADE.name = "Sentry Placer"
+UPGRADE.desc = "Press 'R' to place and build a sentry!"
 UPGRADE.noSound = true
 
 UPGRADE.convars = {
     {
-        name = "pap_turret_placer_range",
+        name = "pap_sentry_placer_range",
         type = "int"
     },
     {
-        name = "pap_turret_placer_damage",
+        name = "pap_sentry_placer_damage",
         type = "int"
     }
 }
 
-local placeRangeCvar = CreateConVar("pap_turret_placer_range", 128, FCVAR_REPLICATED, "Max range of placing turret", 10, 1000)
-local damageCvar = CreateConVar("pap_turret_placer_damage", 60, FCVAR_REPLICATED, "Damage the turret deals per bullet", 0, 100)
+local placeRangeCvar = CreateConVar("pap_sentry_placer_range", 128, FCVAR_REPLICATED, "Max range of placing sentry", 10, 1000)
+local damageCvar = CreateConVar("pap_sentry_placer_damage", 60, FCVAR_REPLICATED, "Damage the sentry deals per bullet", 0, 100)
 
 function UPGRADE:Apply(SWEP)
     SWEP.PlaceRange = placeRangeCvar:GetInt()
     SWEP.DamageAmount = damageCvar:GetInt()
     SWEP.PlaceOffset = 10
-    SWEP.TurretModel = "models/buildables/sentry1.mdl"
+    SWEP.SentryModel = "models/buildables/sentry1.mdl"
 
     if CLIENT then
         timer.Simple(0, function()
@@ -32,13 +32,13 @@ function UPGRADE:Apply(SWEP)
     end
 
     function SWEP:Reload()
-        if not self.TTTPAPTurretPlacerSpawned then
-            self.TTTPAPTurretPlacerSpawned = true
-            self:SpawnTurret()
+        if not self.TTTPAPSentryPlacerSpawned then
+            self.TTTPAPSentryPlacerSpawned = true
+            self:SpawnSentry()
         end
     end
 
-    function SWEP:SpawnTurret()
+    function SWEP:SpawnSentry()
         if CLIENT then return end
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
@@ -46,19 +46,19 @@ function UPGRADE:Apply(SWEP)
         if not tr.HitWorld then return end
 
         if tr.HitPos:Distance(owner:GetPos()) > self.PlaceRange then
-            owner:PrintMessage(HUD_PRINTCENTER, "Look at the ground to place the turret")
+            owner:PrintMessage(HUD_PRINTCENTER, "Look at the ground to place the sentry")
 
             return
         end
 
         local Views = owner:EyeAngles().y
-        local turret = ents.Create("ttt_pap_tf2_turret")
-        turret:SetOwner(owner)
-        turret:SetPos(tr.HitPos + tr.HitNormal)
-        turret:SetAngles(Angle(0, Views, 0))
-        turret.Damage = self.DamageAmount
-        turret:Spawn()
-        turret:Activate()
+        local sentry = ents.Create("ttt_pap_tf2_sentry")
+        sentry:SetOwner(owner)
+        sentry:SetPos(tr.HitPos + tr.HitNormal)
+        sentry:SetAngles(Angle(0, Views, 0))
+        sentry.Damage = self.DamageAmount
+        sentry:Spawn()
+        sentry:Activate()
     end
 
     function SWEP:RemoveHologram()
@@ -67,9 +67,9 @@ function UPGRADE:Apply(SWEP)
         end
     end
 
-    -- Draw hologram when placing down the turret
+    -- Draw hologram when placing down the sentry
     function SWEP:DrawHologram()
-        if self.TTTPAPTurretPlacerSpawned then
+        if self.TTTPAPSentryPlacerSpawned then
             self:RemoveHologram()
 
             return
@@ -90,7 +90,7 @@ function UPGRADE:Apply(SWEP)
                 hologram = self.Hologram
             else
                 -- Make the hologram see-through to indicate it isn't placed yet
-                hologram = ClientsideModel(self.TurretModel)
+                hologram = ClientsideModel(self.SentryModel)
                 hologram:SetColor(Color(200, 200, 200, 200))
                 hologram:SetRenderMode(RENDERMODE_TRANSCOLOR)
                 self.Hologram = hologram
