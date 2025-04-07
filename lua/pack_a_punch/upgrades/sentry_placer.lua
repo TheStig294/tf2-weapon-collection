@@ -17,7 +17,7 @@ UPGRADE.convars = {
 }
 
 local placeRangeCvar = CreateConVar("pap_sentry_placer_range", 128, FCVAR_REPLICATED, "Max range of placing sentry", 10, 1000)
-local damageCvar = CreateConVar("pap_sentry_placer_damage", 60, FCVAR_REPLICATED, "Damage the sentry deals per bullet", 0, 100)
+local damageCvar = CreateConVar("pap_sentry_placer_damage", 10, FCVAR_REPLICATED, "Damage the sentry deals per bullet", 0, 100)
 
 function UPGRADE:Apply(SWEP)
     SWEP.PlaceRange = placeRangeCvar:GetInt()
