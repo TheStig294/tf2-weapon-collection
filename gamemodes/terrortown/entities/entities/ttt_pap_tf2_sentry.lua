@@ -16,6 +16,7 @@ ENT.Range = 500
 ENT.Range = ENT.Range * ENT.Range
 ENT.SearchDelay = 0.5
 ENT.Accuracy = 0.3
+ENT.BeepTime = 3.57
 
 function ENT:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -25,6 +26,7 @@ function ENT:SetupDataTables()
     self:NetworkVar("Bool", "Attacking")
     self:NetworkVar("Float", "NextFire")
     self:NetworkVar("Angle", "OriginalAngles")
+    self:NetworkVar("Float", "BeepTimer")
 end
 
 function ENT:Initialize()
@@ -38,14 +40,16 @@ function ENT:Initialize()
     self:SetAttacking(false)
     self:SetNextFire(CurTime())
     self:SetOriginalAngles(self:GetAngles())
+    self:SetBeepTimer(CurTime())
 end
 
-function ENT:IsValidTarget()
-    local target = self:GetTarget()
+function ENT:IsValidTarget(target)
+    if CLIENT then return IsValid(self:GetTarget()) end
+    target = target or self:GetTarget()
     local owner = self:GetOwner()
     if not IsValid(target) or not target:IsPlayer() or not target:Alive() or target:IsSpec() or (IsValid(owner) and owner == target) then return false end
 
-    return (CLIENT or self:Visible(target)) and target:GetPos():DistToSqr(self:GetPos()) < self.Range
+    return self:Visible(target) and target:GetPos():DistToSqr(self:GetPos()) < self.Range
 end
 
 function ENT:Think()
@@ -56,6 +60,8 @@ function ENT:Think()
         self:SetFullyPlaced(true)
         self:ResetSequence("aim_nat")
         self:SetIdle(true)
+        self:EmitSound("weapons/sentry_scan.wav", 80, 100, 1, CHAN_ITEM)
+        self:SetBeepTimer(CurTime() + self.BeepTime)
     end
 
     if self:GetFullyPlaced() then
@@ -74,12 +80,18 @@ end
 function ENT:FindTarget()
     if self:GetIdleTimer() > CurTime() then return end
     self:SetIdleTimer(CurTime() + self.SearchDelay)
-    local owner = self:GetOwner()
 
-    for _, ent in ipairs(ents.FindInCone(self:GetPos(), self:GetForward(), self.Range, math.cos(math.rad(self.Angle)))) do
-        if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() and (not IsValid(owner) or owner ~= ent) then
+    if self:GetBeepTimer() < CurTime() then
+        self:EmitSound("weapons/sentry_scan.wav", 80, 100, 1, CHAN_ITEM)
+        self:SetBeepTimer(CurTime() + self.BeepTime)
+        self:ResetSequence("aim_nat")
+    end
+
+    for _, ent in ipairs(ents.FindInSphere(self:GetPos(), self.Range)) do
+        if self:IsValidTarget(ent) then
             self:SetTarget(ent)
             self:SetIdle(false)
+            self:EmitSound("weapons/sentry_spot.wav", 80, 100, 1, CHAN_ITEM)
         end
     end
 end
@@ -112,6 +124,7 @@ function ENT:Attack()
         bullet.Num = 5
         self:FireBullets(bullet)
         self:SetNextFire(CurTime() + self.Delay)
+        self:EmitSound("weapons/sentry_shoot.wav", 80, 100, 1, CHAN_WEAPON)
         -- For some reason, traces don't seem to work when fired from this entity, including bullet traces...
         -- So, we have to manually damage the target here, all bullets shot are just for effect
         local randomNum = math.random()
@@ -143,4 +156,6 @@ function ENT:Reset()
     self:SetTarget(NULL)
     self:SetIdle(true)
     self:SetAngles(self:GetOriginalAngles())
+    self:EmitSound("weapons/sentry_scan.wav", 80, 100, 1, CHAN_ITEM)
+    self:SetBeepTimer(CurTime() + self.BeepTime)
 end
