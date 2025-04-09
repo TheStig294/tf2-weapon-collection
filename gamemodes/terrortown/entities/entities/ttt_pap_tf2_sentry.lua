@@ -158,4 +158,5 @@ function ENT:Reset()
     self:SetAngles(self:GetOriginalAngles())
     self:EmitSound("weapons/sentry_scan.wav", 80, 100, 1, CHAN_ITEM)
     self:SetBeepTimer(CurTime() + self.BeepTime)
+    self:EmitSound("weapons/sentry_finish.wav")
 end

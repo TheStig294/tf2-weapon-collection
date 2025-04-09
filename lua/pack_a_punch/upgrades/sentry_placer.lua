@@ -59,6 +59,7 @@ function UPGRADE:Apply(SWEP)
         sentry.Damage = self.DamageAmount
         sentry:Spawn()
         sentry:Activate()
+        owner:EmitSound("player/engineer/sentry_build" .. math.random(2) .. ".wav")
     end
 
     function SWEP:RemoveHologram()
