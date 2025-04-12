@@ -253,9 +253,14 @@ if CLIENT then
         local matrix = owner:GetBoneMatrix(boneid)
         if not matrix then return end
         local newpos, newang = LocalToWorld(offsetvec, offsetang, matrix:GetTranslation(), matrix:GetAngles())
-        w_model:SetPos(newpos)
-        w_model:SetAngles(newang)
-        w_model:SetupBones()
-        w_model:DrawModel()
+
+        if not IsValid(self.w_model) then
+            self.w_model = w_model
+        end
+
+        self.w_model:SetPos(newpos)
+        self.w_model:SetAngles(newang)
+        self.w_model:SetupBones()
+        self.w_model:DrawModel()
     end
 end
