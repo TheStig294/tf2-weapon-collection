@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{	"$basetexture" "skybox\pyrolandRT"
+	"$nofog" 1
+	"$ignorez" 1
+}

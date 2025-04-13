@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture"	"models/props_forest/sawmill_wood_pyro"
+	"$surfaceprop"	"wood"
+}
