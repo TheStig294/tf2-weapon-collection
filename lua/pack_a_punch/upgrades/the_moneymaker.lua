@@ -1,15 +1,15 @@
 local UPGRADE = {}
-UPGRADE.id = "steam_marketplace"
+UPGRADE.id = "the_moneymaker"
 UPGRADE.class = "weapon_ttt_tf2_goldenfryingpan"
-UPGRADE.name = "Steam Marketplace"
+UPGRADE.name = "The Moneymaker"
 UPGRADE.desc = "Sells anything you hit!"
 UPGRADE.noSound = true
 UPGRADE.damageMult = 100
 
 function UPGRADE:Apply(SWEP)
     if SERVER then
-        util.AddNetworkString("TTTPAPSteamMarketplaceHit")
-        util.AddNetworkString("TTTPAPSteamMarketplacePickupGoldWeapon")
+        util.AddNetworkString("TTTPAPTheMoneymakerHit")
+        util.AddNetworkString("TTTPAPTheMoneymakerPickupGoldWeapon")
 
         self:AddHook("EntityTakeDamage", function(ent, dmg)
             if not IsValid(ent) then return end
@@ -18,7 +18,7 @@ function UPGRADE:Apply(SWEP)
             if not IsValid(attacker) then return end
             local inflictor = dmg:GetInflictor()
             if not self:IsValidUpgrade(inflictor) then return end
-            net.Start("TTTPAPSteamMarketplaceHit")
+            net.Start("TTTPAPTheMoneymakerHit")
             net.WriteEntity(ent)
             net.Send(attacker)
             inflictor:RagToGold(ent)
@@ -26,7 +26,7 @@ function UPGRADE:Apply(SWEP)
 
         self:AddHook("WeaponEquip", function(wep, owner)
             if IsValid(wep) and wep:GetMaterial() == "models/player/shared/gold_player" then
-                net.Start("TTTPAPSteamMarketplacePickupGoldWeapon")
+                net.Start("TTTPAPTheMoneymakerPickupGoldWeapon")
                 net.WriteEntity(wep)
                 net.Send(owner)
             end
@@ -47,7 +47,7 @@ function UPGRADE:Apply(SWEP)
         local yellowColor = Color(255, 216, 0)
         local greyColor = Color(118, 107, 94)
 
-        net.Receive("TTTPAPSteamMarketplaceHit", function()
+        net.Receive("TTTPAPTheMoneymakerHit", function()
             local ent = net.ReadEntity()
             if not IsValid(ent) then return end
             local model = ent:GetModel()
@@ -201,7 +201,7 @@ function UPGRADE:Apply(SWEP)
             bottomText3.OwnLine = true
         end)
 
-        net.Receive("TTTPAPSteamMarketplacePickupGoldWeapon", function()
+        net.Receive("TTTPAPTheMoneymakerPickupGoldWeapon", function()
             local wep = net.ReadEntity()
             wep:SetMaterial("models/player/shared/gold_player")
 
