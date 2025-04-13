@@ -4,6 +4,7 @@ UPGRADE.class = "weapon_ttt_tf2_goldenfryingpan"
 UPGRADE.name = "Steam Marketplace"
 UPGRADE.desc = "Sells anything you hit!"
 UPGRADE.noSound = true
+UPGRADE.damageMult = 100
 
 function UPGRADE:Apply(SWEP)
     if SERVER then
@@ -20,7 +21,6 @@ function UPGRADE:Apply(SWEP)
             net.Start("TTTPAPSteamMarketplaceHit")
             net.WriteEntity(ent)
             net.Send(attacker)
-            dmg:SetDamage(10000)
             inflictor:RagToGold(ent)
         end)
 
