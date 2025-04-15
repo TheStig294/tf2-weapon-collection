@@ -16,18 +16,26 @@ function UPGRADE:Apply(SWEP)
         end
 
         SWEP:SetExploded(false)
+        SWEP:SetClip1(1)
 
-        if IsValid(self.v_model) then
-            self.v_model:Remove()
-            self.SwitchedViewModel = false
+        if IsValid(SWEP.v_model) then
+            SWEP.v_model:Remove()
+            SWEP.SwitchedViewModel = false
         end
     end)
 
-    self:AddHook("PlayerShouldTakeDamage", function(ply, attacker)
-        if not IsValid(ply) or not IsValid(attacker) then return end
-        local wep = attacker:GetActiveWeapon()
-        if not IsValid(wep) then return end
-        if self:IsValidUpgrade(wep) and ply == attacker then return false end
+    self:AddToHook(SWEP, "Think", function()
+        if IsValid(SWEP.v_model) and SWEP.v_model:GetMaterial() ~= TTTPAP.camo then
+            SWEP.v_model:SetPAPCamo()
+        end
+    end)
+
+    self:AddHook("EntityTakeDamage", function(ply, dmg)
+        local inflictor = dmg:GetInflictor()
+        if not self:IsValidUpgrade(inflictor) then return end
+        local attacker = dmg:GetAttacker()
+        if not IsValid(attacker) then return end
+        if attacker == ply then return true end
     end)
 end
 

@@ -169,6 +169,13 @@ function SWEP:Think()
         end
 
         if SERVER and IsValid(victim) then
+            if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
+                owner:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
+                self:Explode()
+            elseif not victim:IsPlayer() then
+                owner:EmitSound("weapons/bottle_hit" .. math.random(3) .. ".wav")
+            end
+
             local dmg = DamageInfo()
             local attacker = owner
 
@@ -182,13 +189,6 @@ function SWEP:Think()
             dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
             dmg:SetDamageType(DMG_CLUB)
             victim:TakeDamageInfo(dmg)
-
-            if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
-                owner:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
-                self:Explode()
-            elseif not victim:IsPlayer() then
-                owner:EmitSound("weapons/bottle_hit" .. math.random(3) .. ".wav")
-            end
         end
 
         self.Attack = 0
