@@ -9,27 +9,18 @@ UPGRADE.damageMult = 100
 function UPGRADE:Apply(SWEP)
     if SERVER then
         util.AddNetworkString("TTTPAPTheMoneymakerHit")
-        util.AddNetworkString("TTTPAPTheMoneymakerPickupGoldWeapon")
 
         self:AddHook("EntityTakeDamage", function(ent, dmg)
             if not IsValid(ent) then return end
-            if ent:GetMaterial() == "models/player/shared/gold_player" then return end
+            if ent.TTTPAPTheMoneyMakerSold and ent:GetMaterial() == "models/player/shared/gold_player" then return end
             local attacker = dmg:GetAttacker()
             if not IsValid(attacker) then return end
             local inflictor = dmg:GetInflictor()
             if not self:IsValidUpgrade(inflictor) then return end
+            ent.TTTPAPTheMoneyMakerSold = true
             net.Start("TTTPAPTheMoneymakerHit")
             net.WriteEntity(ent)
             net.Send(attacker)
-            inflictor:RagToGold(ent)
-        end)
-
-        self:AddHook("WeaponEquip", function(wep, owner)
-            if IsValid(wep) and wep:GetMaterial() == "models/player/shared/gold_player" then
-                net.Start("TTTPAPTheMoneymakerPickupGoldWeapon")
-                net.WriteEntity(wep)
-                net.Send(owner)
-            end
         end)
     end
 
@@ -199,19 +190,6 @@ function UPGRADE:Apply(SWEP)
             bottomText3:SetColor(textColor)
             bottomText3:SizeToContents()
             bottomText3.OwnLine = true
-        end)
-
-        net.Receive("TTTPAPTheMoneymakerPickupGoldWeapon", function()
-            local wep = net.ReadEntity()
-            wep:SetMaterial("models/player/shared/gold_player")
-
-            self:AddHook("PreDrawViewModel", function(vm, _, vmWeapon)
-                if IsValid(vmWeapon) and IsValid(wep) and vmWeapon == wep then
-                    vm:SetMaterial("models/player/shared/gold_player")
-                else
-                    vm:SetMaterial("")
-                end
-            end)
         end)
     end
 end

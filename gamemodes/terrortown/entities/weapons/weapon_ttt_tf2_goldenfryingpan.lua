@@ -80,9 +80,11 @@ function SWEP:PrimaryAttack()
     self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
 end
 
-function SWEP:RagToGold(rag)
+local addedBodySearchHook = false
+
+function SWEP:EntToGold(rag)
     if not IsValid(rag) then return end
-    rag:EmitSound("weapons/pan/pan_turn_to_gold.wav")
+    rag:EmitSound("weapons/pan/pan_turn_to_gold.wav", 80, 100, 1, CHAN_WEAPON)
     rag:SetMaterial("models/player/shared/gold_player")
 
     for i = 0, rag:GetPhysicsObjectCount() - 1 do
@@ -91,6 +93,48 @@ function SWEP:RagToGold(rag)
 
         if IsValid(phys) then
             phys:EnableMotion(false)
+        end
+    end
+
+    if not addedBodySearchHook then
+        addedBodySearchHook = true
+
+        if SERVER then
+            hook.Add("TTTCanSearchCorpse", "TF2GoldenFryingPanBodySearch", function(p, body)
+                if body:GetMaterial() == "models/player/shared/gold_player" then
+                    p:ChatPrint("This body cannot be searched, it's solid gold!")
+
+                    return false
+                end
+            end)
+
+            util.AddNetworkString("TF2GoldenFryingPanPickupGoldWeapon")
+
+            hook.Add("WeaponEquip", "TF2GoldenFryingPanPickupGoldGun", function(wep, owner)
+                if IsValid(wep) and wep:GetMaterial() == "models/player/shared/gold_player" then
+                    net.Start("TF2GoldenFryingPanPickupGoldWeapon")
+                    net.WriteEntity(wep)
+                    net.Send(owner)
+                end
+            end)
+        else
+            net.Receive("TF2GoldenFryingPanPickupGoldWeapon", function()
+                local wep = net.ReadEntity()
+                wep:SetMaterial("models/player/shared/gold_player")
+
+                hook.Add("PreDrawViewModel", "TF2GoldenFryingPanGoldWeapon", function(vm, _, vmWeapon)
+                    if IsValid(vmWeapon) and IsValid(wep) and vmWeapon == wep then
+                        vm:SetMaterial("models/player/shared/gold_player")
+                    else
+                        vm:SetMaterial("")
+                    end
+                end)
+
+                hook.Add("TTTPrepareRound", "TF2GoldenFryingPanGoldWeaponReset", function()
+                    hook.Remove("PreDrawViewModel", "TF2GoldenFryingPanGoldWeapon")
+                    hook.Remove("TTTPrepareRound", "TF2GoldenFryingPanGoldWeaponReset")
+                end)
+            end)
         end
     end
 end
@@ -109,9 +153,9 @@ function SWEP:Think()
             mask = MASK_SHOT_HULL,
         })
 
-        local victim = tr.Entity
+        local ent = tr.Entity
 
-        if not IsValid(victim) then
+        if not IsValid(ent) then
             tr = util.TraceHull({
                 start = owner:GetShootPos(),
                 endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
@@ -122,34 +166,36 @@ function SWEP:Think()
             })
         end
 
-        if SERVER and IsValid(victim) then
-            local dmg = DamageInfo()
-            local attacker = owner
-
-            if not IsValid(attacker) then
-                attacker = self
-            end
-
-            dmg:SetAttacker(attacker)
-            dmg:SetInflictor(self)
-            dmg:SetDamage(self.Primary.Damage)
-            dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-            dmg:SetDamageType(DMG_CLUB)
-
-            if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
-                owner:EmitSound("FryingPan.HitFlesh")
+        if IsValid(ent) then
+            if ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
+                self:EmitSound("FryingPan.HitFlesh")
 
                 timer.Simple(0, function()
-                    if not victim:Alive() or victim:IsSpec() then
-                        local rag = victim.server_ragdoll or victim:GetRagdollEntity()
-                        self:RagToGold(rag)
+                    if not ent:Alive() or ent:IsSpec() then
+                        local rag = ent.server_ragdoll or ent:GetRagdollEntity()
+                        self:EntToGold(rag)
                     end
                 end)
-            elseif not victim:IsPlayer() then
-                owner:EmitSound("FryingPan.HitWorld")
+            elseif not ent:IsPlayer() then
+                self:EmitSound("FryingPan.HitWorld")
+                self:EntToGold(ent)
             end
 
-            victim:TakeDamageInfo(dmg)
+            if SERVER then
+                local attacker = owner
+
+                if not IsValid(attacker) then
+                    attacker = self
+                end
+
+                local dmg = DamageInfo()
+                dmg:SetAttacker(attacker)
+                dmg:SetInflictor(self)
+                dmg:SetDamage(self.Primary.Damage)
+                dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
+                dmg:SetDamageType(DMG_CLUB)
+                ent:TakeDamageInfo(dmg)
+            end
         end
 
         self.Attack = 0
