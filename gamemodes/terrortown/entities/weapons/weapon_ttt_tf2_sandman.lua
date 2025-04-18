@@ -55,6 +55,7 @@ SWEP.Secondary.Delay = 10
 SWEP.Secondary.Damage = 25
 SWEP.BallTimer = 0
 SWEP.SlowMultiplier = 0.33
+SWEP.SlowDuration = 7
 
 function SWEP:Initialize()
     self:SetWeaponHoldType(self.HoldType)
@@ -68,13 +69,10 @@ function SWEP:Initialize()
         end
     end)
 
-    local damage = self.Secondary.Damage
-    local slowMult = self.SlowMultiplier
-
     hook.Add("EntityTakeDamage", "TF2SandmanBallDamage", function(victim, dmg)
         local inflictor = dmg:GetInflictor()
 
-        if IsValid(inflictor) and inflictor.TF2SandmanBall then
+        if IsValid(inflictor) and inflictor.TF2SandmanBall and IsValid(self) then
             inflictor.TF2SandmanBall = nil
             inflictor:EmitSound("Weapon_Baseball.HitWorld")
             inflictor:EmitSound("player/scout/bonk2.wav")
@@ -91,16 +89,17 @@ function SWEP:Initialize()
             end
 
             local newDmg = DamageInfo()
-            newDmg:SetDamage(damage)
+            newDmg:SetDamage(self.Secondary.Damage)
             newDmg:SetAttacker(attacker)
             newDmg:SetInflictor(weapon)
             newDmg:SetDamageType(DMG_CLUB)
             victim:TakeDamageInfo(newDmg)
 
             if IsValid(victim) and victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
+                local slowMult = self.SlowMultiplier
                 victim:SetLaggedMovementValue(victim:GetLaggedMovementValue() * (1 - slowMult))
 
-                timer.Simple(7, function()
+                timer.Simple(self.SlowDuration, function()
                     if IsValid(victim) then
                         victim:SetLaggedMovementValue(victim:GetLaggedMovementValue() * (1 + slowMult))
                     end
@@ -176,26 +175,26 @@ function SWEP:SecondaryAttack()
     self:EmitSound("Weapon_BaseballBat.HitBall")
 
     if SERVER then
-        local ball = ents.Create("prop_physics")
-        if not IsValid(ball) then return end
-        ball.TF2SandmanBall = true
-        ball:SetModel("models/weapons/w_models/w_baseball.mdl")
-        ball:SetPos(owner:EyePos() + (owner:GetAimVector() * 24))
-        ball:SetAngles(owner:EyeAngles())
-        ball:Spawn()
-        ball.Owner = owner
-        ball.Weapon = self
+        self.Baseball = ents.Create("prop_physics")
+        if not IsValid(self.Baseball) then return end
+        self.Baseball.TF2SandmanBall = true
+        self.Baseball:SetModel("models/weapons/w_models/w_baseball.mdl")
+        self.Baseball:SetPos(owner:EyePos() + (owner:GetAimVector() * 24))
+        self.Baseball:SetAngles(owner:EyeAngles())
+        self.Baseball:Spawn()
+        self.Baseball.Owner = owner
+        self.Baseball.Weapon = self
 
         timer.Simple(self.Secondary.Delay, function()
-            if IsValid(ball) then
-                ball:Remove()
+            if IsValid(self.Baseball) then
+                self.Baseball:Remove()
             end
         end)
 
-        local phys = ball:GetPhysicsObject()
+        local phys = self.Baseball:GetPhysicsObject()
 
         if not IsValid(phys) then
-            ball:Remove()
+            self.Baseball:Remove()
 
             return
         end
@@ -289,16 +288,16 @@ if CLIENT then
         if not IsValid(owner) then return end
         if not IsValid(vm) then return end
 
-        if not IsValid(self.v_bat) then
-            self.v_bat = ClientsideModel(self.WorldModel, RENDERGROUP_VIEWMODEL)
+        if not IsValid(self.v_model) then
+            self.v_model = ClientsideModel(self.WorldModel, RENDERGROUP_VIEWMODEL)
         end
 
-        self.v_bat:SetPos(vm:GetPos())
-        self.v_bat:SetAngles(vm:GetAngles())
-        self.v_bat:AddEffects(EF_BONEMERGE)
-        self.v_bat:SetNoDraw(true)
-        self.v_bat:SetParent(vm)
-        self.v_bat:DrawModel()
+        self.v_model:SetPos(vm:GetPos())
+        self.v_model:SetAngles(vm:GetAngles())
+        self.v_model:AddEffects(EF_BONEMERGE)
+        self.v_model:SetNoDraw(true)
+        self.v_model:SetParent(vm)
+        self.v_model:DrawModel()
 
         if not IsValid(self.v_baseball) then
             self.v_baseball = ClientsideModel("models/weapons/v_models/v_baseball.mdl", RENDERGROUP_VIEWMODEL)
@@ -312,8 +311,8 @@ if CLIENT then
         self.v_baseball:DrawModel()
     end
 
-    local w_bat = ClientsideModel(SWEP.WorldModel)
-    w_bat:SetNoDraw(true)
+    local w_model = ClientsideModel(SWEP.WorldModel)
+    w_model:SetNoDraw(true)
     local offsetvec = Vector(2.596, 0, 0)
     local offsetang = Angle(180, 90, 0)
 
@@ -331,9 +330,14 @@ if CLIENT then
         local matrix = owner:GetBoneMatrix(boneid)
         if not matrix then return end
         local newpos, newang = LocalToWorld(offsetvec, offsetang, matrix:GetTranslation(), matrix:GetAngles())
-        w_bat:SetPos(newpos)
-        w_bat:SetAngles(newang)
-        w_bat:SetupBones()
-        w_bat:DrawModel()
+
+        if not IsValid(self.w_model) then
+            self.w_model = w_model
+        end
+
+        self.w_model:SetPos(newpos)
+        self.w_model:SetAngles(newang)
+        self.w_model:SetupBones()
+        self.w_model:DrawModel()
     end
 end
