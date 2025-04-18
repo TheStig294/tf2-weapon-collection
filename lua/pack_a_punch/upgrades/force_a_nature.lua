@@ -4,6 +4,16 @@ UPGRADE.class = "weapon_ttt_tf2_scattergun"
 UPGRADE.name = "Force-A-Nature"
 UPGRADE.desc = "A double barrel that launches players back!"
 UPGRADE.noSound = true
-UPGRADE.noCamo = true
 UPGRADE.newClass = "weapon_ttt_tf2_forceanature"
+
+function UPGRADE:Apply(SWEP)
+    self:SetClip(SWEP, 2)
+
+    self:AddToHook(SWEP, "ViewModelDrawn", function()
+        if IsValid(SWEP.v_model) and SWEP.v_model:GetMaterial() ~= TTTPAP.camo then
+            SWEP.v_model:SetPAPCamo()
+        end
+    end)
+end
+
 TTTPAP:Register(UPGRADE)

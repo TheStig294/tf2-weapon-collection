@@ -34,11 +34,11 @@ if CLIENT then
         desc = "A double barrel that launches players back!"
     }
 
-    SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_forceanature.png"
+    SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_scattergun.png"
 end
 
 SWEP.Primary.Sound = Sound("weapons/scatter_gun_double_shoot.wav")
-SWEP.Primary.Damage = 9.45
+SWEP.Primary.Damage = 6
 SWEP.Primary.ClipSize = 2
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
@@ -49,7 +49,7 @@ SWEP.Primary.NumberofShots = 12
 SWEP.Primary.Automatic = true
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.3125
-SWEP.Primary.Force = 0.3
+SWEP.Primary.Force = 250
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -89,10 +89,34 @@ function SWEP:PrimaryAttack()
     bullet.Force = self.Primary.Force
     bullet.Damage = self.Primary.Damage
     bullet.AmmoType = self.Primary.Ammo
-    self:ShootEffects()
+
+    bullet.Callback = function(_, tr, _)
+        local ent = tr.Entity
+        if not IsValid(ent) then return end
+        local vel = (ent:GetPos() - owner:GetPos()) * self.Primary.Force / 2
+        ent:SetVelocity(vel)
+        if not ent:IsPlayer() then return end
+
+        timer.Simple(0, function()
+            local rag = ent.server_ragdoll or ent:GetRagdollEntity()
+            if not IsValid(rag) then return end
+
+            for i = 0, rag:GetPhysicsObjectCount() - 1 do
+                local phys = rag:GetPhysicsObjectNum(i)
+
+                if IsValid(phys) then
+                    phys:AddVelocity(vel)
+                end
+            end
+        end)
+    end
+
     owner:FireBullets(bullet)
-    self:EmitSound(self.Primary.Sound)
     owner:MuzzleFlash()
+    owner:SetGroundEntity(nil)
+    owner:SetVelocity(-owner:GetForward() * self.Primary.Force * 1.5)
+    self:ShootEffects()
+    self:EmitSound(self.Primary.Sound)
     self:TakePrimaryAmmo(1)
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
     self.ReloadingTimer = CurTime() + 1
