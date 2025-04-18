@@ -162,6 +162,12 @@ function SWEP:Think()
 
             if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
                 owner:EmitSound("Weapon_PickAxe.HitFlesh")
+
+                timer.Simple(0, function()
+                    if not victim:Alive() or victim:IsSpec() then
+                        owner:EmitSound("player/soldier/kill" .. math.random(3) .. ".wav")
+                    end
+                end)
             elseif not victim:IsPlayer() then
                 owner:EmitSound("Weapon_Shovel.HitWorld")
             end

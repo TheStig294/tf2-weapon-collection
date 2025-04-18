@@ -183,6 +183,12 @@ function SWEP:Think()
 
             if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
                 owner:EmitSound("Weapon_Wrench.HitFlesh")
+
+                timer.Simple(0, function()
+                    if not victim:Alive() or victim:IsSpec() then
+                        owner:EmitSound("player/engineer/kill" .. math.random(3) .. ".wav")
+                    end
+                end)
             elseif not victim:IsPlayer() then
                 owner:EmitSound("Weapon_Wrench.HitWorld")
             end
