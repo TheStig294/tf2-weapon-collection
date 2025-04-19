@@ -304,7 +304,7 @@ function SWEP:Think()
 			dmg:SetInflictor(self)
 			dmg:SetDamage(self.Primary.Damage)
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-			dmg:SetDamageType(DMG_SLOWBURN)
+			dmg:SetDamageType(DMG_BURN)
 			ent:TakeDamageInfo(dmg)
 			ent:Ignite(10)
 

@@ -71,19 +71,19 @@ function SWEP:SetHooks()
     if self.HooksSet then return end
 
     if SERVER then
-        util.AddNetworkString("TF2LollichopConfetti")
+        util.AddNetworkString("TF2RainblowerConfetti")
     else
         -- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
         local confettiMat = Material("confetti.png")
-        local balloonMat = Material("effects/balloon001")
+        local sparkleMat = Material("effects/tp_sparkle2")
 
-        local balloonColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
+        local sparkleColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
 
-        local confettiCount = 10
-        local balloonCount = 3
+        local confettiCount = 1
+        local sparkleCount = 3
 
         -- Confetti and laughter effect on damaging a player
-        net.Receive("TF2LollichopConfetti", function()
+        net.Receive("TF2RainblowerConfetti", function()
             local ent = net.ReadEntity()
             if not IsValid(ent) then return end
             ent:EmitSound("player/pyro/laugh" .. math.random(9) .. ".mp3")
@@ -110,24 +110,22 @@ function SWEP:SetHooks()
                 p:SetDieTime(math.random(4, 7))
                 p:SetGravity(gravity)
                 p:SetAirResistance(125)
-                p.TF2LollichopParticle = true
+                p.TF2RainblowerParticle = true
             end
 
-            gravity = -gravity
-
-            for _ = 1, balloonCount do
-                local p = emitter:Add(balloonMat, pos)
-                p:SetStartSize(math.random(16, 20))
+            for _ = 1, sparkleCount do
+                local p = emitter:Add(sparkleMat, pos)
+                p:SetStartSize(math.random(8, 10))
                 p:SetEndSize(0)
                 p:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
                 p:SetAngleVelocity(Angle(math.random(5, 50), math.random(5, 50), math.random(5, 50)))
                 p:SetVelocity(Vector(math.random(-velMax, velMax), math.random(-velMax, velMax), math.random(-velMax, velMax)))
-                local randomColour = balloonColours[math.random(#balloonColours)]
+                local randomColour = sparkleColours[math.random(#sparkleColours)]
                 p:SetColor(randomColour.r, randomColour.g, randomColour.b)
                 p:SetDieTime(math.random(4, 7))
                 p:SetGravity(gravity)
                 p:SetAirResistance(125)
-                p.TF2LollichopParticle = true
+                p.TF2RainblowerParticle = true
             end
 
             emitter:Finish()
@@ -136,8 +134,8 @@ function SWEP:SetHooks()
         local client = LocalPlayer()
 
         -- Make all sounds higher pitched!
-        hook.Add("EntityEmitSound", "TF2LollichopHighPitch", function(SoundData)
-            if not client or not client.TF2LollichopEffects then return end
+        hook.Add("EntityEmitSound", "TF2RainblowerHighPitch", function(SoundData)
+            if not client or not client.TF2RainblowerEffects or SoundData.SoundName:StartsWith("weapons/rainblower/") then return end
             SoundData.Pitch = SoundData.Pitch * self.PitchMultiplier
 
             return true
@@ -156,19 +154,19 @@ function SWEP:SetHooks()
             ["$pp_colour_mulb"] = 0
         }
 
-        hook.Add("RenderScreenspaceEffects", "TF2LollichopHighSaturation", function()
-            if not client or not client.TF2LollichopEffects then return end
+        hook.Add("RenderScreenspaceEffects", "TF2RainblowerHighSaturation", function()
+            if not client or not client.TF2RainblowerEffects then return end
             DrawColorModify(colourParameters)
         end)
 
-        hook.Add("TTTPrepareRound", "TF2LollichopReset", function()
+        hook.Add("TTTPrepareRound", "TF2RainblowerReset", function()
             for _, ply in player.Iterator() do
-                ply.TF2LollichopEffects = nil
+                ply.TF2RainblowerEffects = nil
             end
 
-            hook.Remove("EntityEmitSound", "TF2LollichopHighPitch")
-            hook.Remove("RenderScreenspaceEffects", "TF2LollichopHighSaturation")
-            hook.Remove("TTTPrepareRound", "TF2LollichopReset")
+            hook.Remove("EntityEmitSound", "TF2RainblowerHighPitch")
+            hook.Remove("RenderScreenspaceEffects", "TF2RainblowerHighSaturation")
+            hook.Remove("TTTPrepareRound", "TF2RainblowerReset")
         end)
     end
 
@@ -190,7 +188,7 @@ function SWEP:Initialize()
     local owner = self:GetOwner()
 
     if IsValid(owner) then
-        owner.TF2LollichopEffects = true
+        owner.TF2RainblowerEffects = true
         self:SetHooks()
     end
 
@@ -210,7 +208,7 @@ function SWEP:Deploy()
     self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
-    owner.TF2LollichopEffects = true
+    owner.TF2RainblowerEffects = true
 
     if self:Clip1() > 0 then
         self:EmitSound("weapons/rainblower/rainblower_pilot.wav")
@@ -233,7 +231,7 @@ function SWEP:PrimaryAttack()
     if not self.IsAttacking then
         if SERVER then
             local flame = ents.Create("info_particle_system")
-            flame:SetKeyValue("effect_name", "flamethrower_rainbow_REAL")
+            flame:SetKeyValue("effect_name", "flamethrower_rainbow")
             flame:SetOwner(owner)
             local Forward = owner:EyeAngles():Forward()
             local Right = owner:EyeAngles():Right()
@@ -327,7 +325,7 @@ end
 
 function SWEP:Holster()
     for _, ent in ents.Iterator() do
-        if ent.TF2LollichopParticle then
+        if ent.TF2RainblowerParticle then
             ent:SetDieTime(0.1)
             ent:Remove()
         end
@@ -336,10 +334,10 @@ function SWEP:Holster()
     local owner = self:GetOwner()
 
     if IsValid(owner) then
-        owner.TF2LollichopEffects = false
+        owner.TF2RainblowerEffects = false
     end
 
-    self:StopSound("Weapon_FlameThrower.PilotLoop")
+    self:StopSound("weapons/rainblower/rainblower_pilot.wav")
 
     return self.BaseClass.Holster(self)
 end
@@ -360,15 +358,24 @@ function SWEP:OnRemove()
     return self.BaseClass.OnRemove(self)
 end
 
+function SWEP:RemoveFlame()
+    self:StopSound(self.Primary.Sound)
+    self:StopSound("weapons/rainblower/rainblower_loop.wav")
+
+    if SERVER and IsValid(self.Flame) then
+        self.Flame:Remove()
+    end
+
+    self.DoLoopingSound = false
+    self.IsAttacking = false
+end
+
 function SWEP:Think()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
 
     if self.DoLoopingSound and self.SoundTimer <= CurTime() then
-        if SERVER then
-            owner:EmitSound("weapons/rainblower/rainblower_loop.wav")
-        end
-
+        self:EmitSound("weapons/rainblower/rainblower_loop.wav")
         self.DoLoopingSound = false
     end
 
@@ -380,51 +387,8 @@ function SWEP:Think()
         self.Flame:SetAngles(owner:EyeAngles())
     end
 
-    if self.IsAttacking and not owner:KeyDown(IN_ATTACK) then
-        if SERVER then
-            owner:StopSound("weapons/rainblower/rainblower_loop.wav")
-
-            if IsValid(self.Flame) then
-                self.Flame:Remove()
-            end
-        end
-
-        self:StopSound(self.Primary.Sound)
-        self:EmitSound("weapons/rainblower/rainblower_loop.wav")
-        self.DoLoopingSound = false
-        self.IsAttacking = false
-    end
-
-    if self.IsAttacking and self:Clip1() <= 0 then
-        self:StopSound(self.Primary.Sound)
-        self:EmitSound("weapons/rainblower/rainblower_loop.wav")
-
-        if SERVER then
-            owner:StopSound("weapons/rainblower/rainblower_loop.wav")
-
-            if IsValid(self.Flame) then
-                self.Flame:Remove()
-            end
-        end
-
-        self.DoLoopingSound = false
-        self.IsAttacking = false
-    end
-
-    if self.IsAttacking and owner:WaterLevel() == 3 then
-        self:StopSound(self.Primary.Sound)
-        self:EmitSound("weapons/rainblower/rainblower_loop.wav")
-
-        if SERVER then
-            owner:StopSound("weapons/rainblower/rainblower_loop.wav")
-
-            if IsValid(self.Flame) then
-                self.Flame:Remove()
-            end
-        end
-
-        self.DoLoopingSound = false
-        self.IsAttacking = false
+    if self.IsAttacking and (not owner:KeyDown(IN_ATTACK) or self:Clip1() <= 0 or owner:WaterLevel() == 3) then
+        self:RemoveFlame()
     end
 
     if self.IsAttacking and self.IsAttackingTimer <= CurTime() then
@@ -460,9 +424,12 @@ function SWEP:Think()
             dmg:SetInflictor(self)
             dmg:SetDamage(self.Primary.Damage)
             dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-            dmg:SetDamageType(DMG_SLOWBURN)
+            dmg:SetDamageType(DMG_BURN)
             ent:TakeDamageInfo(dmg)
             ent:Ignite(10)
+            net.Start("TF2RainblowerConfetti")
+            net.WriteEntity(ent)
+            net.Send(owner)
 
             timer.Simple(0.1, function()
                 if IsValid(ent) and ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
