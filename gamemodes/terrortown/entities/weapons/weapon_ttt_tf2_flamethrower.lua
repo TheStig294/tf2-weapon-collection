@@ -204,15 +204,23 @@ function SWEP:SecondaryAttack()
 	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
 end
 
+function SWEP:RemoveFlame()
+	if SERVER and IsValid(self.Flame) then
+		self.Flame:Remove()
+	end
+
+	self:StopSound(self.Primary.Sound)
+	self:EmitSound("Weapon_FlameThrower.PilotLoop")
+	self.DoLoopingSound = false
+	self.IsAttacking = false
+end
+
 function SWEP:Think()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
 
 	if self.DoLoopingSound and self.SoundTimer <= CurTime() then
-		if SERVER then
-			owner:EmitSound("weapons/flame_thrower_loop.wav")
-		end
-
+		self:EmitSound("weapons/flame_thrower_loop.wav")
 		self.DoLoopingSound = false
 	end
 
@@ -224,51 +232,8 @@ function SWEP:Think()
 		self.Flame:SetAngles(owner:EyeAngles())
 	end
 
-	if self.IsAttacking and not owner:KeyDown(IN_ATTACK) then
-		if SERVER then
-			owner:StopSound("weapons/flame_thrower_loop.wav")
-
-			if IsValid(self.Flame) then
-				self.Flame:Remove()
-			end
-		end
-
-		self:StopSound(self.Primary.Sound)
-		self:EmitSound("Weapon_FlameThrower.PilotLoop")
-		self.DoLoopingSound = false
-		self.IsAttacking = false
-	end
-
-	if self.IsAttacking and self:Clip1() <= 0 then
-		self:StopSound(self.Primary.Sound)
-		self:EmitSound("Weapon_FlameThrower.PilotLoop")
-
-		if SERVER then
-			owner:StopSound("weapons/flame_thrower_loop.wav")
-
-			if IsValid(self.Flame) then
-				self.Flame:Remove()
-			end
-		end
-
-		self.DoLoopingSound = false
-		self.IsAttacking = false
-	end
-
-	if self.IsAttacking and owner:WaterLevel() == 3 then
-		self:StopSound(self.Primary.Sound)
-		self:EmitSound("Weapon_FlameThrower.PilotLoop")
-
-		if SERVER then
-			owner:StopSound("weapons/flame_thrower_loop.wav")
-
-			if IsValid(self.Flame) then
-				self.Flame:Remove()
-			end
-		end
-
-		self.DoLoopingSound = false
-		self.IsAttacking = false
+	if self.IsAttacking and (not owner:KeyDown(IN_ATTACK) or self:Clip1() <= 0 or owner:WaterLevel() == 3) then
+		self:RemoveFlame()
 	end
 
 	if self.IsAttacking and self.IsAttackingTimer <= CurTime() then

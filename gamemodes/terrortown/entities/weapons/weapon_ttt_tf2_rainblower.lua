@@ -361,6 +361,7 @@ end
 function SWEP:RemoveFlame()
     self:StopSound(self.Primary.Sound)
     self:StopSound("weapons/rainblower/rainblower_loop.wav")
+    self:EmitSound("weapons/rainblower/rainblower_end.wav")
 
     if SERVER and IsValid(self.Flame) then
         self.Flame:Remove()
