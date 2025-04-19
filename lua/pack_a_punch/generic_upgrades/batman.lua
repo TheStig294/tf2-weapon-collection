@@ -1,0 +1,9 @@
+local UPGRADE = {}
+UPGRADE.id = "batman"
+UPGRADE.class = "weapon_ttt_tf2_bat"
+UPGRADE.name = "Batman"
+UPGRADE.desc = "Double damage & swing speed!"
+UPGRADE.noSound = true
+UPGRADE.damageMult = 2
+UPGRADE.firerateMult = 2
+TTTPAP:Register(UPGRADE)

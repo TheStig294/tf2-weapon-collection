@@ -1,23 +1,23 @@
 local UPGRADE = {}
-UPGRADE.id = "sentry_wrench"
-UPGRADE.class = "weapon_ttt_tf2_eurekaeffect"
-UPGRADE.name = "Sentry Wrench"
+UPGRADE.id = "sentry_placer"
+UPGRADE.class = "weapon_ttt_tf2_wrench"
+UPGRADE.name = "Sentry Placer"
 UPGRADE.desc = "Press 'R' to place and build a sentry!"
 UPGRADE.noSound = true
 
 UPGRADE.convars = {
     {
-        name = "pap_sentry_wrench_range",
+        name = "pap_sentry_placer_range",
         type = "int"
     },
     {
-        name = "pap_sentry_wrench_damage",
+        name = "pap_sentry_placer_damage",
         type = "int"
     }
 }
 
-local placeRangeCvar = CreateConVar("pap_sentry_wrench_range", 128, FCVAR_REPLICATED, "Max range of placing sentry", 10, 1000)
-local damageCvar = CreateConVar("pap_sentry_wrench_damage", 10, FCVAR_REPLICATED, "Damage the sentry deals per bullet", 0, 100)
+local placeRangeCvar = CreateConVar("pap_sentry_placer_range", 128, FCVAR_REPLICATED, "Max range of placing sentry", 10, 1000)
+local damageCvar = CreateConVar("pap_sentry_placer_damage", 10, FCVAR_REPLICATED, "Damage the sentry deals per bullet", 0, 100)
 
 function UPGRADE:Apply(SWEP)
     SWEP.PlaceRange = placeRangeCvar:GetInt()
