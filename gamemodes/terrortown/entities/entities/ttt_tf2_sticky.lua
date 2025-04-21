@@ -3,6 +3,10 @@ ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.Spawnable = false
 ENT.PrintName = "Sticky Bomb"
+ENT.Damage = 60
+ENT.SelfDamage = true
+ENT.ExplodeSound = "weapons/rocket_explosion.wav"
+ENT.DamageForce = 1
 
 function ENT:Draw()
     self:DrawModel()
@@ -33,8 +37,10 @@ function ENT:Think()
         if not IsValid(owner) then return end
         local wep = owner:GetActiveWeapon()
         if not IsValid(wep) then return end
+        local inflictorWep = self.Weapon
+        if not IsValid(inflictorWep) then return end
 
-        if owner:KeyDown(IN_ATTACK2) and self.Activation and WEPS.GetClass(wep) == "weapon_ttt_tf2_stickybomblauncher" then
+        if owner:KeyDown(IN_ATTACK2) and self.Activation and WEPS.GetClass(wep) == WEPS.GetClass(inflictorWep) then
             owner:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
             self:Remove()
         end
@@ -70,7 +76,7 @@ function ENT:OnRemove()
             self:EmitSound("ambient/energy/spark1.wav", 100, math.random(75, 125))
         else
             util.Effect("HelicopterMegaBomb", effect, true, true)
-            self:EmitSound("weapons/rocket_explosion.wav", 100, math.random(75, 125))
+            self:EmitSound(self.ExplodeSound, 100, math.random(75, 125))
             local inflictor = self.Weapon
 
             if not IsValid(inflictor) then
@@ -81,11 +87,16 @@ function ENT:OnRemove()
             dmg:SetDamageType(DMG_BLAST)
             dmg:SetAttacker(owner)
             dmg:SetInflictor(inflictor)
-            dmg:SetDamage(self.Damage or 40)
+            dmg:SetDamage(self.Damage)
 
             for _, ent in ipairs(ents.FindInSphere(self:GetPos(), self.Range or 140)) do
-                if IsValid(ent) then
+                if IsValid(ent) and (self.SelfDamage or owner ~= ent) then
                     ent:TakeDamageInfo(dmg)
+                end
+
+                if self.DamageForce then
+                    local normal = (ent:GetPos() - self:GetPos()):GetNormalized()
+                    ent:SetVelocity(normal * self.DamageForce)
                 end
             end
         end
