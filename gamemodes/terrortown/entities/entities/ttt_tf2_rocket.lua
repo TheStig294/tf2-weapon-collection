@@ -1,7 +1,7 @@
 AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Size = 0.4
-ENT.PrintName = "RPG Rocket"
+ENT.PrintName = "TF2 Rocket"
 
 --[[---------------------------------------------------------
 Initialize

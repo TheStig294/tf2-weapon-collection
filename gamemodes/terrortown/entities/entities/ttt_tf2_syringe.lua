@@ -2,7 +2,7 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.Spawnable = false
-ENT.PrintName = "Syringe-Gun Syringe"
+ENT.PrintName = "Syringe"
 
 function ENT:Draw()
     self:DrawModel()

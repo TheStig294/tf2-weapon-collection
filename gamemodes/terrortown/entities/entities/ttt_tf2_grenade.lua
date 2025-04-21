@@ -2,7 +2,9 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.Spawnable = false
-ENT.PrintName = "Grenade-Launcher Grenade"
+ENT.PrintName = "TF2 Grenade"
+ENT.Damage = 20
+ENT.Range = 140
 
 function ENT:Initialize()
     self:SetModel("models/weapons/w_models/w_grenade_grenadelauncher.mdl")
@@ -37,12 +39,6 @@ function ENT:PhysicsCollide(data)
 end
 
 function ENT:OnRemove()
-    local owner = self:GetOwner()
-
-    if not IsValid(owner) then
-        owner = self
-    end
-
     local effect = EffectData()
     effect:SetOrigin(self:GetPos())
     util.Effect("HelicopterMegaBomb", effect, true, true)
@@ -55,16 +51,12 @@ function ENT:OnRemove()
             inflictor = self
         end
 
-        local dmg = DamageInfo()
-        dmg:SetDamageType(DMG_BLAST)
-        dmg:SetAttacker(owner)
-        dmg:SetInflictor(inflictor)
-        dmg:SetDamage(self.Damage or 30)
+        local owner = self.DamageOwner
 
-        for _, ent in ipairs(ents.FindInSphere(self:GetPos(), self.Range or 140)) do
-            if IsValid(ent) then
-                ent:TakeDamageInfo(dmg)
-            end
+        if not IsValid(owner) then
+            owner = self
         end
+
+        util.BlastDamage(inflictor, owner, self:GetPos(), self.Radius, self.Damage)
     end
 end
