@@ -38,8 +38,8 @@ end
 
 SWEP.Primary.Ammo = "Grenade"
 SWEP.Primary.Sound = Sound("weapons/grenade_launcher_shoot.wav")
-SWEP.Primary.Damage = 30
-SWEP.Primary.BlastRange = 140
+SWEP.Primary.Damage = 20
+SWEP.Primary.Radius = 140
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 4
 SWEP.Primary.DefaultClip = 8
@@ -123,11 +123,11 @@ function SWEP:ShootGrenade()
 	local ent = ents.Create("ttt_tf2_grenade")
 	if not IsValid(ent) then return end
 	ent.Weapon = self
-	ent:SetOwner(owner)
+	ent.DamageOwner = owner
 	ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 16))
 	ent:SetAngles(owner:EyeAngles())
 	ent.Damage = self.Primary.Damage
-	ent.Range = self.Primary.DamageRange
+	ent.Radius = self.Primary.Radius
 	ent:Spawn()
 	local phys = ent:GetPhysicsObject()
 
