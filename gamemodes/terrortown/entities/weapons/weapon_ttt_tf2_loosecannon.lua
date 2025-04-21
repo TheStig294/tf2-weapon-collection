@@ -39,19 +39,18 @@ end
 
 SWEP.Primary.Sound = Sound("weapons/loose_cannon_shoot.wav")
 SWEP.Primary.Damage = 60
-SWEP.Primary.ExplosionDamage = 60
+SWEP.Primary.ExplosionDamage = 40
 SWEP.Primary.Radius = 200
 SWEP.Primary.ClipSize = 1
-SWEP.Primary.Ammo = "Buckshot"
-SWEP.Primary.ChargeTime = 1
-SWEP.AmmoEnt = "item_box_buckshot_ttt"
-SWEP.WeaponID = AMMO_SHOTGUN
-SWEP.Primary.DefaultClip = 1
+SWEP.Primary.Ammo = "CombineCannon"
+SWEP.Primary.DefaultClip = 3
 SWEP.Primary.Spread = 0
 SWEP.Primary.Automatic = false
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.5
+SWEP.Primary.ChargeTime = 1
 SWEP.ReloadAnimDelay = 1
+SWEP.ChargeMult = 1
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -80,6 +79,22 @@ end
 
 function SWEP:Initialize()
     self:ResetAnimations()
+
+    -- Sound effect for hitting a player at the same time as the cannonball exploding!
+    hook.Add("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound", function(ent, dmg)
+        if not IsValid(ent) or not ent:IsPlayer() or not dmg:IsExplosionDamage() then return end
+        local inflictor = dmg:GetInflictor()
+        if not IsValid(inflictor) then return end
+
+        if inflictor:GetClass() == self.ClassName and inflictor.ImpactDamageTime and CurTime() - inflictor.ImpactDamageTime < 0.5 then
+            inflictor:EmitSound("player/doubledonk.wav")
+        end
+    end)
+
+    hook.Add("TTTPrepareRound", "TF2LooseCannonReset", function()
+        hook.Remove("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound")
+        hook.Remove("TTTPrepareRound", "TF2LooseCannonReset")
+    end)
 
     return self.BaseClass.Initialize(self)
 end
@@ -165,6 +180,7 @@ function SWEP:FireCannon()
     ent.Damage = self.Primary.Damage
     ent.ExplosionDamage = self.Primary.ExplosionDamage
     ent.Radius = self.Primary.Radius
+    ent.ExplodeTime = self:GetAttackingTimer()
     ent:Spawn()
     local phys = ent:GetPhysicsObject()
 
@@ -175,7 +191,7 @@ function SWEP:FireCannon()
     end
 
     local velocity = owner:GetAimVector()
-    velocity = velocity * 7000
+    velocity = velocity * 7000 * self.ChargeMult
     velocity = velocity + (VectorRand() * 10)
     phys:ApplyForceCenter(velocity)
     self:StopParticles()
@@ -188,6 +204,8 @@ function SWEP:Think()
     if not IsValid(vm) then return end
 
     if self:GetAttacking() then
+        self.ChargeMult = 1 / (0.5 + self:GetAttackingTimer() - CurTime())
+
         if self:GetAttackingTimer() < CurTime() then
             self:Overcharge()
         elseif not owner:KeyDown(IN_ATTACK) then
