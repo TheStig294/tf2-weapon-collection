@@ -86,7 +86,7 @@ function SWEP:Initialize()
         local inflictor = dmg:GetInflictor()
         if not IsValid(inflictor) then return end
 
-        if inflictor:GetClass() == self.ClassName and inflictor.ImpactDamageTime and CurTime() - inflictor.ImpactDamageTime < 0.5 then
+        if inflictor:GetClass() == "weapon_ttt_tf2_loosecannon" and inflictor.ImpactDamageTime and CurTime() - inflictor.ImpactDamageTime < 0.5 then
             inflictor:EmitSound("player/doubledonk.wav")
         end
     end)
@@ -165,6 +165,9 @@ end
 function SWEP:FireCannon()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
+    vm:SendViewModelMatchingSequence(vm:LookupSequence("g_fire"))
     self:SetAttacking(false)
     self:EmitSound("weapons/loose_cannon_explode.wav")
     self:TakePrimaryAmmo(1)

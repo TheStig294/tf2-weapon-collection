@@ -41,7 +41,7 @@ SWEP.CanBuy = {ROLE_TRAITOR}
 
 SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/stickybomblauncher_shoot.wav")
-SWEP.Primary.Damage = 40
+SWEP.Primary.Damage = 60
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 8
 SWEP.Primary.DefaultClip = 32
