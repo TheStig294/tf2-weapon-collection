@@ -1,4 +1,4 @@
-SWEP.PrintName = "Eternal Reward"
+SWEP.PrintName = "Your Eternal Reward"
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -28,7 +28,7 @@ SWEP.AutoSpawnable = false
 if CLIENT then
 	SWEP.EquipMenuData = {
 		type = "item_weapon",
-		desc = "Hit someone from behind for an instant kill!\n\nTake on the appearance and weapons of your victims!"
+		desc = "Hit someone from behind for an instant kill!\n\nDoesn't leave bodies, take on the appearance of your victims!"
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_knife.png"
@@ -50,6 +50,8 @@ SWEP.Primary.Force = 2000
 SWEP.BackstabAngle = 30
 SWEP.BackstabRange = 64
 
+SWEP.Primary.Anims = {"eternal_stab_a", "eternal_stab_b", "eternal_stab_c"}
+
 function SWEP:Initialize()
 	self:SetWeaponHoldType(self.HoldType)
 	self.Idle = 0
@@ -57,8 +59,12 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
+	vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_draw"))
 	self:SetWeaponHoldType(self.HoldType)
-	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 0.5)
 	self:SetNextSecondaryFire(CurTime() + 0.5)
 	self.Attack = 0
@@ -81,9 +87,136 @@ function SWEP:Holster()
 	return true
 end
 
+function SWEP:TakeAppearance(ply)
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+
+	timer.Simple(0, function()
+		if not IsValid(ply) or not ply:IsPlayer() or ply:Alive() or not ply:IsSpec() then return end
+
+		if SERVER then
+			local rag = ply.server_ragdoll or ply:GetRagdollEntity()
+
+			if IsValid(rag) then
+				rag:Remove()
+			end
+		end
+
+		-- From here onwards, this is code taken from the Spy role from Custom Roles
+		-- (Which I originally contributed lol... guess I'm kinda stealing it back?)
+		local SetModel = FindMetaTable("Entity").SetModel
+
+		if not owner.TF2EternalRewardOGModel then
+			owner.TF2EternalRewardOGModel = {
+				model = ply:GetModel(),
+				skin = ply:GetSkin(),
+				bodygroups = {},
+				color = ply:GetColor()
+			}
+
+			for _, value in pairs(owner:GetBodyGroups()) do
+				owner.TF2EternalRewardOGModel.bodygroups[value.id] = owner:GetBodygroup(value.id)
+			end
+		end
+
+		SetModel(owner, ply:GetModel())
+		owner:SetSkin(ply:GetSkin())
+		owner:SetColor(ply:GetColor())
+
+		for _, value in pairs(ply:GetBodyGroups()) do
+			owner:SetBodygroup(value.id, ply:GetBodygroup(value.id))
+		end
+
+		if SERVER then
+			owner:SetupHands()
+			owner:PrintMessage(HUD_PRINTCENTER, "Disguised as " .. ply:Nick())
+		end
+
+		-- This is where the fun ends for non-CR players, as there's no way to manipulate the target ID popup in base TTT...
+		-- (Well... without extreme hacking... Hiding the target ID is close enough and follows the convention of other weapons that do this)
+		if not CR_VERSION then
+			owner:SetNWBool("disguised", true)
+		else
+			owner:SetNWString("TF2EternalRewardName", ply:Nick())
+
+			if CLIENT then
+				hook.Add("TTTTargetIDPlayerName", "TF2EternalRewardTargetIDName", function(p, cli, _, clr)
+					local disguiseName = p:GetNWString("TF2EternalRewardName", "")
+					if not disguiseName or #disguiseName == 0 then return end
+
+					if p == cli or (cli:IsTraitorTeam() and ShouldShowTraitorExtraInfo()) then
+						return LANG.GetParamTranslation("player_name_disguised", {
+							name = p:Nick(),
+							disguise = disguiseName
+						}), clr
+					end
+
+					return disguiseName, clr
+				end)
+
+				local client
+
+				hook.Add("TTTChatPlayerName", "TF2EternalRewardChatName", function(p, team_chat)
+					local disguiseName = p:GetNWString("TF2EternalRewardName", "")
+					if not disguiseName or #disguiseName == 0 then return end
+
+					if not IsPlayer(client) then
+						client = LocalPlayer()
+					end
+
+					if team_chat then return end
+
+					if p == client or (client:IsTraitorTeam() and ShouldShowTraitorExtraInfo()) then
+						return LANG.GetParamTranslation("player_name_disguised", {
+							name = p:Nick(),
+							disguise = disguiseName
+						})
+					end
+
+					return disguiseName
+				end)
+			end
+		end
+
+		hook.Add("TTTPrepareRound", "TF2EternalRewardResetModels", function()
+			for _, p in player.Iterator() do
+				if p.TF2EternalRewardOGModel then
+					local modelData = p.TF2EternalRewardOGModel
+					SetModel(p, modelData.model)
+					p:SetSkin(modelData.skin)
+					p:SetColor(modelData.color)
+
+					for id, value in pairs(modelData.bodygroups) do
+						p:SetBodygroup(id, value)
+					end
+
+					if SERVER then
+						p:SetupHands()
+					end
+
+					if CR_VERSION then
+						p:SetNWString("TF2EternalRewardName", "")
+					end
+
+					p.TF2EternalRewardOGModel = nil
+				end
+			end
+
+			hook.Remove("TTTPrepareRound", "TF2EternalRewardResetModels")
+
+			if CLIENT then
+				hook.Remove("TTTTargetIDPlayerName", "TF2EternalRewardTargetIDName")
+				hook.Remove("TTTChatPlayerName", "TF2EternalRewardChatName")
+			end
+		end)
+	end)
+end
+
 function SWEP:PrimaryAttack()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 
 	if self.Backstab == 1 then
 		local tr = util.TraceLine({
@@ -129,10 +262,15 @@ function SWEP:PrimaryAttack()
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
 			dmg:SetDamageType(DMG_SLASH)
 			tr.Entity:TakeDamageInfo(dmg)
+			self:TakeAppearance(tr.Entity)
 
 			timer.Simple(0.1, function()
 				if IsValid(tr.Entity) and tr.Entity:IsPlayer() and (tr.Entity:Alive() or not tr.Entity:IsSpec()) then
 					tr.Entity:Kill()
+
+					if IsValid(self) then
+						self:TakeAppearance(tr.Entity)
+					end
 				end
 			end)
 		end
@@ -157,7 +295,7 @@ function SWEP:PrimaryAttack()
 
 	if self.Backstab == 0 then
 		self:EmitSound(self.Primary.Sound)
-		self:SendWeaponAnim(ACT_VM_HITCENTER)
+		vm:SendViewModelMatchingSequence(vm:LookupSequence(self.Primary.Anims[math.random(#self.Primary.Anims)]))
 		self.Attack = 1
 		self.AttackTimer = CurTime() + 0.2
 	end
@@ -169,6 +307,8 @@ end
 function SWEP:Think()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 
 	local tr = util.TraceLine({
 		start = owner:GetShootPos(),
@@ -196,14 +336,14 @@ function SWEP:Think()
 		end
 
 		if angle <= self.BackstabAngle and angle >= -self.BackstabAngle and self.Backstab == 0 then
-			self:SendWeaponAnim(ACT_DEPLOY)
+			vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_up"))
 			self.Backstab = 1
 			self.Idle = 0
 			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
 		end
 
 		if not (angle <= self.BackstabAngle and angle >= -self.BackstabAngle) and self.Backstab == 1 then
-			self:SendWeaponAnim(ACT_UNDEPLOY)
+			vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_down"))
 			self.Backstab = 0
 			self.Idle = 0
 			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
@@ -211,14 +351,14 @@ function SWEP:Think()
 	end
 
 	if not (tr.Hit and IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC())) and self.Backstab == 1 then
-		self:SendWeaponAnim(ACT_UNDEPLOY)
+		vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_down"))
 		self.Backstab = 0
 		self.Idle = 0
 		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
 	end
 
 	if self.Attack == 2 and self.AttackTimer <= CurTime() then
-		self:SendWeaponAnim(ACT_VM_SWINGHARD)
+		vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab"))
 		self.Attack = 0
 		self.Idle = 0
 		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
@@ -257,6 +397,7 @@ function SWEP:Think()
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
 			dmg:SetDamageType(DMG_SLASH)
 			tr2.Entity:TakeDamageInfo(dmg)
+			self:TakeAppearance(tr2.Entity)
 		end
 
 		if SERVER and tr2.Hit then
@@ -275,14 +416,63 @@ function SWEP:Think()
 	if self.Idle == 0 and self.IdleTimer <= CurTime() then
 		if SERVER then
 			if self.Backstab == 0 then
-				self:SendWeaponAnim(ACT_VM_IDLE)
+				vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_idle"))
 			end
 
 			if self.Backstab == 1 then
-				self:SendWeaponAnim(ACT_DEPLOY_IDLE)
+				vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_idle"))
 			end
 		end
 
 		self.Idle = 1
+	end
+end
+
+if CLIENT then
+	function SWEP:ViewModelDrawn(vm)
+		local owner = self:GetOwner()
+		if not IsValid(owner) then return end
+		if not IsValid(vm) then return end
+
+		if not IsValid(self.v_model) then
+			self.v_model = ClientsideModel("models/weapons/c_models/c_eternal_reward/c_eternal_reward.mdl", RENDERGROUP_VIEWMODEL)
+		end
+
+		self.v_model:SetPos(vm:GetPos())
+		self.v_model:SetAngles(vm:GetAngles())
+		self.v_model:AddEffects(EF_BONEMERGE)
+		self.v_model:SetNoDraw(true)
+		self.v_model:SetParent(vm)
+		self.v_model:DrawModel()
+	end
+
+	local w_model = ClientsideModel(SWEP.WorldModel)
+	w_model:SetNoDraw(true)
+	local offsetvec = Vector(2.596, 0, 0)
+	local offsetang = Angle(180, 90, 0)
+
+	function SWEP:DrawWorldModel(flags)
+		local owner = self:GetOwner()
+
+		if not IsValid(owner) then
+			self:DrawModel(flags)
+
+			return
+		end
+
+		local boneid = owner:LookupBone("ValveBiped.Bip01_R_Hand")
+		if not boneid then return end
+		local matrix = owner:GetBoneMatrix(boneid)
+		if not matrix then return end
+		local newpos, newang = LocalToWorld(offsetvec, offsetang, matrix:GetTranslation(), matrix:GetAngles())
+
+		if not IsValid(self.w_model) then
+			self.w_model = w_model
+		end
+
+		self.w_model:SetPos(newpos)
+		self.w_model:SetAngles(newang)
+		self.w_model:SetupBones()
+		self.w_model:DrawModel()
 	end
 end

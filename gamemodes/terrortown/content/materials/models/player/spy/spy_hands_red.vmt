@@ -18,11 +18,13 @@
 
 	"360?$color2" "[ 0.7 0.7 0.7 ]"
 
-	// Cloaking
 	"$cloakPassEnabled" "1"
 	"Proxies"
 	{
-		"invis"
+		"spy_invis" //wmodel and team color cloak support
+		{
+		}
+		"invis" //vmodel cloak support
 		{
 		}
 	}
