@@ -55,7 +55,6 @@ function SWEP:Deploy()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("spk_draw"))
     self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
     self.Attack = 0
     self.AttackTimer = CurTime()
     self.Idle = 0
@@ -116,7 +115,7 @@ function SWEP:Teleport()
     end)
 end
 
-function SWEP:SecondaryAttack()
+function SWEP:Reload()
     if not self.HasTeleported then
         self.HasTeleported = true
         self:Teleport()
@@ -133,7 +132,6 @@ function SWEP:PrimaryAttack()
     vm:SendViewModelMatchingSequence(vm:LookupSequence(self.Primary.Anims[math.random(#self.Primary.Anims)]))
     owner:SetAnimation(PLAYER_ATTACK1)
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
     self.Attack = 1
     self.AttackTimer = CurTime() + 0.2
     self.Idle = 0
@@ -209,6 +207,11 @@ function SWEP:Think()
 end
 
 if CLIENT then
+    function SWEP:DrawHUD()
+        if self.HasTeleported then return end
+        draw.WordBox(8, 265, ScrH() - 50, "Press Reload to teleport", "HealthAmmo", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+    end
+
     function SWEP:ViewModelDrawn(vm)
         local owner = self:GetOwner()
         if not IsValid(owner) then return end

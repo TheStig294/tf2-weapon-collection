@@ -2,7 +2,7 @@ local UPGRADE = {}
 UPGRADE.id = "sentry_wrench"
 UPGRADE.class = "weapon_ttt_tf2_eurekaeffect"
 UPGRADE.name = "Sentry Wrench"
-UPGRADE.desc = "Press 'R' to place and build a sentry!"
+UPGRADE.desc = "Press Right-Click to place and build a sentry!"
 UPGRADE.noSound = true
 
 UPGRADE.convars = {
@@ -25,7 +25,7 @@ function UPGRADE:Apply(SWEP)
     SWEP.PlaceOffset = 10
     SWEP.SentryModel = "models/buildables/sentry1.mdl"
 
-    function SWEP:Reload()
+    function SWEP:SecondaryAttack()
         if not self.TTTPAPSentryWrenchSpawned then
             self.TTTPAPSentryWrenchSpawned = true
             self:SpawnSentry()
