@@ -47,7 +47,7 @@ SWEP.Primary.Ammo = "SMG1"
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Delay = 0.1
-SWEP.Primary.Force = 1000
+SWEP.Primary.Force = 1500
 SWEP.ReloadAnimDelay = 0.5
 
 function SWEP:SetupDataTables()
