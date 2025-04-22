@@ -51,6 +51,7 @@ SWEP.Primary.Delay = 0.5
 SWEP.Primary.ChargeTime = 1
 SWEP.ReloadAnimDelay = 1
 SWEP.ChargeMult = 1
+SWEP.MaxChargeMult = 2
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -131,6 +132,7 @@ function SWEP:PrimaryAttack()
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
     self.StartReload = false
     self:SetReloading(false)
+    self.LastFireTime = CurTime()
 end
 
 function SWEP:Reload()
@@ -205,9 +207,10 @@ function SWEP:Think()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
+    self.ChargeMult = 0
 
     if self:GetAttacking() then
-        self.ChargeMult = 1 / (0.5 + self:GetAttackingTimer() - CurTime())
+        self.ChargeMult = self.MaxChargeMult * (CurTime() - self.LastFireTime)
 
         if self:GetAttackingTimer() < CurTime() then
             self:Overcharge()
@@ -256,6 +259,10 @@ function SWEP:Think()
 end
 
 if CLIENT then
+    function SWEP:DrawHUD()
+        draw.WordBox(8, 265, ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "HealthAmmo", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+    end
+
     function SWEP:ViewModelDrawn(vm)
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
