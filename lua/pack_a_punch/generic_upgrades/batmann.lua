@@ -1,7 +1,7 @@
 local UPGRADE = {}
-UPGRADE.id = "batman"
+UPGRADE.id = "batmann"
 UPGRADE.class = "weapon_ttt_tf2_bat"
-UPGRADE.name = "Batman"
+UPGRADE.name = "Batmann"
 UPGRADE.desc = "Double damage & swing speed!"
 UPGRADE.noSound = true
 UPGRADE.damageMult = 2
