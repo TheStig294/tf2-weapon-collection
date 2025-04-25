@@ -59,6 +59,8 @@ SWEP.Secondary.Delay = 2
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)
     self.CloakCostTimer = CurTime()
@@ -66,7 +68,7 @@ function SWEP:Deploy()
     self.CloakTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + 0.3
-    owner:GetViewModel():SetMaterial("")
+    vm:SetMaterial("")
     owner:SetMaterial("")
     owner:DrawShadow(true)
     self:SetNWBool("CloakNormalMaterial", true)
@@ -76,7 +78,7 @@ function SWEP:Deploy()
     local hookname = "TTTInvisWatch" .. owner:SteamID64()
 
     hook.Add("Think", hookname, function()
-        if not IsValid(owner) or not IsValid(self) then
+        if not IsValid(owner) or not IsValid(self) or not IsValid(vm) then
             hook.Remove(hookname)
 
             return
@@ -109,19 +111,19 @@ function SWEP:Deploy()
         end
 
         if self:GetNWBool("CloakNormalMaterial", true) then
-            owner:GetViewModel():SetMaterial("")
+            vm:SetMaterial("")
         end
 
         if self:GetNWBool("CloakMaterial1", true) then
-            owner:GetViewModel():SetMaterial("models/player/spy/cloak_1")
+            vm:SetMaterial("models/player/spy/cloak_1")
         end
 
         if self:GetNWBool("CloakMaterial2", true) then
-            owner:GetViewModel():SetMaterial("models/player/spy/cloak_2")
+            vm:SetMaterial("models/player/spy/cloak_2")
         end
 
         if self:GetNWBool("CloakMaterial3", true) then
-            owner:GetViewModel():SetMaterial("models/player/spy/cloak_3")
+            vm:SetMaterial("models/player/spy/cloak_3")
         end
 
         if self.Cloak == 1 then
@@ -203,6 +205,8 @@ function SWEP:OnRemove()
     self:Holster()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
 
     if self.Cloak ~= 0 then
         self:EmitSound(self.Secondary.Sound, 85, 100, 1, CHAN_STATIC)
@@ -211,7 +215,7 @@ function SWEP:OnRemove()
     self.CloakCostTimer = CurTime()
     self.Cloak = 0
     self.CloakTimer = CurTime()
-    owner:GetViewModel():SetMaterial("")
+    vm:SetMaterial("")
     owner:SetMaterial("")
     owner:DrawShadow(true)
     self:SetNWBool("CloakNormalMaterial", true)
@@ -240,6 +244,8 @@ function SWEP:PrimaryAttack()
     if self.CloakTimer <= CurTime() then
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
+        local vm = owner:GetViewModel()
+        if not IsValid(vm) then return end
 
         if self.Cloak == 0 then
             self:EmitSound(self.Primary.Sound, 85, 100, 1, CHAN_STATIC)
@@ -248,7 +254,7 @@ function SWEP:PrimaryAttack()
             self.Cloak = 1
             self.CloakTimer = CurTime() + self.Primary.Delay
             self.Idle = 0
-            self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+            self.IdleTimer = CurTime() + vm:SequenceDuration()
             owner:SetMaterial("models/shadertest/predator")
             owner:DrawShadow(false)
             self:SetNWBool("CloakNormalMaterial", false)

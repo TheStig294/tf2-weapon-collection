@@ -111,6 +111,8 @@ function SWEP:PrimaryAttack()
 	self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	if not self.FiresUnderwater and owner:WaterLevel() == 3 then return end
 
 	if not self.IsAttacking then
@@ -138,7 +140,7 @@ function SWEP:PrimaryAttack()
 
 	self.IsAttacking = true
 	self.Idle = false
-	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:SecondaryAttack()
@@ -146,6 +148,8 @@ function SWEP:SecondaryAttack()
 	if self:Clip1() < 20 then return end
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	if not self.FiresUnderwater and owner:WaterLevel() == 3 then return end
 
 	local tr = util.TraceLine({
@@ -201,7 +205,7 @@ function SWEP:SecondaryAttack()
 	self:SetNextPrimaryFire(CurTime() + self.Secondary.Delay)
 	self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
 	self.Idle = false
-	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:RemoveFlame()

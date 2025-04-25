@@ -76,7 +76,7 @@ function SWEP:Deploy()
     self.Spin = 0
     self.SpinTimer = CurTime() + 0.5
     self.Idle = 0
-    self.IdleTimer = CurTime() + self:GetOwner():GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 
     return self.BaseClass.Deploy(self)
 end
@@ -134,7 +134,7 @@ function SWEP:PrimaryAttack()
         self.Spin = 1
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Spin ~= 2 then return end
@@ -182,7 +182,7 @@ function SWEP:SecondaryAttack()
         self.Spin = 1
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Spin == 2 then
@@ -235,7 +235,7 @@ function SWEP:Think()
         self.Spin = 0
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() then

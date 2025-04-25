@@ -59,6 +59,10 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	self:SetWeaponHoldType(self.HoldType)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 0.5)
@@ -66,7 +70,7 @@ function SWEP:Deploy()
 	self.Attack = 0
 	self.AttackTimer = CurTime()
 	self.Idle = 0
-	self.IdleTimer = CurTime() + self:GetOwner():GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 
 	return true
 end
@@ -86,6 +90,8 @@ end
 function SWEP:PrimaryAttack()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 
 	if self.Backstab == 1 then
 		local tr = util.TraceLine({
@@ -165,12 +171,14 @@ function SWEP:PrimaryAttack()
 	end
 
 	self.Idle = 0
-	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:Think()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 
 	local tr = util.TraceLine({
 		start = owner:GetShootPos(),
@@ -201,14 +209,14 @@ function SWEP:Think()
 			self:SendWeaponAnim(ACT_DEPLOY)
 			self.Backstab = 1
 			self.Idle = 0
-			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+			self.IdleTimer = CurTime() + vm:SequenceDuration()
 		end
 
 		if not (angle <= self.BackstabAngle and angle >= -self.BackstabAngle) and self.Backstab == 1 then
 			self:SendWeaponAnim(ACT_UNDEPLOY)
 			self.Backstab = 0
 			self.Idle = 0
-			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+			self.IdleTimer = CurTime() + vm:SequenceDuration()
 		end
 	end
 
@@ -216,14 +224,14 @@ function SWEP:Think()
 		self:SendWeaponAnim(ACT_UNDEPLOY)
 		self.Backstab = 0
 		self.Idle = 0
-		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+		self.IdleTimer = CurTime() + vm:SequenceDuration()
 	end
 
 	if self.Attack == 2 and self.AttackTimer <= CurTime() then
 		self:SendWeaponAnim(ACT_VM_SWINGHARD)
 		self.Attack = 0
 		self.Idle = 0
-		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+		self.IdleTimer = CurTime() + vm:SequenceDuration()
 	end
 
 	if self.Attack == 1 and self.AttackTimer <= CurTime() then

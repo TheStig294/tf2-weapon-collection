@@ -82,7 +82,7 @@ function SWEP:Deploy()
     self.Attack = 0
     self.AttackTimer = CurTime()
     self.Idle = 0
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 
     return self.BaseClass.Deploy(self)
 end
@@ -100,7 +100,7 @@ function SWEP:PrimaryAttack()
     self.Attack = 1
     self.AttackTimer = CurTime() + 0.2
     self.Idle = 0
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:Explode()

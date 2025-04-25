@@ -93,6 +93,8 @@ function SWEP:PrimaryAttack()
     if not self:CanPrimaryAttack() then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
     self:ResetAnimations()
 
     if SERVER then
@@ -120,7 +122,7 @@ function SWEP:PrimaryAttack()
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
     self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
     self.Idle = 0
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:Reload()

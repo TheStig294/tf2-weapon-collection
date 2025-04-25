@@ -207,7 +207,7 @@ function SWEP:Deploy()
     self.Attack = 0
     self.AttackTimer = CurTime()
     self.Idle = 0
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
     owner.TF2RainblowerEffects = true
 
     if self:Clip1() > 0 then
@@ -226,6 +226,8 @@ function SWEP:PrimaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
     if not self.FiresUnderwater and owner:WaterLevel() == 3 then return end
 
     if not self.IsAttacking then
@@ -245,8 +247,6 @@ function SWEP:PrimaryAttack()
         end
 
         self:EmitSound(self.Primary.Sound)
-        local vm = owner:GetViewModel()
-        if not IsValid(vm) then return end
         vm:SendViewModelMatchingSequence(vm:LookupSequence("ft_fire"))
         owner:SetAnimation(PLAYER_ATTACK1)
         self.DoLoopingSound = true
@@ -255,7 +255,7 @@ function SWEP:PrimaryAttack()
 
     self.IsAttacking = true
     self.Idle = false
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:SecondaryAttack()
@@ -320,7 +320,7 @@ function SWEP:SecondaryAttack()
     self:SetNextPrimaryFire(CurTime() + self.Secondary.Delay)
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.Idle = false
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:Holster()

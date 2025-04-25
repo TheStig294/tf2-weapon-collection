@@ -283,7 +283,7 @@ if CLIENT then
     local w_model = ClientsideModel(SWEP.WorldModel)
     w_model:SetNoDraw(true)
     local offsetvec = Vector(2.596, 0, 0)
-    local offsetang = Angle(180, 90, 0)
+    local offsetang = Angle(180, 180, 0)
 
     function SWEP:DrawWorldModel(flags)
         local owner = self:GetOwner()

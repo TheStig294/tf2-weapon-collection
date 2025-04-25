@@ -70,7 +70,7 @@ function SWEP:Deploy()
 	self.Attack = 0
 	self.AttackTimer = CurTime()
 	self.Idle = 0
-	self.IdleTimer = CurTime() + self:GetOwner():GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 
 	return true
 end
@@ -301,7 +301,7 @@ function SWEP:PrimaryAttack()
 	end
 
 	self.Idle = 0
-	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:Think()
@@ -339,14 +339,14 @@ function SWEP:Think()
 			vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_up"))
 			self.Backstab = 1
 			self.Idle = 0
-			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+			self.IdleTimer = CurTime() + vm:SequenceDuration()
 		end
 
 		if not (angle <= self.BackstabAngle and angle >= -self.BackstabAngle) and self.Backstab == 1 then
 			vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_down"))
 			self.Backstab = 0
 			self.Idle = 0
-			self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+			self.IdleTimer = CurTime() + vm:SequenceDuration()
 		end
 	end
 
@@ -354,14 +354,14 @@ function SWEP:Think()
 		vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab_down"))
 		self.Backstab = 0
 		self.Idle = 0
-		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+		self.IdleTimer = CurTime() + vm:SequenceDuration()
 	end
 
 	if self.Attack == 2 and self.AttackTimer <= CurTime() then
 		vm:SendViewModelMatchingSequence(vm:LookupSequence("eternal_backstab"))
 		self.Attack = 0
 		self.Idle = 0
-		self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+		self.IdleTimer = CurTime() + vm:SequenceDuration()
 	end
 
 	if self.Attack == 1 and self.AttackTimer <= CurTime() then

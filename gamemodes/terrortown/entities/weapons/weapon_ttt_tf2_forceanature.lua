@@ -62,7 +62,7 @@ function SWEP:Deploy()
     self.Attack = 0
     self.AttackTimer = CurTime()
     self.Idle = 0
-    self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
     self.Reloading = 0
     self.ReloadingTimer = CurTime()
 
@@ -185,7 +185,7 @@ if CLIENT then
     local w_model = ClientsideModel(SWEP.WorldModel)
     w_model:SetNoDraw(true)
     local offsetvec = Vector(2.596, 0, 0)
-    local offsetang = Angle(180, 90, 0)
+    local offsetang = Angle(180, 180, 0)
 
     function SWEP:DrawWorldModel(flags)
         local owner = self:GetOwner()

@@ -65,13 +65,17 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)
     self.Sound = 0
     self.Spin = 0
     self.SpinTimer = CurTime() + 0.5
     self.Idle = 0
-    self.IdleTimer = CurTime() + self:GetOwner():GetViewModel():SequenceDuration()
+    self.IdleTimer = CurTime() + vm:SequenceDuration()
 
     return self.BaseClass.Deploy(self)
 end
@@ -118,6 +122,8 @@ function SWEP:PrimaryAttack()
     if not self:CanPrimaryAttack() then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
 
     if self.Spin == 0 and self.SpinTimer <= CurTime() and owner:KeyDown(IN_ATTACK) and self:Clip1() > 0 then
         if SERVER then
@@ -128,7 +134,7 @@ function SWEP:PrimaryAttack()
         self.Spin = 1
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Spin ~= 2 then return end
@@ -164,6 +170,8 @@ function SWEP:SecondaryAttack()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
     if owner:KeyDown(IN_ATTACK) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
 
     if self.Spin == 0 and self.SpinTimer <= CurTime() and owner:KeyDown(IN_ATTACK2) and self:Clip1() > 0 then
         if SERVER then
@@ -174,7 +182,7 @@ function SWEP:SecondaryAttack()
         self.Spin = 1
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Spin == 2 then
@@ -198,6 +206,8 @@ function SWEP:Think()
     self.Primary.Automatic = self:Clip1() > 0
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
 
     if self.Spin == 1 and self.SpinTimer <= CurTime() then
         self.Spin = 2
@@ -234,7 +244,7 @@ function SWEP:Think()
         self.Spin = 0
         self.SpinTimer = CurTime() + 0.9
         self.Idle = 0
-        self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
+        self.IdleTimer = CurTime() + vm:SequenceDuration()
     end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() then
