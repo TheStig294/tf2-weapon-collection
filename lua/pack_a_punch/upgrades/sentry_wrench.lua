@@ -46,7 +46,7 @@ function UPGRADE:Apply(SWEP)
         end
 
         local Views = owner:EyeAngles().y
-        local sentry = ents.Create("ttt_pap_tf2_sentry")
+        local sentry = ents.Create("ttt_tf2_sentry")
         sentry:SetOwner(owner)
         sentry:SetPos(tr.HitPos + tr.HitNormal)
         sentry:SetAngles(Angle(0, Views, 0))

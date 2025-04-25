@@ -45,7 +45,7 @@ function UPGRADE:Apply(SWEP)
             if not model or not util.IsValidModel(model) then return end
 
             if nextPlayNotifSound < CurTime() then
-                surface.PlaySound("ttt_pack_a_punch/steam_marketplace/notification.wav")
+                surface.PlaySound("misc/notification.wav")
                 nextPlayNotifSound = CurTime() + notifSoundCooldown
             end
 
