@@ -6,6 +6,8 @@ ENT.Radius = 200
 ENT.Duration = 10
 
 function ENT:Initialize()
+    ParticleEffectAttach("peejar_trail_red", PATTACH_POINT_FOLLOW, self, 1)
+
     if SERVER then
         util.AddNetworkString("TF2JarateHit")
     end
@@ -20,6 +22,7 @@ function ENT:Initialize()
     hook.Add("OnEntityWaterLevelChanged", "TF2JarateWaterRemove", function(ent, _, newLvl)
         if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() and newLvl > 1 then
             ent.TF2JarateHit = nil
+            ent:StopParticles()
         end
     end)
 
@@ -44,6 +47,7 @@ function ENT:Explode()
         -- Skip players underwater
         if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() and ent:WaterLevel() < 2 then
             ent.TF2JarateHit = true
+            ParticleEffectAttach("peejar_drips", PATTACH_POINT_FOLLOW, ent, 1)
             table.insert(hitPlayers, ent)
             local timername = "TF2JarateHit" .. ent:SteamID64()
 
@@ -55,16 +59,15 @@ function ENT:Explode()
                 end
 
                 ent.TF2JarateHit = nil
+                ent:StopParticles()
             end)
         end
     end
 
+    ParticleEffect("peejar_impact", self:GetPos(), angle_zero)
     net.Start("TF2JarateHit")
     net.WriteUInt(self.Duration, 4)
     net.Send(hitPlayers)
-    local effect = EffectData()
-    effect:SetOrigin(self:GetPos())
-    util.Effect("AntlionGib", effect, true, true)
     self:EmitSound("weapons/jar_explode.wav", 90, 100, 0.75)
     self:Remove()
 end
@@ -76,7 +79,13 @@ if CLIENT then
 
         hook.Add("RenderScreenspaceEffects", "TF2JarateScreenEffect", function()
             -- If the player is underwater, the effect is likely about to be removed, so disable it now
-            if client:WaterLevel() > 1 then return end
+            if client:WaterLevel() > 1 then
+                hook.Remove("RenderScreenspaceEffects", "TF2JarateScreenEffect")
+                timer.Remove("TF2JarateScreenEffectRemove")
+
+                return
+            end
+
             surface.SetDrawColor(255, 255, 255, 255)
             surface.SetTexture(surface.GetTextureID("effects/jarate_overlay"))
             surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
