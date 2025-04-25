@@ -61,6 +61,7 @@ SWEP.MouseSensitivity = 1
 SWEP.HasScoped = false
 SWEP.ChargeHudOffset = 10
 SWEP.RedDotSprite = nil
+SWEP.AllowDrop = true
 
 function SWEP:Initialize()
     self.IdleTimer = CurTime() + 1
@@ -125,6 +126,7 @@ function SWEP:SetScope(doScope)
     if doScope then
         self.ScopedTimer = CurTime() + 3
         self.MouseSensitivity = 0.2
+        self.AllowDrop = false
 
         if IsValid(owner) then
             owner:SetFOV(owner:GetFOV() / 5, 0.1)
@@ -132,6 +134,7 @@ function SWEP:SetScope(doScope)
     else
         self.ScopedTimer = CurTime()
         self.MouseSensitivity = 1
+        self.AllowDrop = true
 
         if IsValid(owner) then
             owner:SetFOV(0, 0.1)
@@ -170,6 +173,14 @@ function SWEP:PreDrop()
     self:Holster()
 
     return self.BaseClass.PreDrop(self)
+end
+
+if SERVER then
+    function SWEP:OnRemove()
+        if IsValid(self.RedDotSprite) then
+            self.RedDotSprite:Remove()
+        end
+    end
 end
 
 function SWEP:PrimaryAttack()
@@ -231,9 +242,6 @@ function SWEP:SecondaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.HasScoped = true
     self:SetScope(not self.Scoped)
-end
-
-function SWEP:Reload()
 end
 
 function SWEP:Think()
