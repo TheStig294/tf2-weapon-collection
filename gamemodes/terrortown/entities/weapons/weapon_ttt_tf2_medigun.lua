@@ -24,6 +24,7 @@ SWEP.Base = "weapon_tttbase"
 SWEP.Kind = WEAPON_EQUIP2
 SWEP.Slot = 7
 SWEP.AutoSpawnable = false
+SWEP.LimitedStock = true
 
 SWEP.CanBuy = {ROLE_DETECTIVE}
 
@@ -146,6 +147,7 @@ function SWEP:Holster()
 
     if self.Uber then
         self:SetInvulnerable(self.Target, false)
+        self:SetInvulnerable(owner, false)
     end
 
     if SERVER and self.Attack then
@@ -349,6 +351,10 @@ function SWEP:ShouldDisableBeam()
     return false
 end
 
+function SWEP:UberChargeReady()
+    return not self.UsedUber and self:Clip1() <= 0 and IsValid(self.Target)
+end
+
 function SWEP:Think()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
@@ -377,13 +383,9 @@ function SWEP:Think()
         end
     end
 
-    if SERVER and not self.UsedUber and self:Clip1() <= 0 and IsValid(self.Target) then
-        owner:PrintMessage(HUD_PRINTCENTER, "Healing depleted, right-click to activate ÜberCharge!")
-
-        if not self.PlayedChargedSound then
-            owner:EmitSound("player/medic_charge_ready" .. math.random(2) .. ".wav")
-            self.PlayedChargedSound = true
-        end
+    if SERVER and self:UberChargeReady() and not self.PlayedChargedSound then
+        owner:EmitSound("player/medic_charge_ready" .. math.random(2) .. ".wav")
+        self.PlayedChargedSound = true
     end
 
     if self.Uber then
@@ -475,5 +477,13 @@ function SWEP:Think()
         end
 
         self.Idle = true
+    end
+end
+
+if CLIENT then
+    function SWEP:DrawHUD()
+        if self:UberChargeReady() then
+            draw.WordBox(8, 265, ScrH() - 50, "Right-Click for ÜberCharge", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        end
     end
 end
