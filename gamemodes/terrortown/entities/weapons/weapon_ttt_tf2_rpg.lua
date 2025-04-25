@@ -48,7 +48,8 @@ SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Automatic = true
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.05
-SWEP.Primary.Force = 1000000
+SWEP.Primary.Force = 562.5
+SWEP.Primary.Radius = 169
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Automatic = true
@@ -131,6 +132,8 @@ function SWEP:FireRocket()
 	local pos = owner:GetShootPos() + aim * 0 + side * 0 + up * 0
 	local rocket = ents.Create("ttt_tf2_rocket")
 	rocket.Weapon = self
+	rocket.Force = self.Primary.Force
+	rocket.Radius = self.Primary.Radius
 	rocket:SetSaveValue("m_flDamage", 90)
 	if not rocket:IsValid() then return false end
 	rocket:SetAngles(aim:Angle())

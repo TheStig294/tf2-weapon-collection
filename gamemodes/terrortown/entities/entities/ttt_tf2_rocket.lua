@@ -2,6 +2,8 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Size = 0.4
 ENT.PrintName = "TF2 Rocket"
+ENT.Force = 562.5
+ENT.Radius = 169
 
 --[[---------------------------------------------------------
 Initialize
@@ -71,42 +73,19 @@ function ENT:Explode()
         owner:TakeDamageInfo(dmg)
     end
 
-    -- Apply knockback (velocity change)
-    local explosionPos = self:GetPos()
-    local radius = 169 -- Adjust as needed
-    local knockbackForce = 562.5 -- Adjust as needed
-
-    for _, ent in pairs(ents.FindInSphere(explosionPos, radius)) do
+    for _, ent in pairs(ents.FindInSphere(self:GetPos(), self.Radius)) do
         if IsValid(ent) and (ent:IsPlayer() or ent:IsNPC()) then
             local direction = (ent:GetPos() - self:GetPos()):GetNormalized()
-            ent:SetVelocity(direction * knockbackForce)
+            direction.z = 1
+            ent:SetVelocity(direction * self.Force)
         end
     end
 
     self:Remove()
 end
 
---[[---------------------------------------------------------
-Think
----------------------------------------------------------]]
-function ENT:Think()
-end
-
---[[---------------------------------------------------------
-Touch
----------------------------------------------------------]]
 function ENT:Touch()
     if SERVER and self.StopExp == false then
         self:Explode()
-    end
-end
-
-if CLIENT then
-    function ENT:Draw()
-        self:DrawModel()
-    end
-
-    function ENT:IsTranslucent()
-        return true
     end
 end
