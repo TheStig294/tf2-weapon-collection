@@ -5,6 +5,16 @@ ENT.Model = Model("models/weapons/c_models/urinejar.mdl")
 ENT.Radius = 200
 ENT.Duration = 10
 
+local function ResetPlayer(ply)
+    if ply.TF2JarateHP then
+        ply:SetHealth(ply.TF2JarateHP)
+        ply:SetColor(ply.TF2JarateColour)
+        ply:StopParticles()
+        ply.TF2JarateHP = nil
+        ply.TF2JarateColour = nil
+    end
+end
+
 function ENT:Initialize()
     ParticleEffectAttach("peejar_trail_red", PATTACH_POINT_FOLLOW, self, 1)
 
@@ -12,22 +22,14 @@ function ENT:Initialize()
         util.AddNetworkString("TF2JarateHit")
     end
 
-    hook.Add("ScalePlayerDamage", "TF2JarateDamage", function(ply, _, dmginfo)
-        if ply.TF2JarateHit then
-            dmginfo:ScaleDamage(2)
-        end
-    end)
-
     -- Jarate is removed on entering waist-high water
     hook.Add("OnEntityWaterLevelChanged", "TF2JarateWaterRemove", function(ent, _, newLvl)
         if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() and newLvl > 1 then
-            ent.TF2JarateHit = nil
-            ent:StopParticles()
+            ResetPlayer(ent)
         end
     end)
 
     hook.Add("TTTPrepareRound", "TF2JarateReset", function()
-        hook.Remove("ScalePlayerDamage", "TF2JarateDamage")
         hook.Remove("OnEntityWaterLevelChanged", "TF2JarateWaterRemove")
         hook.Remove("TTTPrepareRound", "TF2JarateReset")
     end)
@@ -42,11 +44,15 @@ end
 function ENT:Explode()
     if CLIENT then return end
     local hitPlayers = {}
+    local peeColour = Color(255, 255, 0)
 
     for _, ent in ipairs(ents.FindInSphere(self:GetPos(), self.Radius)) do
         -- Skip players underwater
         if IsValid(ent) and ent:IsPlayer() and ent:Alive() and not ent:IsSpec() and ent:WaterLevel() < 2 then
-            ent.TF2JarateHit = true
+            ent.TF2JarateHP = ent:Health()
+            ent.TF2JarateColour = ent:GetColor()
+            ent:SetHealth(1)
+            ent:SetColor(peeColour)
             ParticleEffectAttach("peejar_drips", PATTACH_POINT_FOLLOW, ent, 1)
             table.insert(hitPlayers, ent)
             local timername = "TF2JarateHit" .. ent:SteamID64()
@@ -58,8 +64,7 @@ function ENT:Explode()
                     return
                 end
 
-                ent.TF2JarateHit = nil
-                ent:StopParticles()
+                ResetPlayer(ent)
             end)
         end
     end
