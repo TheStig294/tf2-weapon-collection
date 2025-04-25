@@ -108,7 +108,7 @@ function SWEP:DrawHUD()
         surface.SetTexture(surface.GetTextureID("sprites/redglow1"))
         surface.SetDrawColor(255, 255, 255, 255)
         surface.DrawTexturedRect(x - 32, y - 32, 64, 64)
-        draw.SimpleText("Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%", "HealthAmmo", ScrW() / 2, self.ChargeHudOffset, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        draw.SimpleText("Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%", "TF2Font", ScrW() / 2, self.ChargeHudOffset, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     else
         return self.BaseClass.DrawHUD(self)
     end

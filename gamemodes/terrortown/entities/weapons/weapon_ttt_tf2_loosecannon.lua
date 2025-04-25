@@ -260,7 +260,7 @@ end
 
 if CLIENT then
     function SWEP:DrawHUD()
-        draw.WordBox(8, 265, ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "HealthAmmo", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, 265, ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)
