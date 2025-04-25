@@ -147,6 +147,7 @@ function SWEP:PrimaryAttack()
     bullet.Force = self.Primary.Force
     bullet.Damage = self.Primary.Damage
     bullet.AmmoType = self.Primary.Ammo
+    bullet.Inflictor = self
     owner:FireBullets(bullet)
 
     if self.Sound == 0 then

@@ -89,6 +89,7 @@ function SWEP:PrimaryAttack()
     bullet.Tracer = 1
     bullet.Damage = self.Primary.Damage
     bullet.AmmoType = self.Primary.Ammo
+    bullet.Inflictor = self
     owner:FireBullets(bullet)
     owner:MuzzleFlash()
     self:ShootEffects()

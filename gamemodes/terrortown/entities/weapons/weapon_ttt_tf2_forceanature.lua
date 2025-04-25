@@ -89,6 +89,7 @@ function SWEP:PrimaryAttack()
     bullet.Force = self.Primary.Force
     bullet.Damage = self.Primary.Damage
     bullet.AmmoType = self.Primary.Ammo
+    bullet.Inflictor = self
 
     bullet.Callback = function(_, tr, _)
         local ent = tr.Entity

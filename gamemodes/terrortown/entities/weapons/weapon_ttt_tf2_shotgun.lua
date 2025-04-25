@@ -98,7 +98,7 @@ function SWEP:PrimaryAttack()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
 	self:ResetAnimations()
-	self:EmitSound("weapons/scatter_gun_shoot.wav")
+	self:EmitSound(self.Primary.Sound)
 	self:SetNextPrimaryFire(CurTime() + 0.625)
 	owner:SetAnimation(PLAYER_ATTACK1)
 	self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
@@ -115,6 +115,7 @@ function SWEP:PrimaryAttack()
 	bullet.Force = self.Primary.Force
 	bullet.Damage = self.Primary.Damage
 	bullet.AmmoType = self.Primary.Ammo
+	bullet.Inflictor = self
 	owner:FireBullets(bullet)
 end
 
@@ -153,9 +154,11 @@ function SWEP:Think()
 				self:SendWeaponAnim(ACT_RELOAD_FINISH)
 
 				timer.Simple(0.1, function()
+					if not IsValid(self) then return end
 					self:EmitSound("weapons/shotgun_cock_back.wav")
 
 					timer.Simple(0.1, function()
+						if not IsValid(self) then return end
 						self:EmitSound("weapons/shotgun_cock_forward.wav")
 					end)
 				end)
