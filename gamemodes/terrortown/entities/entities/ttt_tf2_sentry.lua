@@ -17,6 +17,8 @@ ENT.Range = ENT.Range * ENT.Range
 ENT.SearchDelay = 0.5
 ENT.Accuracy = 0.3
 ENT.BeepTime = 3.57
+ENT.BarrelCreated = false
+ENT.HP = 200
 
 function ENT:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -43,6 +45,58 @@ function ENT:Initialize()
     self:SetBeepTimer(CurTime())
 end
 
+function ENT:InitPhysics()
+    local barrel = ents.Create("prop_physics")
+    barrel:SetModel("models/props_c17/oildrum001.mdl")
+    barrel:SetPos(self:GetPos())
+    barrel:SetMoveType(MOVETYPE_NONE)
+    barrel:SetNoDraw(true)
+    barrel:Spawn()
+    barrel:Activate()
+    barrel.HP = self.HP
+    barrel.TF2Sentry = self
+    local phys = barrel:GetPhysicsObject()
+
+    if IsValid(phys) then
+        phys:EnableMotion(false)
+    end
+
+    hook.Add("EntityTakeDamage", "TF2SentryDamage", function(ent, dmg)
+        if not IsValid(ent) or not IsValid(ent.TF2Sentry) then return end
+        local inflictor = dmg:GetInflictor()
+        if inflictor == ent.TF2Sentry then return true end
+        ent.HP = ent.HP - dmg:GetDamage()
+
+        if ent.HP <= 0 then
+            if IsValid(ent.TF2Sentry) then
+                ent.TF2Sentry:Remove()
+            end
+
+            ent:Remove()
+        end
+    end)
+
+    barrel:CallOnRemove("TF2SentryBarrelRemove", function()
+        if IsValid(barrel.TF2Sentry) then
+            barrel.TF2Sentry:Remove()
+        end
+    end)
+
+    self.Barrel = barrel
+    self.BarrelCreated = true
+end
+
+function ENT:OnRemove()
+    local effect = EffectData()
+    effect:SetOrigin(self:GetPos())
+    util.Effect("Explosion", effect, true, true)
+    self:StopSound("weapons/sentry_scan.wav")
+
+    if IsValid(self.Barrel) then
+        self.Barrel:Remove()
+    end
+end
+
 function ENT:IsValidTarget(target)
     if CLIENT then return IsValid(self:GetTarget()) end
     target = target or self:GetTarget()
@@ -65,6 +119,10 @@ function ENT:Think()
     end
 
     if self:GetFullyPlaced() then
+        if SERVER and not self.BarrelCreated then
+            self:InitPhysics()
+        end
+
         if self:GetIdle() then
             self:FindTarget()
         elseif self:IsValidTarget() then
@@ -97,6 +155,7 @@ function ENT:FindTarget()
 end
 
 local angleOffset = Angle(0, 90, 80)
+local shootOffset = Vector(0, 0, 100)
 
 function ENT:Attack()
     local target = self:GetTarget()
@@ -114,7 +173,7 @@ function ENT:Attack()
         local bullet = {}
         bullet.Attacker = self:GetOwner() or self
         bullet.Inflictor = self
-        bullet.Src = self:GetPos()
+        bullet.Src = self:GetPos() + shootOffset
         bullet.Dir = self:GetForward()
         bullet.Spread = Vector(1 * self.Spread, 1 * self.Spread, 0)
         bullet.Force = self.Force
@@ -122,6 +181,7 @@ function ENT:Attack()
         bullet.AmmoType = self.AmmoType
         bullet.TracerName = self.Tracer
         bullet.Num = 5
+        bullet.IgnoreEntity = self.Barrel
         self:FireBullets(bullet)
         self:SetNextFire(CurTime() + self.Delay)
         self:EmitSound("weapons/sentry_shoot.wav", 80, 100, 1, CHAN_WEAPON)
