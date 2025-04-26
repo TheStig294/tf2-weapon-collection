@@ -10,27 +10,51 @@ end
 
 function ENT:ActivateSandvich(ply)
     ply.TF2SandvichHealth = ply:Health()
+    ply.TF2SandvichSeconds = self.Duration
 
     if ply:Health() < ply:GetMaxHealth() then
         ply:SetHealth(ply:GetMaxHealth())
     end
 
-    if SERVER and IsFirstTimePredicted() then
-        ply:EmitSound("player/heavy/sandvich" .. math.random(12) .. ".wav")
-    end
+    self:EmitSound("player/heavy/sandvich" .. math.random(12) .. ".wav")
+    local timername = "TF2Sandvich" .. ply:SteamID64()
 
-    timer.Simple(self.Duration, function()
-        if not IsValid(ply) or not ply.TF2SandvichHealth or ply.TF2SandvichHealth > ply:Health() then return end
-        ply:SetHealth(ply.TF2SandvichHealth)
-        ply.TF2SandvichHealth = nil
+    timer.Create(timername, 1, self.Duration, function()
+        if not IsValid(ply) or not ply:Alive() or ply:IsSpec() or not ply.TF2SandvichHealth or not ply.TF2SandvichSeconds then
+            ply.TF2SandvichHealth = nil
+            ply.TF2SandvichSeconds = nil
+            timer.Remove(timername)
+
+            return
+        end
+
+        if timer.RepsLeft(timername) == 0 then
+            if ply.TF2SandvichHealth > ply:Health() then return end
+            ply:SetHealth(ply.TF2SandvichHealth)
+            ply.TF2SandvichHealth = nil
+            ply.TF2SandvichSeconds = nil
+        else
+            ply.TF2SandvichSeconds = ply.TF2SandvichSeconds - 1
+        end
     end)
+
+    if CLIENT then
+        local client = LocalPlayer()
+
+        hook.Add("HUDPaintBackground", "TF2SandvichHUDSeconds", function()
+            if not client.TF2SandvichSeconds then return end
+            draw.WordBox(8, 265, ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        end)
+    end
 
     hook.Add("TTTPrepareRound", "TF2SandvichHealthReset", function()
         for _, p in player.Iterator() do
             p.TF2SandvichHealth = nil
+            p.TF2SandvichSeconds = nil
         end
 
         hook.Remove("TTTPrepareRound", "TF2SandvichHealthReset")
+        hook.Remove("HUDPaintBackground", "TF2SandvichHUDSeconds")
     end)
 end
 

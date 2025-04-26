@@ -22,6 +22,7 @@ SWEP.Primary.Delay = 1
 SWEP.Secondary.Delay = 0.2
 SWEP.HoldType = "grenade"
 SWEP.Duration = 15
+SWEP.FullHealthPrompt = false
 
 function SWEP:GetGrenadeName()
     return "ttt_tf2_sandvich_proj"
@@ -41,32 +42,73 @@ end
 
 function SWEP:ActivateSandvich(ply)
     ply.TF2SandvichHealth = ply:Health()
+    ply.TF2SandvichSeconds = self.Duration
 
     if ply:Health() < ply:GetMaxHealth() then
         ply:SetHealth(ply:GetMaxHealth())
     end
 
     self:EmitSound("player/heavy/sandvich" .. math.random(12) .. ".wav")
+    local timername = "TF2Sandvich" .. ply:SteamID64()
 
-    timer.Simple(self.Duration, function()
-        if not IsValid(ply) or not ply.TF2SandvichHealth or ply.TF2SandvichHealth > ply:Health() then return end
-        ply:SetHealth(ply.TF2SandvichHealth)
-        ply.TF2SandvichHealth = nil
+    timer.Create(timername, 1, self.Duration, function()
+        if not IsValid(ply) or not ply:Alive() or ply:IsSpec() or not ply.TF2SandvichHealth or not ply.TF2SandvichSeconds then
+            ply.TF2SandvichHealth = nil
+            ply.TF2SandvichSeconds = nil
+            timer.Remove(timername)
+
+            return
+        end
+
+        if timer.RepsLeft(timername) == 0 then
+            if ply.TF2SandvichHealth > ply:Health() then return end
+            ply:SetHealth(ply.TF2SandvichHealth)
+            ply.TF2SandvichHealth = nil
+            ply.TF2SandvichSeconds = nil
+        else
+            ply.TF2SandvichSeconds = ply.TF2SandvichSeconds - 1
+        end
     end)
+
+    if CLIENT then
+        local client = LocalPlayer()
+
+        hook.Add("HUDPaintBackground", "TF2SandvichHUDSeconds", function()
+            if not client.TF2SandvichSeconds then return end
+            draw.WordBox(8, 265, ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        end)
+    end
 
     hook.Add("TTTPrepareRound", "TF2SandvichHealthReset", function()
         for _, p in player.Iterator() do
             p.TF2SandvichHealth = nil
+            p.TF2SandvichSeconds = nil
         end
 
         hook.Remove("TTTPrepareRound", "TF2SandvichHealthReset")
+        hook.Remove("HUDPaintBackground", "TF2SandvichHUDSeconds")
     end)
 end
 
 function SWEP:PrimaryAttack()
+    if self.IsEating then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+
+    if owner:Health() >= owner:GetMaxHealth() then
+        self.FullHealthPrompt = true
+
+        timer.Simple(5, function()
+            if IsValid(self) then
+                self.FullHealthPrompt = false
+            end
+        end)
+
+        return
+    end
+
     local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("item1_inspect_start"))
     self:EmitSound(self.Primary.Sound)
     self.IsEating = true
@@ -112,6 +154,11 @@ function SWEP:Think()
 end
 
 if CLIENT then
+    function SWEP:DrawHUD()
+        if not self.FullHealthPrompt then return end
+        draw.WordBox(8, 265, ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+    end
+
     function SWEP:ViewModelDrawn(vm)
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
