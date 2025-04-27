@@ -29,6 +29,7 @@ if SERVER then
     hook.Add("TTTPlayerRoleChanged", "TF2Engineer_ClassChangeReset", function(ply, _, newRole)
         if newRole == ROLE_REDENGINEER or newRole == ROLE_BLUENGINEER then
             TF2WC:StripAndGiveLoadout(ply, loadoutWeps)
+            SetRoleHealth(ply)
             ply:EmitSound("player/engineer/spawn" .. math.random(6) .. ".wav")
 
             timer.Simple(1, function()
