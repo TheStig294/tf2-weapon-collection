@@ -3,7 +3,7 @@ ROLE.nameraw = "bluengineer"
 ROLE.name = "BLU Engineer"
 ROLE.nameplural = "BLU Engineers"
 ROLE.nameext = "a BLU Engineer"
-ROLE.nameshort = "ren"
+ROLE.nameshort = "ber"
 ROLE.desc = [[You are {role}! {comrades}  
 
 Place down a deadly sentry turret by right-clicking with your wrench!
