@@ -11,9 +11,7 @@ Instead of buying items, you choose a TF2 class to play as! (Press ',')
 Press {menukey} to receive your special equipment]]
 ROLE.shortdesc = "Chooses a TF2 class' abilities instead of buying equipment"
 ROLE.team = ROLE_TEAM_DETECTIVE
-
-ROLE.shop = {"Change TF2 Class"}
-
+ROLE.shop = {}
 ROLE.loadout = {}
 ROLE.startinghealth = 100
 ROLE.maxhealth = 100

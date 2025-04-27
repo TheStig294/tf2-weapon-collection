@@ -11,8 +11,7 @@ Place down a deadly sentry turret by right-clicking with your wrench!
 Press {menukey} to receive your special equipment]]
 ROLE.shortdesc = "Can place a deadly sentry turret"
 ROLE.team = ROLE_TEAM_DETECTIVE
-
-ROLE.shop = {"Change TF2 Class"}
+ROLE.shop = {}
 
 ROLE.loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
 
@@ -24,19 +23,7 @@ RegisterRole(ROLE)
 
 if SERVER then
     AddCSLuaFile()
-
-    hook.Add("TTTPlayerRoleChanged", "TF2Engineer_ClassChangeReset", function(ply, _, newRole)
-        if newRole == ROLE_BLUENGINEER or newRole == ROLE_BLUENGINEER then
-            TF2WC:StripAndGiveLoadout(ply, ROLE.loadout)
-            local wrench = ply:GetWeapon("weapon_ttt_tf2_eurekaeffect")
-
-            if IsValid(wrench) then
-                TF2WC:AddSentryPlacerFunctions(wrench)
-            end
-
-            ply:EmitSound("player/engineer/spawn" .. math.random(6) .. ".wav")
-        end
-    end)
+    -- This role's logic is handled in the BLU Engineer's lua file
 end
 
 if CLIENT then

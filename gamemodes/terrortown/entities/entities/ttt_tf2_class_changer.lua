@@ -8,7 +8,7 @@ local TF2ClassChanger = {
     type = "item_passive",
     material = "vgui/ttt/ttt_tf2_class_changer.png",
     name = "Change TF2 Class",
-    desc = "Buy this to change your class!"
+    desc = "Buy this to change your class!\n\nIf you are a RED/BLU Mann, you haven't chosen a class yet.\n\nSo, you get 1 class change for free by pressing the comma key [,]!"
 }
 
 hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equipment, _)
@@ -34,15 +34,24 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
     table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
 
-    for _, role in ipairs(TF2WC.REDRolesList) do
+    -- 
+    -- TODO: Uncomment once all roles are added
+    -- 
+    -- for _, role in ipairs(TF2WC.REDRolesList) do
+    --     table.insert(EquipmentItems[role], TF2ClassChanger)
+    -- end
+    -- for _, role in ipairs(TF2WC.BLURolesList) do
+    --     table.insert(EquipmentItems[role], TF2ClassChanger)
+    -- end
+    for _, role in pairs(TF2WC.REDRolesList) do
         table.insert(EquipmentItems[role], TF2ClassChanger)
     end
 
-    for _, role in ipairs(TF2WC.BLURolesList) do
+    for _, role in pairs(TF2WC.BLURolesList) do
         table.insert(EquipmentItems[role], TF2ClassChanger)
     end
 
-    hook.Remove("TTTPrepareRound", "TTTPAPRegister")
+    hook.Remove("TTTPrepareRound", "TF2ClassChangerItemRegister")
 
     if SERVER then
         util.AddNetworkString("TF2ClassChangerScreen")
@@ -65,7 +74,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                 ply:SetRole(TF2WC.BLURolesList[class])
             end
 
-            FullStateUpdate()
+            timer.Simple(1, function()
+                SendFullStateUpdate()
+            end)
         end)
     end
 
@@ -75,20 +86,18 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
         net.Receive("TF2ClassChangerScreen", function()
             if not TF2WC:IsValidTF2Role(client) then return end
             -- Playing the looping background music
-            surface.PlaySound("music/class_menu_bg.wav")
-
-            timer.Create("TF2ClassChangerScreenMusic", 4.115, 0, function()
-                surface.PlaySound("music/class_menu_bg.wav")
-            end)
-
+            client:EmitSound("music/class_menu_bg.wav")
+            gui.EnableScreenClicker(true)
             -- Selecting a class
             local originalRole = client:GetRole()
             local screenMats = {}
             local screenSounds = {}
 
             for i = 1, 9 do
-                table.insert(screenMats, Material("vgui/ttt/tf2_class_screens/" .. i .. ".jpg"))
-                table.insert(screenSounds, Sound("music/class_menu_0" .. i .. ".wav"))
+                local mat = Material("vgui/ttt/tf2_class_screens/" .. i .. ".jpg")
+                local snd = Sound("music/class_menu_0" .. i .. ".wav")
+                table.insert(screenMats, mat)
+                table.insert(screenSounds, snd)
             end
 
             local cursorX, cursorY = 0, 0
@@ -101,7 +110,8 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             hook.Add("PostDrawHUD", "TF2ClassChangerScreen", function()
                 if client:GetRole() ~= originalRole then
                     hook.Remove("PostDrawHUD", "TF2ClassChangerScreen")
-                    timer.Remove("TF2ClassChangerScreenMusic")
+                    client:StopSound("music/class_menu_bg.wav")
+                    gui.EnableScreenClicker(false)
 
                     return
                 end
@@ -126,12 +136,14 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                         net.WriteUInt(selectedClass, 4)
                         net.SendToServer()
                         hook.Remove("PostDrawHUD", "TF2ClassChangerScreen")
-                        timer.Remove("TF2ClassChangerScreenMusic")
+                        client:StopSound("music/class_menu_bg.wav")
+                        gui.EnableScreenClicker(false)
 
                         return
                     end
                 end
 
+                surface.SetDrawColor(255, 255, 255, 255)
                 surface.SetMaterial(screenMats[selectedClass])
                 surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
             end)
