@@ -25,7 +25,7 @@ if SERVER then
     AddCSLuaFile()
 
     hook.Add("PlayerButtonDown", "TF2Mann_ClassChangeButton", function(ply, button)
-        if button ~= KEY_COMMA or (not ply:IsRedmann() and not ply:IsBlumann()) or ply.TF2ClassChanged then return end
+        if button ~= KEY_COMMA or (not ply:IsREDMann() and not ply:IsBLUMann()) or ply.TF2ClassChanged then return end
         ply:SetProperty("TF2ClassChanged", true)
         ply:ConCommand("ttt_tf2_class_changer")
     end)
@@ -38,10 +38,14 @@ if SERVER then
 end
 
 if CLIENT then
-    local client = LocalPlayer()
+    local client
 
     hook.Add("HUDPaint", "TF2Mann_ClassChangeTextPrompt", function()
-        if (not ply:IsRedmann() and not ply:IsBlumann()) or client.TF2ClassChanged or not client:Alive() or client:IsSpec() then return end
+        if not client then
+            client = LocalPlayer()
+        end
+
+        if (not client:IsREDMann() and not client:IsBLUMann()) or client.TF2ClassChanged or not client:Alive() or client:IsSpec() then return end
         draw.WordBox(8, 265, ScrH() - 50, "Press comma [,] to switch class", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end)
 
