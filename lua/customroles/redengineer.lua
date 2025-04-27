@@ -1,0 +1,52 @@
+local ROLE = {}
+ROLE.nameraw = "redengineer"
+ROLE.name = "RED Engineer"
+ROLE.nameplural = "RED Engineers"
+ROLE.nameext = "a RED Engineer"
+ROLE.nameshort = "ren"
+ROLE.desc = [[You are {role}! {comrades}  
+
+Place down a deadly sentry turret by right-clicking with your wrench!
+
+Press {menukey} to receive your special equipment]]
+ROLE.shortdesc = "Can place a deadly sentry turret"
+ROLE.team = ROLE_TEAM_TRAITOR
+
+ROLE.shop = {"Change TF2 Class"}
+
+ROLE.loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
+
+ROLE.startinghealth = 66
+ROLE.maxhealth = 66
+ROLE.translations = {}
+ROLE.convars = {}
+RegisterRole(ROLE)
+
+if SERVER then
+    AddCSLuaFile()
+
+    hook.Add("TTTPlayerRoleChanged", "TF2Engineer_ClassChangeReset", function(ply, _, newRole)
+        if newRole == ROLE_REDENGINEER or newRole == ROLE_BLUENGINEER then
+            TF2WC:StripAndGiveLoadout(ply, ROLE.loadout)
+            local wrench = ply:GetWeapon("weapon_ttt_tf2_eurekaeffect")
+
+            if IsValid(wrench) then
+                TF2WC:AddSentryPlacerFunctions(wrench)
+            end
+
+            ply:EmitSound("player/engineer/spawn" .. math.random(6) .. ".wav")
+        end
+    end)
+end
+
+if CLIENT then
+    hook.Add("TTTTutorialRoleText", "REDEngineer_TTTTutorialRoleText", function(role, _)
+        if role == ROLE_REDENGINEER then
+            local roleColor = GetRoleTeamColor(ROLE_TEAM_TRAITOR)
+            local counterpartColour = GetRoleTeamColor(ROLE_TEAM_DETECTIVE)
+            local html = "The " .. ROLE_STRINGS[ROLE_REDENGINEER] .. " is a <span style='color: rgb(" .. roleColor.r .. ", " .. roleColor.g .. ", " .. roleColor.b .. ")'>traitor</span> role who can place down a deadly sentry turret! This is instead of choosing items in a buy menu.<br>Right-click while holding out your wrench to place the sentry turret.<br>To change roles again, they can buy the 'Class Changer' item in their buy menu; however, <span style='color: rgb(" .. roleColor.r .. ", " .. roleColor.g .. ", " .. roleColor.b .. ")'>this costs a credit!</span><br>This role is the <span style='color: rgb(" .. roleColor.r .. ", " .. roleColor.g .. ", " .. roleColor.b .. ")'>traitor</span> equivalent to the " .. ROLE_STRINGS[ROLE_BLUENGINEER] .. ", which works exactly the same, except it is a <span style='color: rgb(" .. counterpartColour.r .. ", " .. counterpartColour.g .. ", " .. counterpartColour.b .. ")'>detective</span> role."
+
+            return html
+        end
+    end)
+end
