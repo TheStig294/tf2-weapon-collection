@@ -111,6 +111,27 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         return IsValid(ply) and (self.REDRoles[ply:GetRole()] or self.BLURoles[ply:GetRole()])
     end
 
+    -- Gives ammo to a player's gun equivalent to ammo boxes, without going over TTT's reserve ammo limits
+    function TF2WC:DirectGiveAmmoBoxes(ply, class, boxNumber)
+        local SWEP = weapons.Get(class)
+        local ammoEnt = SWEP.AmmoEnt
+        local ammoType = SWEP.Primary.Ammo
+
+        if ammoEnt then
+            if ammoEnt == "item_ammo_pistol_ttt" then
+                ply:SetAmmo(math.min(60, ply:GetAmmoCount(ammoType) + 20 * boxNumber), ammoType)
+            elseif ammoEnt == "item_ammo_smg1_ttt" then
+                ply:SetAmmo(math.min(60, ply:GetAmmoCount(ammoType) + 30 * boxNumber), ammoType)
+            elseif ammoEnt == "item_ammo_revolver_ttt" then
+                ply:SetAmmo(math.min(36, ply:GetAmmoCount(ammoType) + 12 * boxNumber), ammoType)
+            elseif ammoEnt == "item_ammo_357_ttt" then
+                ply:SetAmmo(math.min(20, ply:GetAmmoCount(ammoType) + 10 * boxNumber), ammoType)
+            elseif ammoEnt == "item_box_buckshot_ttt" then
+                ply:SetAmmo(math.min(24, ply:GetAmmoCount(ammoType) + 8 * boxNumber), ammoType)
+            end
+        end
+    end
+
     function TF2WC:StripAndGiveLoadout(ply, loadout)
         local stripWepKinds = {}
 
@@ -128,6 +149,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         timer.Simple(0.1, function()
             for _, class in ipairs(loadout) do
                 ply:Give(class)
+                self:DirectGiveAmmoBoxes(ply, class, 2)
             end
 
             ply:SelectWeapon(loadout[1])
