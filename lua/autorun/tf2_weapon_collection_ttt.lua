@@ -56,3 +56,41 @@ hook.Add("PreRegisterSWEP", "TF2WeaponCollectionDroppableCrowbar", function(SWEP
         hook.Remove("PreRegisterSWEP", "TF2WeaponCollectionDroppableCrowbar")
     end
 end)
+
+hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
+    TF2WC = TF2WC or {}
+
+    TF2WC.REDRoles = {
+        [ROLE_REDSCOUT] = true,
+        [ROLE_REDSOLIDER] = true,
+        [ROLE_REDPYRO] = true,
+        [ROLE_REDDEMOMAN] = true,
+        [ROLE_REDHEAVY] = true,
+        [ROLE_REDENGINEER] = true,
+        [ROLE_REDMEDIC] = true,
+        [ROLE_REDSNIPER] = true,
+        [ROLE_REDSPY] = true,
+        [ROLE_REDMANN] = true
+    }
+
+    TF2WC.BLURoles = {
+        [ROLE_BLUSCOUT] = true,
+        [ROLE_BLUSOLIDER] = true,
+        [ROLE_BLUPYRO] = true,
+        [ROLE_BLUDEMOMAN] = true,
+        [ROLE_BLUHEAVY] = true,
+        [ROLE_BLUENGINEER] = true,
+        [ROLE_BLUMEDIC] = true,
+        [ROLE_BLUSNIPER] = true,
+        [ROLE_BLUSPY] = true,
+        [ROLE_BLUMANN] = true
+    }
+
+    TF2WC.REDRolesList = {ROLE_REDSCOUT, ROLE_REDSOLIDER, ROLE_REDPYRO, ROLE_REDDEMOMAN, ROLE_REDHEAVY, ROLE_REDENGINEER, ROLE_REDMEDIC, ROLE_REDSNIPER, ROLE_REDSPY}
+
+    TF2WC.BLURolesList = {ROLE_BLUSCOUT, ROLE_BLUSOLIDER, ROLE_BLUPYRO, ROLE_BLUDEMOMAN, ROLE_BLUHEAVY, ROLE_BLUENGINEER, ROLE_BLUMEDIC, ROLE_BLUSNIPER, ROLE_BLUSPY}
+
+    function TF2WC:IsValidTF2Role(ply)
+        return IsValid(ply) and (self.REDRoles[ply:GetRole()] or self.BLURoles[ply:GetRole()])
+    end
+end)
