@@ -26,13 +26,13 @@ RegisterRole(ROLE)
 if SERVER then
     AddCSLuaFile()
 
-    hook.Add("PlayerButtonDown", "TF2ClassChangeButton", function(ply, button)
+    hook.Add("PlayerButtonDown", "TF2Mann_ClassChangeButton", function(ply, button)
         if button ~= KEY_COMMA or (not ply:IsRedmann() and not ply:IsBlumann()) or ply.TF2ClassChanged then return end
         ply:SetProperty("TF2ClassChanged", true)
         ply:ConCommand("ttt_tf2_class_changer")
     end)
 
-    hook.Add("TTTPlayerRoleChanged", "TF2ClassChangeReset", function(ply, _, newRole)
+    hook.Add("TTTPlayerRoleChanged", "TF2Mann_ClassChangeReset", function(ply, _, newRole)
         if newRole == ROLE_REDMANN or newRole == ROLE_BLUMANN then
             ply:SetProperty("TF2ClassChanged", false)
         end
@@ -42,7 +42,7 @@ end
 if CLIENT then
     local client = LocalPlayer()
 
-    hook.Add("HUDPaint", "TF2ClassChangeTextPrompt", function()
+    hook.Add("HUDPaint", "TF2Mann_ClassChangeTextPrompt", function()
         if (not ply:IsRedmann() and not ply:IsBlumann()) or client.TF2ClassChanged or not client:Alive() or client:IsSpec() then return end
         draw.WordBox(8, 265, ScrH() - 50, "Press comma [,] to switch class", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end)

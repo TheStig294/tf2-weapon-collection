@@ -32,6 +32,16 @@ end)
 
 hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
+    table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
+
+    for _, role in ipairs(TF2WC.REDRolesList) do
+        table.insert(EquipmentItems[role], TF2ClassChanger)
+    end
+
+    for _, role in ipairs(TF2WC.BLURolesList) do
+        table.insert(EquipmentItems[role], TF2ClassChanger)
+    end
+
     hook.Remove("TTTPrepareRound", "TTTPAPRegister")
 
     if SERVER then
