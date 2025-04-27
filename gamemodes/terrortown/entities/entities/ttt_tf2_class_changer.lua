@@ -123,8 +123,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                     for class, sectionPercent in ipairs(classSections) do
                         if cursorX / ScrW() < sectionPercent then
                             if selectedClass ~= class then
+                                client:StopSound(screenSounds[selectedClass])
                                 selectedClass = class
-                                surface.PlaySound(screenSounds[class])
+                                client:EmitSound(screenSounds[class])
                             end
 
                             break
