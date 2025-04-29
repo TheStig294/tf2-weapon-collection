@@ -107,6 +107,36 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         [6] = ROLE_BLUENGINEER
     }
 
+    -- 
+    -- TODO: Change the below to a sequential table
+    -- 
+    TF2WC.Classes = {
+        [6] = {
+            name = "engineer",
+            roles = {ROLE_REDENGINEER, ROLE_BLUENGINEER},
+            loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"},
+        },
+    }
+
+    if SERVER then
+        hook.Add("TTTPlayerRoleChanged", "TF2_ClassChangeSpawn", function(ply, _, newRole)
+            -- 
+            -- TODO: Change the below to ipairs
+            -- 
+            for _, class in pairs(TF2WC.Classes) do
+                for _, role in ipairs(class.roles) do
+                    if newRole == role then
+                        TF2WC:StripAndGiveLoadout(ply, class.loadout)
+                        SetRoleHealth(ply)
+                        ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(6) .. ".wav")
+
+                        return
+                    end
+                end
+            end
+        end)
+    end
+
     function TF2WC:IsValidTF2Role(ply)
         return IsValid(ply) and (self.REDRoles[ply:GetRole()] or self.BLURoles[ply:GetRole()])
     end

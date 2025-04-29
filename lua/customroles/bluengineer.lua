@@ -12,9 +12,7 @@ Press {menukey} to receive your special equipment]]
 ROLE.shortdesc = "Can place a deadly sentry turret"
 ROLE.team = ROLE_TEAM_DETECTIVE
 ROLE.shop = {}
-
-ROLE.loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
-
+ROLE.loadout = {}
 ROLE.startinghealth = 66
 ROLE.maxhealth = 66
 ROLE.translations = {}
