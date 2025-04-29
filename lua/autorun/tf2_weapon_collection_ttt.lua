@@ -90,52 +90,73 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     -- TF2WC.REDRolesList = {ROLE_REDSCOUT, ROLE_REDSOLIDER, ROLE_REDPYRO, ROLE_REDDEMOMAN, ROLE_REDHEAVY, ROLE_REDENGINEER, ROLE_REDMEDIC, ROLE_REDSNIPER, ROLE_REDSPY}
     -- TF2WC.BLURolesList = {ROLE_BLUSCOUT, ROLE_BLUSOLIDER, ROLE_BLUPYRO, ROLE_BLUDEMOMAN, ROLE_BLUHEAVY, ROLE_BLUENGINEER, ROLE_BLUMEDIC, ROLE_BLUSNIPER, ROLE_BLUSPY}
     TF2WC.REDRoles = {
+        [ROLE_REDSCOUT] = true,
         [ROLE_REDENGINEER] = true,
-        [ROLE_REDMANN] = true
+        [ROLE_REDMANN] = true,
     }
 
     TF2WC.BLURoles = {
+        [ROLE_BLUSCOUT] = true,
         [ROLE_BLUENGINEER] = true,
-        [ROLE_BLUMANN] = true
+        [ROLE_BLUMANN] = true,
     }
 
     TF2WC.REDRolesList = {
-        [6] = ROLE_REDENGINEER
+        [1] = ROLE_REDSCOUT,
+        [6] = ROLE_REDENGINEER,
     }
 
     TF2WC.BLURolesList = {
-        [6] = ROLE_BLUENGINEER
+        [1] = ROLE_BLUSCOUT,
+        [6] = ROLE_BLUENGINEER,
     }
 
     -- 
     -- TODO: Change the below to a sequential table
     -- 
     TF2WC.Classes = {
+        [1] = {
+            name = "scout",
+            roles = {ROLE_REDSCOUT, ROLE_BLUSCOUT},
+            loadout = {"weapon_ttt_tf2_sandman", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_scattergun"},
+            speed = 1.33
+        },
         [6] = {
             name = "engineer",
             roles = {ROLE_REDENGINEER, ROLE_BLUENGINEER},
             loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"},
+            speed = 1
         },
     }
 
-    if SERVER then
-        hook.Add("TTTPlayerRoleChanged", "TF2_ClassChangeSpawn", function(ply, _, newRole)
-            -- 
-            -- TODO: Change the below to ipairs
-            -- 
-            for _, class in pairs(TF2WC.Classes) do
-                for _, role in ipairs(class.roles) do
-                    if newRole == role then
+    hook.Add("TTTPlayerRoleChanged", "TF2_ClassChangeReset", function(ply, _, newRole)
+        -- 
+        -- TODO: Change the below to ipairs
+        -- 
+        for _, class in pairs(TF2WC.Classes) do
+            for _, role in ipairs(class.roles) do
+                if newRole == role then
+                    if SERVER then
                         TF2WC:StripAndGiveLoadout(ply, class.loadout)
                         SetRoleHealth(ply)
-                        ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(6) .. ".wav")
-
-                        return
+                        ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav")
                     end
+
+                    ply.TF2SpeedMult = class.speed
+
+                    return
                 end
             end
-        end)
-    end
+        end
+
+        ply.TF2SpeedMult = nil
+    end)
+
+    hook.Add("TTTSpeedMultiplier", "TF2_ClassSpeedMult", function(ply, mults)
+        if ply.TF2SpeedMult then
+            table.insert(mults, ply.TF2SpeedMult)
+        end
+    end)
 
     function TF2WC:IsValidTF2Role(ply)
         return IsValid(ply) and (self.REDRoles[ply:GetRole()] or self.BLURoles[ply:GetRole()])
