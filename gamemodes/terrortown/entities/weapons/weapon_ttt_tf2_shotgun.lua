@@ -39,7 +39,7 @@ if CLIENT then
 end
 
 SWEP.Primary.Sound = Sound("weapons/shotgun_shoot.wav")
-SWEP.Primary.Damage = 4
+SWEP.Primary.Damage = 6
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 6
 SWEP.Primary.Ammo = "Buckshot"
