@@ -65,7 +65,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     -- 
     -- TF2WC.REDRoles = {
     --     [ROLE_REDSCOUT] = true,
-    --     [ROLE_REDSOLIDER] = true,
+    --     [ROLE_REDSOLDIER] = true,
     --     [ROLE_REDPYRO] = true,
     --     [ROLE_REDDEMOMAN] = true,
     --     [ROLE_REDHEAVY] = true,
@@ -77,7 +77,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     -- }
     -- TF2WC.BLURoles = {
     --     [ROLE_BLUSCOUT] = true,
-    --     [ROLE_BLUSOLIDER] = true,
+    --     [ROLE_BLUSOLDIER] = true,
     --     [ROLE_BLUPYRO] = true,
     --     [ROLE_BLUDEMOMAN] = true,
     --     [ROLE_BLUHEAVY] = true,
@@ -87,27 +87,31 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     --     [ROLE_BLUSPY] = true,
     --     [ROLE_BLUMANN] = true
     -- }
-    -- TF2WC.REDRolesList = {ROLE_REDSCOUT, ROLE_REDSOLIDER, ROLE_REDPYRO, ROLE_REDDEMOMAN, ROLE_REDHEAVY, ROLE_REDENGINEER, ROLE_REDMEDIC, ROLE_REDSNIPER, ROLE_REDSPY}
-    -- TF2WC.BLURolesList = {ROLE_BLUSCOUT, ROLE_BLUSOLIDER, ROLE_BLUPYRO, ROLE_BLUDEMOMAN, ROLE_BLUHEAVY, ROLE_BLUENGINEER, ROLE_BLUMEDIC, ROLE_BLUSNIPER, ROLE_BLUSPY}
+    -- TF2WC.REDRolesList = {ROLE_REDSCOUT, ROLE_REDSOLDIER, ROLE_REDPYRO, ROLE_REDDEMOMAN, ROLE_REDHEAVY, ROLE_REDENGINEER, ROLE_REDMEDIC, ROLE_REDSNIPER, ROLE_REDSPY}
+    -- TF2WC.BLURolesList = {ROLE_BLUSCOUT, ROLE_BLUSOLDIER, ROLE_BLUPYRO, ROLE_BLUDEMOMAN, ROLE_BLUHEAVY, ROLE_BLUENGINEER, ROLE_BLUMEDIC, ROLE_BLUSNIPER, ROLE_BLUSPY}
     TF2WC.REDRoles = {
         [ROLE_REDSCOUT] = true,
+        [ROLE_REDSOLDIER] = true,
         [ROLE_REDENGINEER] = true,
         [ROLE_REDMANN] = true,
     }
 
     TF2WC.BLURoles = {
         [ROLE_BLUSCOUT] = true,
+        [ROLE_BLUSOLDIER] = true,
         [ROLE_BLUENGINEER] = true,
         [ROLE_BLUMANN] = true,
     }
 
     TF2WC.REDRolesList = {
         [1] = ROLE_REDSCOUT,
+        [2] = ROLE_REDSOLDIER,
         [6] = ROLE_REDENGINEER,
     }
 
     TF2WC.BLURolesList = {
         [1] = ROLE_BLUSCOUT,
+        [2] = ROLE_BLUSOLDIER,
         [6] = ROLE_BLUENGINEER,
     }
 
@@ -121,11 +125,16 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             loadout = {"weapon_ttt_tf2_sandman", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_scattergun"},
             speed = 1.33
         },
+        [2] = {
+            name = "soldier",
+            roles = {ROLE_REDSOLDIER, ROLE_BLUSOLDIER},
+            loadout = {"weapon_ttt_tf2_rpg", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_escapeplan"},
+            speed = 0.8
+        },
         [6] = {
             name = "engineer",
             roles = {ROLE_REDENGINEER, ROLE_BLUENGINEER},
-            loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"},
-            speed = 1
+            loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
         },
     }
 
