@@ -9,7 +9,7 @@ ROLE.desc = [[You are {role}! {comrades}
 You can move faster and jump an extra time!
 
 Press {menukey} to receive your special equipment]]
-ROLE.shortdesc = "Can place a deadly sentry turret"
+ROLE.shortdesc = "Can jump an extra time and move faster"
 ROLE.team = ROLE_TEAM_DETECTIVE
 ROLE.shop = {}
 ROLE.loadout = {}
@@ -21,7 +21,7 @@ RegisterRole(ROLE)
 
 if SERVER then
     AddCSLuaFile()
-    -- This role's logic is handled in the BLU Scout's lua file
+    -- This role's logic is handled in the RED Scout's lua file
 end
 
 if CLIENT then

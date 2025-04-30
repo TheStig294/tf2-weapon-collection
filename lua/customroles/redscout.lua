@@ -9,7 +9,7 @@ ROLE.desc = [[You are {role}! {comrades}
 You can move faster and jump an extra time!
 
 Press {menukey} to receive your special equipment]]
-ROLE.shortdesc = "Can place a deadly sentry turret"
+ROLE.shortdesc = "Can jump an extra time and move faster"
 ROLE.team = ROLE_TEAM_TRAITOR
 ROLE.shop = {}
 ROLE.loadout = {}

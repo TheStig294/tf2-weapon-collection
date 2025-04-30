@@ -21,7 +21,7 @@ RegisterRole(ROLE)
 
 if SERVER then
     AddCSLuaFile()
-    -- This role's logic is handled in the BLU Engineer's lua file
+    -- This role's logic is handled in the RED Engineer's lua file
 end
 
 if CLIENT then
