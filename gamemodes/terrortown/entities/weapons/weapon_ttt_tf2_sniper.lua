@@ -109,7 +109,15 @@ function SWEP:DrawHUD()
         surface.SetTexture(surface.GetTextureID("sprites/redglow1"))
         surface.SetDrawColor(255, 255, 255, 255)
         surface.DrawTexturedRect(x - 32, y - 32, 64, 64)
-        draw.SimpleText("Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%", "TF2Font", ScrW() / 2, self.ChargeHudOffset, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        local text
+
+        if (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper()) then
+            text = "Damage: locked at 100%, Sniper role"
+        else
+            text = "Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%"
+        end
+
+        draw.SimpleText(text, "TF2Font", ScrW() / 2, self.ChargeHudOffset, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     else
         return self.BaseClass.DrawHUD(self)
     end
@@ -260,7 +268,8 @@ function SWEP:Think()
             owner:EmitSound("player/recharged.wav", SNDLVL_75dB, PITCH_NORM, VOL_NORM, CHAN_STATIC)
         end
 
-        if self.ScopedTimer <= CurTime() then
+        -- The Sniper custom role always deals max damage with the sniper rifle
+        if self.ScopedTimer <= CurTime() or (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper()) then
             self.Primary.Damage = self.Primary.FullChargeDamage
             self.ScopedLaserAlpha = 255
         end

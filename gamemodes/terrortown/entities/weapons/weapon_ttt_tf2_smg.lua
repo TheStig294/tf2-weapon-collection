@@ -21,8 +21,8 @@ SWEP.FiresUnderwater = false
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
 SWEP.Base = "weapon_tttbase"
-SWEP.Kind = WEAPON_HEAVY
-SWEP.Slot = 2
+SWEP.Kind = WEAPON_PISTOL
+SWEP.Slot = 1
 SWEP.AutoSpawnable = true
 
 if CLIENT then

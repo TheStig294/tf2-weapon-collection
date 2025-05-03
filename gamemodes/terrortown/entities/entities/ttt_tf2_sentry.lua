@@ -95,6 +95,12 @@ function ENT:OnRemove()
     if IsValid(self.Barrel) then
         self.Barrel:Remove()
     end
+
+    local owner = self:GetOwner()
+
+    if SERVER and IsValid(owner) then
+        owner:EmitSound("player/engineer/sentry_down.wav")
+    end
 end
 
 function ENT:IsValidTarget(target)

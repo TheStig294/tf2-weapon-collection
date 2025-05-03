@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+ "$basetexture" "vgui/ttt/roles/rpy/icon_rpy"
+ "$vertexcolor" 1
+ "$vertexalpha" 1
+ "$translucent" 1
+}

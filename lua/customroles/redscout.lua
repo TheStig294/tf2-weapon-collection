@@ -107,7 +107,7 @@ if not plymeta.GetJumpLevel then
             if ply:IsPlayer() then
                 ply:SetJumpLevel(0)
                 ply:SetJumped(-1)
-                ply:SetMaxJumpLevel(1)
+                ply:SetMaxJumpLevel(0)
                 ply:SetExtraJumpPower(1)
                 ply:SetMaxJumpDistance(0)
                 ply:SetJumpLocation(vector_origin)

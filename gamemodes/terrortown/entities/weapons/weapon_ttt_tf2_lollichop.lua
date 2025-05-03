@@ -161,17 +161,6 @@ function SWEP:SetHooks()
     self.HooksSet = true
 end
 
-function SWEP:Initialize()
-    local owner = self:GetOwner()
-
-    if IsValid(owner) then
-        owner.TF2LollichopEffects = true
-        self:SetHooks()
-    end
-
-    return self.BaseClass.Initialize(self)
-end
-
 function SWEP:Deploy()
     self:SetHooks()
     local owner = self:GetOwner()
