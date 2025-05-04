@@ -25,7 +25,8 @@ if SERVER then
     hook.Add("PlayerButtonDown", "TF2Mann_ClassChangeButton", function(ply, button)
         if button ~= KEY_COMMA or (not ply:IsREDMann() and not ply:IsBLUMann()) or ply.TF2ClassChanged then return end
         ply:SetProperty("TF2ClassChanged", true)
-        ply:ConCommand("ttt_tf2_class_changer")
+        net.Start("TF2ClassChangerScreen")
+        net.Send(ply)
     end)
 
     hook.Add("TTTPlayerRoleChanged", "TF2Mann_ClassChangeReset", function(ply, _, newRole)

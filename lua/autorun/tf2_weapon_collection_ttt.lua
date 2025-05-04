@@ -60,32 +60,6 @@ end)
 hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     TF2WC = TF2WC or {}
 
-    TF2WC.REDRoles = {
-        [ROLE_REDSCOUT] = true,
-        [ROLE_REDSOLDIER] = true,
-        [ROLE_REDPYRO] = true,
-        [ROLE_REDDEMOMAN] = true,
-        [ROLE_REDHEAVY] = true,
-        [ROLE_REDENGINEER] = true,
-        [ROLE_REDMEDIC] = true,
-        [ROLE_REDSNIPER] = true,
-        [ROLE_REDSPY] = true,
-        [ROLE_REDMANN] = true
-    }
-
-    TF2WC.BLURoles = {
-        [ROLE_BLUSCOUT] = true,
-        [ROLE_BLUSOLDIER] = true,
-        [ROLE_BLUPYRO] = true,
-        [ROLE_BLUDEMOMAN] = true,
-        [ROLE_BLUHEAVY] = true,
-        [ROLE_BLUENGINEER] = true,
-        [ROLE_BLUMEDIC] = true,
-        [ROLE_BLUSNIPER] = true,
-        [ROLE_BLUSPY] = true,
-        [ROLE_BLUMANN] = true
-    }
-
     TF2WC.Classes = {
         {
             name = "scout",
@@ -163,10 +137,6 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             table.insert(mults, ply.TF2SpeedMult)
         end
     end)
-
-    function TF2WC:IsValidTF2Role(ply)
-        return IsValid(ply) and (self.REDRoles[ply:GetRole()] or self.BLURoles[ply:GetRole()])
-    end
 
     -- Gives ammo to a player's gun equivalent to ammo boxes, without going over TTT's reserve ammo limits
     function TF2WC:DirectGiveAmmoBoxes(ply, class, boxNumber)

@@ -14,7 +14,8 @@ local TF2ClassChanger = {
 hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equipment, _)
     if equipment == EQUIP_TF2_CLASS_CHANGER then
         -- This is defined below, where all the magic happens...
-        ply:ConCommand("ttt_tf2_class_changer")
+        net.Start("TF2ClassChangerScreen")
+        net.Send(ply)
 
         -- Removes the equipment from the player, to make the item re-buyable
         timer.Simple(0.1, function()
@@ -44,19 +45,10 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     if SERVER then
         util.AddNetworkString("TF2ClassChangerScreen")
 
-        local function ClassChangerScreen(ply)
-            if not TF2WC:IsValidTF2Role(ply) then return end
-            net.Start("TF2ClassChangerScreen")
-            net.Send(ply)
-        end
-
-        concommand.Add("ttt_tf2_class_changer", ClassChangerScreen, nil, "Brings up the class selection screen for the TTT TF2 Roles")
-
         net.Receive("TF2ClassChangerScreen", function(_, ply)
             local class = net.ReadUInt(4)
-            if not TF2WC:IsValidTF2Role(ply) then return end
 
-            if TF2WC.REDRoles[ply:GetRole()] then
+            if ply:IsTraitorTeam() then
                 ply:SetRole(TF2WC.Classes[class].roles[1])
             else
                 ply:SetRole(TF2WC.Classes[class].roles[2])
@@ -72,7 +64,6 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
         local client = LocalPlayer()
 
         net.Receive("TF2ClassChangerScreen", function()
-            if not TF2WC:IsValidTF2Role(client) then return end
             -- Playing the looping background music
             client:EmitSound("music/class_menu_bg.wav")
             gui.EnableScreenClicker(true)
