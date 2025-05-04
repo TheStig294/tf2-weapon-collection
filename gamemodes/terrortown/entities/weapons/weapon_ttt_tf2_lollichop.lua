@@ -161,6 +161,20 @@ function SWEP:SetHooks()
     self.HooksSet = true
 end
 
+function SWEP:Initialize()
+    -- SWEP:Deploy() isn't called if the player spawns on and picks up this weapon, and they haven't been given the crowbar yet
+    -- So we have to check for that case here
+    timer.Simple(1, function()
+        if not IsValid(self) then return end
+        local owner = self:GetOwner()
+        if not IsValid(owner) then return end
+        owner.TF2LollichopEffects = true
+        self:SetHooks()
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:Deploy()
     self:SetHooks()
     local owner = self:GetOwner()
