@@ -252,6 +252,13 @@ function SWEP:SecondaryAttack()
     self:SetScope(not self.Scoped)
 end
 
+function SWEP:OwnerIsSniper()
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return false end
+
+    return (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper())
+end
+
 function SWEP:Think()
     local owner = self:GetOwner()
 
@@ -264,12 +271,12 @@ function SWEP:Think()
             end
         end
 
-        if CLIENT and self.ScopedTimer < CurTime() + 0.025 and self.ScopedTimer > CurTime() and IsValid(owner) then
+        if CLIENT and self.ScopedTimer < CurTime() + 0.025 and self.ScopedTimer > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
             owner:EmitSound("player/recharged.wav", SNDLVL_75dB, PITCH_NORM, VOL_NORM, CHAN_STATIC)
         end
 
         -- The Sniper custom role always deals max damage with the sniper rifle
-        if self.ScopedTimer <= CurTime() or (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper()) then
+        if self.ScopedTimer <= CurTime() or self:OwnerIsSniper() then
             self.Primary.Damage = self.Primary.FullChargeDamage
             self.ScopedLaserAlpha = 255
         end
