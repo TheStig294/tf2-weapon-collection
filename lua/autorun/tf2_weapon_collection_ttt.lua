@@ -60,35 +60,6 @@ end)
 hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     TF2WC = TF2WC or {}
 
-    -- 
-    -- TODO: Uncomment once all roles are added
-    -- 
-    -- TF2WC.REDRoles = {
-    --     [ROLE_REDSCOUT] = true,
-    --     [ROLE_REDSOLDIER] = true,
-    --     [ROLE_REDPYRO] = true,
-    --     [ROLE_REDDEMOMAN] = true,
-    --     [ROLE_REDHEAVY] = true,
-    --     [ROLE_REDENGINEER] = true,
-    --     [ROLE_REDMEDIC] = true,
-    --     [ROLE_REDSNIPER] = true,
-    --     [ROLE_REDSPY] = true,
-    --     [ROLE_REDMANN] = true
-    -- }
-    -- TF2WC.BLURoles = {
-    --     [ROLE_BLUSCOUT] = true,
-    --     [ROLE_BLUSOLDIER] = true,
-    --     [ROLE_BLUPYRO] = true,
-    --     [ROLE_BLUDEMOMAN] = true,
-    --     [ROLE_BLUHEAVY] = true,
-    --     [ROLE_BLUENGINEER] = true,
-    --     [ROLE_BLUMEDIC] = true,
-    --     [ROLE_BLUSNIPER] = true,
-    --     [ROLE_BLUSPY] = true,
-    --     [ROLE_BLUMANN] = true
-    -- }
-    -- TF2WC.REDRolesList = {ROLE_REDSCOUT, ROLE_REDSOLDIER, ROLE_REDPYRO, ROLE_REDDEMOMAN, ROLE_REDHEAVY, ROLE_REDENGINEER, ROLE_REDMEDIC, ROLE_REDSNIPER, ROLE_REDSPY}
-    -- TF2WC.BLURolesList = {ROLE_BLUSCOUT, ROLE_BLUSOLDIER, ROLE_BLUPYRO, ROLE_BLUDEMOMAN, ROLE_BLUHEAVY, ROLE_BLUENGINEER, ROLE_BLUMEDIC, ROLE_BLUSNIPER, ROLE_BLUSPY}
     TF2WC.REDRoles = {
         [ROLE_REDSCOUT] = true,
         [ROLE_REDSOLDIER] = true,
@@ -115,104 +86,72 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         [ROLE_BLUMANN] = true
     }
 
-    TF2WC.REDRolesList = {
-        [1] = ROLE_REDSCOUT,
-        [2] = ROLE_REDSOLDIER,
-        [3] = ROLE_REDPYRO,
-        [4] = ROLE_REDDEMOMAN,
-        [5] = ROLE_REDHEAVY,
-        [6] = ROLE_REDENGINEER,
-        [7] = ROLE_REDMEDIC,
-        [8] = ROLE_REDSNIPER,
-        [9] = ROLE_REDSPY,
-    }
-
-    TF2WC.BLURolesList = {
-        [1] = ROLE_BLUSCOUT,
-        [2] = ROLE_BLUSOLDIER,
-        [3] = ROLE_BLUPYRO,
-        [4] = ROLE_BLUDEMOMAN,
-        [5] = ROLE_BLUHEAVY,
-        [6] = ROLE_BLUENGINEER,
-        [7] = ROLE_BLUMEDIC,
-        [8] = ROLE_BLUSNIPER,
-        [9] = ROLE_BLUSPY,
-    }
-
-    -- 
-    -- TODO: Change the below to a sequential table
-    -- 
     TF2WC.Classes = {
-        [1] = {
+        {
             name = "scout",
             roles = {ROLE_REDSCOUT, ROLE_BLUSCOUT},
             loadout = {"weapon_ttt_tf2_sandman", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_scattergun"},
             speed = 1.33
         },
-        [2] = {
+        {
             name = "soldier",
             roles = {ROLE_REDSOLDIER, ROLE_BLUSOLDIER},
             loadout = {"weapon_ttt_tf2_rpg", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_escapeplan"},
             speed = 0.8
         },
-        [3] = {
+        {
             name = "pyro",
             roles = {ROLE_REDPYRO, ROLE_BLUPYRO},
             loadout = {"weapon_ttt_tf2_flamethrower", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_lollichop"}
         },
-        [4] = {
+        {
             name = "demoman",
             roles = {ROLE_REDDEMOMAN, ROLE_BLUDEMOMAN},
             loadout = {"weapon_ttt_tf2_grenadelauncher", "weapon_ttt_tf2_stickybomblauncher", "weapon_ttt_tf2_caber"},
             speed = 0.93
         },
-        [5] = {
+        {
             name = "heavy",
             roles = {ROLE_REDHEAVY, ROLE_BLUHEAVY},
             loadout = {"weapon_ttt_tf2_minigun", "weapon_ttt_tf2_sandvich", "weapon_ttt_tf2_goldenfryingpan"},
             speed = 0.77
         },
-        [6] = {
+        {
             name = "engineer",
             roles = {ROLE_REDENGINEER, ROLE_BLUENGINEER},
             loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
         },
-        [7] = {
+        {
             name = "medic",
             roles = {ROLE_REDMEDIC, ROLE_BLUMEDIC},
             loadout = {"weapon_ttt_tf2_medigun", "weapon_ttt_tf2_syringegun", "weapon_ttt_tf2_bonesaw"},
             speed = 1.07
         },
-        [8] = {
+        {
             name = "sniper",
             roles = {ROLE_REDSNIPER, ROLE_BLUSNIPER},
             loadout = {"weapon_ttt_tf2_sniper", "weapon_ttt_tf2_smg", "weapon_ttt_tf2_machete"}
         },
-        [9] = {
+        {
             name = "spy",
             roles = {ROLE_REDSPY, ROLE_BLUSPY},
             loadout = {"weapon_ttt_tf2_knife", "weapon_ttt_tf2_revolver", "weapon_ttt_tf2_inviswatch"},
             speed = 1.07
-        },
+        }
     }
 
     hook.Add("TTTPlayerRoleChanged", "TF2_ClassChangeReset", function(ply, _, newRole)
-        -- 
-        -- TODO: Change the below to ipairs
-        -- 
-        for _, class in pairs(TF2WC.Classes) do
-            for _, role in ipairs(class.roles) do
-                if newRole == role then
-                    if SERVER then
-                        TF2WC:StripAndGiveLoadout(ply, class.loadout)
-                        SetRoleHealth(ply)
-                        ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav")
-                    end
-
-                    ply.TF2SpeedMult = class.speed
-
-                    return
+        for _, class in ipairs(TF2WC.Classes) do
+            if newRole == class.roles[1] or newRole == class.roles[2] then
+                if SERVER then
+                    TF2WC:StripAndGiveLoadout(ply, class.loadout)
+                    SetRoleHealth(ply)
+                    ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav")
                 end
+
+                ply.TF2SpeedMult = class.speed
+
+                return
             end
         end
 

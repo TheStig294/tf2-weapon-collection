@@ -34,21 +34,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
     table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
 
-    -- 
-    -- TODO: Uncomment once all roles are added
-    -- 
-    -- for _, role in ipairs(TF2WC.REDRolesList) do
-    --     table.insert(EquipmentItems[role], TF2ClassChanger)
-    -- end
-    -- for _, role in ipairs(TF2WC.BLURolesList) do
-    --     table.insert(EquipmentItems[role], TF2ClassChanger)
-    -- end
-    for _, role in pairs(TF2WC.REDRolesList) do
-        table.insert(EquipmentItems[role], TF2ClassChanger)
-    end
-
-    for _, role in pairs(TF2WC.BLURolesList) do
-        table.insert(EquipmentItems[role], TF2ClassChanger)
+    for _, class in ipairs(TF2WC.Classes) do
+        table.insert(EquipmentItems[class.roles[1]], TF2ClassChanger)
+        table.insert(EquipmentItems[class.roles[2]], TF2ClassChanger)
     end
 
     hook.Remove("TTTPrepareRound", "TF2ClassChangerItemRegister")
@@ -69,9 +57,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             if not TF2WC:IsValidTF2Role(ply) then return end
 
             if TF2WC.REDRoles[ply:GetRole()] then
-                ply:SetRole(TF2WC.REDRolesList[class])
+                ply:SetRole(TF2WC.Classes[class].roles[1])
             else
-                ply:SetRole(TF2WC.BLURolesList[class])
+                ply:SetRole(TF2WC.Classes[class].roles[2])
             end
 
             timer.Simple(1, function()
