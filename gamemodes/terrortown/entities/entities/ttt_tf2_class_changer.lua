@@ -95,12 +95,32 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             -- E.g. If the cursor is in the first 20% of the screen from the left, then the Scout would be selected (The first class from the left on the screen)
             local classSections = {0.20, 0.26, 0.34, 0.43, 0.49, 0.56, 0.65, 0.70, 1}
 
-            hook.Add("PostDrawHUD", "TF2ClassChangerScreen", function()
+            local function SelectClass(class)
+                net.Start("TF2ClassChangerScreen")
+                net.WriteUInt(class, 4)
+                net.SendToServer()
+                hook.Remove("DrawOverlay", "TF2ClassChangerScreen")
+                hook.Remove("TTTPrepareRound", "TF2ClassChangerReset")
+                timer.Remove("TF2ClassChangerScreenTimeout")
+                client:StopSound("music/class_menu_bg.wav")
+                gui.EnableScreenClicker(false)
+            end
+
+            -- So, DrawOverlay is a little dangerous as it covers the pause screen, meaning if an error occurred, the player would be stuck.
+            -- So the first thing we're doing here is setting up a separate timer to kill the class changer screen after a few seconds, just in case
+            -- Also... why not just use PostDrawHUD? Because it has the irritating property where if a centre-screen message appears,
+            -- all PostDrawHUDs get displaced downwards for the duration of the message, where setting something to be at y = 0, is actually halfway down the screen...
+            timer.Create("TF2ClassChangerScreenTimeout", 15, 1, function()
+                SelectClass(selectedClass)
+            end)
+
+            hook.Add("DrawOverlay", "TF2ClassChangerScreen", function()
                 if client:GetRole() ~= originalRole or not client:Alive() or client:IsSpec() then
                     client:StopSound("music/class_menu_bg.wav")
                     gui.EnableScreenClicker(false)
-                    hook.Remove("PostDrawHUD", "TF2ClassChangerScreen")
+                    hook.Remove("DrawOverlay", "TF2ClassChangerScreen")
                     hook.Remove("TTTPrepareRound", "TF2ClassChangerReset")
+                    timer.Remove("TF2ClassChangerScreenTimeout")
 
                     return
                 end
@@ -122,12 +142,7 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                     end
 
                     if input.IsMouseDown(MOUSE_LEFT) then
-                        net.Start("TF2ClassChangerScreen")
-                        net.WriteUInt(selectedClass, 4)
-                        net.SendToServer()
-                        hook.Remove("PostDrawHUD", "TF2ClassChangerScreen")
-                        client:StopSound("music/class_menu_bg.wav")
-                        gui.EnableScreenClicker(false)
+                        SelectClass(selectedClass)
 
                         return
                     end
@@ -141,8 +156,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             hook.Add("TTTPrepareRound", "TF2ClassChangerReset", function()
                 client:StopSound("music/class_menu_bg.wav")
                 gui.EnableScreenClicker(false)
-                hook.Remove("PostDrawHUD", "TF2ClassChangerScreen")
+                hook.Remove("DrawOverlay", "TF2ClassChangerScreen")
                 hook.Remove("TTTPrepareRound", "TF2ClassChangerReset")
+                timer.Remove("TF2ClassChangerScreenTimeout")
             end)
         end)
     end
