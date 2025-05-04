@@ -168,6 +168,8 @@ function SWEP:Initialize()
         if not IsValid(self) then return end
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
+        local wep = owner:GetActiveWeapon()
+        if not IsValid(wep) or wep ~= self then return end
         owner.TF2LollichopEffects = true
         self:SetHooks()
     end)
