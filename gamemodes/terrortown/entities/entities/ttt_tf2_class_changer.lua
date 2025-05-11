@@ -8,7 +8,7 @@ local TF2ClassChanger = {
     type = "item_passive",
     material = "vgui/ttt/ttt_tf2_class_changer.png",
     name = "Change TF2 Class",
-    desc = "Buy this to change your class!\n\nIf you are a RED/BLU Mann, you haven't chosen a class yet.\n\nSo, you get 1 class change for free by pressing the comma key [,]!"
+    desc = "Buy this to change your class!\n\nIf you are a RED or BLU Mann, press comma [,] instead."
 }
 
 hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equipment, _)
