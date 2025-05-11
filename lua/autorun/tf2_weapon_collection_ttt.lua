@@ -173,10 +173,20 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end
     end)
 
-    hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker)
+    hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker, dmg)
         timer.Simple(1, function()
             if not IsValid(ply) or (not ply.TF2Class and not ply:IsREDMann() and not ply:IsBLUMann()) then return end
-            if ply:Alive() or not ply:IsSpec() or not IsValid(attacker) then return end
+            if ply:Alive() or not ply:IsSpec() then return end
+
+            if not IsValid(attacker) and IsValid(dmg) then
+                attacker = dmg:GetInflictor()
+            end
+
+            if attacker == ply then
+                attacker = ply.server_ragdoll or ply:GetRagdollEntity()
+            end
+
+            if not IsValid(attacker) then return end
             ply:SendLua("surface.PlaySound(\"misc/freeze_cam.wav\")")
             ply:SetObserverMode(OBS_MODE_FREEZECAM)
             ply:SpectateEntity(attacker)
