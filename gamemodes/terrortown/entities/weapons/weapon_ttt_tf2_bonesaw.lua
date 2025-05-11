@@ -25,7 +25,6 @@ SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
 SWEP.Base = "weapon_tttbase"
 SWEP.Kind = WEAPON_MELEE
-SWEP.Slot = 0
 SWEP.AutoSpawnable = true
 
 if CLIENT then
@@ -42,7 +41,7 @@ SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "none"
-SWEP.Primary.Damage = 48
+SWEP.Primary.Damage = 30
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
 SWEP.HealAmount = 1
