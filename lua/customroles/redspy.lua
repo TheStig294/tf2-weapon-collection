@@ -36,10 +36,10 @@ end
 if CLIENT then
     hook.Add("TTTPlayerRoleChanged", "TF2Spy_DisguiserPrompt", function(ply, _, newRole)
         if newRole == ROLE_REDSPY or newRole == ROLE_BLUSPY then
-            local hookname = "TF2Spy_DisguisePrompt" .. ply:SteamID64()
+            local hookname = "TF2Spy_DisguisePrompt"
 
             hook.Add("HUDPaint", hookname, function()
-                if ply:GetNWBool("disguised") or GetRoundState() ~= ROUND_ACTIVE then
+                if ply:GetNWBool("disguised") or GetRoundState() ~= ROUND_ACTIVE or ply:GetRole() ~= newRole then
                     hook.Remove("HUDPaint", hookname)
 
                     return

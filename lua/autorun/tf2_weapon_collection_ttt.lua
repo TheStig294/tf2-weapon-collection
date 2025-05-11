@@ -65,30 +65,35 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             name = "scout",
             roles = {ROLE_REDSCOUT, ROLE_BLUSCOUT},
             loadout = {"weapon_ttt_tf2_sandman", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_scattergun"},
-            speed = 1.33
+            speed = 1.33,
+            prompt = "+1 jump, extra speed"
         },
         {
             name = "soldier",
             roles = {ROLE_REDSOLDIER, ROLE_BLUSOLDIER},
             loadout = {"weapon_ttt_tf2_rpg", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_escapeplan"},
-            speed = 0.8
+            speed = 0.8,
+            prompt = "No fall damage"
         },
         {
             name = "pyro",
             roles = {ROLE_REDPYRO, ROLE_BLUPYRO},
-            loadout = {"weapon_ttt_tf2_flamethrower", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_lollichop"}
+            loadout = {"weapon_ttt_tf2_flamethrower", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_lollichop"},
+            prompt = "No fire damage"
         },
         {
             name = "demoman",
             roles = {ROLE_REDDEMOMAN, ROLE_BLUDEMOMAN},
             loadout = {"weapon_ttt_tf2_grenadelauncher", "weapon_ttt_tf2_stickybomblauncher", "weapon_ttt_tf2_caber"},
-            speed = 0.93
+            speed = 0.93,
+            prompt = "No explosion damage"
         },
         {
             name = "heavy",
             roles = {ROLE_REDHEAVY, ROLE_BLUHEAVY},
             loadout = {"weapon_ttt_tf2_minigun", "weapon_ttt_tf2_sandvich", "weapon_ttt_tf2_goldenfryingpan"},
-            speed = 0.77
+            speed = 0.77,
+            prompt = "More health, less speed"
         },
         {
             name = "engineer",
@@ -99,12 +104,14 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             name = "medic",
             roles = {ROLE_REDMEDIC, ROLE_BLUMEDIC},
             loadout = {"weapon_ttt_tf2_medigun", "weapon_ttt_tf2_syringegun", "weapon_ttt_tf2_bonesaw"},
-            speed = 1.07
+            speed = 1.07,
+            prompt = "Passive health regen"
         },
         {
             name = "sniper",
             roles = {ROLE_REDSNIPER, ROLE_BLUSNIPER},
-            loadout = {"weapon_ttt_tf2_sniper", "weapon_ttt_tf2_smg", "weapon_ttt_tf2_machete"}
+            loadout = {"weapon_ttt_tf2_sniper", "weapon_ttt_tf2_smg", "weapon_ttt_tf2_machete"},
+            prompt = "No rifle charge"
         },
         {
             name = "spy",
@@ -126,10 +133,28 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                     ply.TF2NoSpawnSound = true
                     ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
 
-                    timer.Simple(6, function()
+                    timer.Create("TF2EnableSpawnSound", 12, 1, function()
                         if IsValid(ply) then
                             ply.TF2NoSpawnSound = nil
                         end
+                    end)
+                end
+
+                if CLIENT and class.prompt then
+                    timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
+                        hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
+                            if GetRoundState() ~= ROUND_ACTIVE or ply:GetRole() ~= newRole then
+                                hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
+
+                                return
+                            end
+
+                            draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                        end)
+
+                        timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
+                            hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
+                        end)
                     end)
                 end
 
