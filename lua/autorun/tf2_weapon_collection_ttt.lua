@@ -158,19 +158,29 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                     end)
                 end
 
-                ply.TF2SpeedMult = class.speed
+                ply.TF2Class = class
 
                 return
             end
         end
 
-        ply.TF2SpeedMult = nil
+        ply.TF2Class = nil
     end)
 
     hook.Add("TTTSpeedMultiplier", "TF2_ClassSpeedMult", function(ply, mults)
-        if ply.TF2SpeedMult then
-            table.insert(mults, ply.TF2SpeedMult)
+        if ply.TF2Class and ply.TF2Class.speed then
+            table.insert(mults, ply.TF2Class.speed)
         end
+    end)
+
+    hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker)
+        timer.Simple(1, function()
+            if not IsValid(ply) or (not ply.TF2Class and not ply:IsREDMann() and not ply:IsBLUMann()) then return end
+            if ply:Alive() or not ply:IsSpec() or not IsValid(attacker) then return end
+            ply:SendLua("surface.PlaySound(\"misc/freeze_cam.wav\")")
+            ply:SetObserverMode(OBS_MODE_FREEZECAM)
+            ply:SpectateEntity(attacker)
+        end)
     end)
 
     -- Gives ammo to a player's gun equivalent to ammo boxes, without going over TTT's reserve ammo limits
