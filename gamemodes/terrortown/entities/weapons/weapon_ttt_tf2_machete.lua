@@ -42,12 +42,13 @@ SWEP.Primary.ClipSize = -1
 SWEP.Primary.DefaultClip = -1
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "none"
-SWEP.Primary.Damage = 48
+SWEP.Primary.Damage = 35
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
 SWEP.BleedDamage = 5
 SWEP.BleedDamageTicks = 6
 SWEP.BleedDamageDelay = 1
+SWEP.DamageType = DMG_CLUB
 
 function SWEP:Deploy()
 	self:SetWeaponHoldType(self.HoldType)
@@ -115,12 +116,12 @@ function SWEP:Think()
 			dmg:SetInflictor(self)
 			dmg:SetDamage(self.Primary.Damage)
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-			dmg:SetDamageType(DMG_CLUB)
+			dmg:SetDamageType(self.DamageType)
 			ent:TakeDamageInfo(dmg)
 			local timername = "TF2KukriBleedDamage" .. ent:EntIndex()
 
 			timer.Create(timername, self.BleedDamageDelay, self.BleedDamageTicks, function()
-				if not IsValid(ent) or GetRoundState() == ROUND_PREP or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
+				if not IsValid(ent) or not IsValid(self) or GetRoundState() == ROUND_PREP or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
 					timer.Remove(timername)
 
 					return
@@ -136,7 +137,7 @@ function SWEP:Think()
 				dmg:SetAttacker(attacker)
 				dmg:SetInflictor(self)
 				dmg:SetDamage(self.BleedDamage)
-				dmg:SetDamageType(DMG_CLUB)
+				dmg:SetDamageType(self.DamageType)
 				ent:TakeDamageInfo(dmg)
 			end)
 		end
