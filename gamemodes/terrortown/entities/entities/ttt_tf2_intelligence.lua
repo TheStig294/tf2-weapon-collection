@@ -15,8 +15,11 @@ function ENT:Initialize()
     self:SetModel(self.Model)
     self:SetIsBLU(false)
     self.NextSpin = CurTime()
+    self:SetMoveType(MOVETYPE_VPHYSICS)
+    self:SetSolid(SOLID_VPHYSICS)
 
     if SERVER then
+        self:SetTrigger(true)
         local hookname = "TF2IntelligenceBypassPVS" .. self:EntIndex()
 
         hook.Add("SetupPlayerVisibility", hookname, function()
@@ -71,4 +74,9 @@ function ENT:Think()
         self.NextSpin = CurTime() + self.SpinDelay
         self:SetAngles(self:GetAngles() + self.SpinAngles)
     end
+end
+
+function ENT:StartTouch(ent)
+    print(ent)
+    self:Remove()
 end
