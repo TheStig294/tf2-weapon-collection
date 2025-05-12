@@ -4,6 +4,8 @@ ENT.Base = "base_anim"
 ENT.Spawnable = false
 ENT.PrintName = "Intelligence Briefcase"
 ENT.Model = "models/flag/briefcase.mdl"
+ENT.SpinDelay = 0.01
+ENT.SpinAngles = Angle(0, 1, 0)
 
 function ENT:SetupDataTables()
     self:NetworkVar("Bool", "IsBLU")
@@ -12,6 +14,7 @@ end
 function ENT:Initialize()
     self:SetModel(self.Model)
     self:SetIsBLU(false)
+    self.NextSpin = CurTime()
 
     if SERVER then
         local hookname = "TF2IntelligenceBypassPVS" .. self:EntIndex()
@@ -60,5 +63,12 @@ function ENT:SetBLU(setBLU)
         self:SetMaterial("models/flag/briefcase_blue")
     else
         self:SetMaterial("models/flag/briefcase")
+    end
+end
+
+function ENT:Think()
+    if CLIENT and CurTime() > self.NextSpin then
+        self.NextSpin = CurTime() + self.SpinDelay
+        self:SetAngles(self:GetAngles() + self.SpinAngles)
     end
 end
