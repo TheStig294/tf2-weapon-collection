@@ -70,13 +70,14 @@ function ENT:SetBLU(setBLU)
 end
 
 function ENT:Think()
-    if CLIENT and CurTime() > self.NextSpin then
+    if CLIENT and CurTime() > self.NextSpin and not IsValid(self:GetParent()) then
         self.NextSpin = CurTime() + self.SpinDelay
         self:SetAngles(self:GetAngles() + self.SpinAngles)
     end
 end
 
-function ENT:StartTouch(ent)
-    print(ent)
-    self:Remove()
+function ENT:StartTouch(ply)
+    print("Touched:", ply)
+    if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
+    self:FollowBone(ply, ply:LookupBone("ValveBiped.Bip01_Spine"))
 end
