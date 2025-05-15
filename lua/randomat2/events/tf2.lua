@@ -6,6 +6,8 @@ EVENT.id = "tf2"
 
 EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
+local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE, "Number of intel captures to win", 1, 10)
+
 function EVENT:Begin()
     local REDSpawn, BLUSpawn
     local playerSpawns = ents.FindByClass("info_player_start")
@@ -44,8 +46,10 @@ function EVENT:Begin()
     BLUIntel:SetPos(BLUSpawn)
     BLUIntel:Spawn()
     BLUIntel:SetBLU(true)
+    local REDIntelCaptures = 0
+    local BLUIntelCaptures = 0
 
-    self:AddHook("TF2IntelligenceReturned", function(ply, isBLU)
+    self:AddHook("TF2IntelligenceCaptured", function(ply, isBLU)
         local str = ply:Nick() .. " has returned the intelligence for the"
 
         if isBLU then
@@ -56,6 +60,17 @@ function EVENT:Begin()
 
         PrintMessage(HUD_PRINTCENTER, str)
         PrintMessage(HUD_PRINTTALK, str)
+
+        if isBLU then
+            BLUIntelCaptures = BLUIntelCaptures + 1
+        else
+            REDIntelCaptures = REDIntelCaptures + 1
+        end
+    end)
+
+    self:AddHook("TTTCheckForWin", function()
+        if REDIntelCaptures >= capturesToWin:GetInt() then return WIN_TRAITOR end
+        if BLUIntelCaptures >= capturesToWin:GetInt() then return WIN_INNOCENT end
     end)
 end
 

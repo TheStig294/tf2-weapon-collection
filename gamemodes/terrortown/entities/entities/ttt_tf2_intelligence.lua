@@ -116,27 +116,24 @@ function ENT:Think()
 end
 
 function ENT:StartTouch(ply)
-    if IsValid(self:GetNWEntity("HeldPlayer")) then return end
+    local intelEnt = ply:GetNWEntity("TF2Intelligence")
+    if IsValid(intelEnt) and intelEnt == self then return end
     if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
 
-    -- Returning the enemy intel
+    -- Capturing the enemy intel
     if (ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam())) and not self:GetNWBool("IsBLU") then
-        local intelEnt = ply:GetNWEntity("TF2Intelligence")
-
         if IsValid(intelEnt) and intelEnt:GetNWBool("IsBLU") then
             ply:SetNWEntity("TF2Intelligence", NULL)
-            hook.Run("TF2IntelligenceReturned", ply, self:GetNWBool("IsBLU"))
+            hook.Run("TF2IntelligenceCaptured", ply, false)
         end
 
         return
     end
 
-    if (ply:GetRole() == ROLE_DETECTIVE or (ply.IsDetectiveTeam and ply:IsDetectiveTeam())) and self:GetNWBool("IsBLU") then
-        local intelEnt = ply:GetNWEntity("TF2Intelligence")
-
+    if (ply:GetRole() == ROLE_DETECTIVE or ply:GetRole() == ROLE_INNOCENT or (ply.IsInnocentTeam and ply:IsInnocentTeam())) and self:GetNWBool("IsBLU") then
         if IsValid(intelEnt) and not intelEnt:GetNWBool("IsBLU") then
             ply:SetNWEntity("TF2Intelligence", NULL)
-            hook.Run("TF2IntelligenceReturned", ply, self:GetNWBool("IsBLU"))
+            hook.Run("TF2IntelligenceCaptured", ply, true)
         end
 
         return
@@ -144,4 +141,6 @@ function ENT:StartTouch(ply)
 
     ply:SetNWEntity("TF2Intelligence", self)
     ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
+    ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
+    ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
 end
