@@ -7,13 +7,8 @@ ENT.Model = "models/flag/briefcase.mdl"
 ENT.SpinDelay = 0.01
 ENT.SpinAngles = Angle(0, 1, 0)
 
-function ENT:SetupDataTables()
-    self:NetworkVar("Bool", "IsBLU")
-end
-
 function ENT:Initialize()
     self:SetModel(self.Model)
-    self:SetIsBLU(false)
     self.NextSpin = CurTime()
     self:SetMoveType(MOVETYPE_VPHYSICS)
     self:SetSolid(SOLID_VPHYSICS)
@@ -31,11 +26,37 @@ function ENT:Initialize()
 
             AddOriginToPVS(self:GetPos())
         end)
+
+        local playerDeathHookname = "TF2IntelligenceDeath" .. self:EntIndex()
+
+        hook.Add("PostPlayerDeath", playerDeathHookname, function(ply)
+            ply:SetNWEntity("TF2Intelligence", NULL)
+            ply:StopParticles()
+
+            if not IsValid(self) then
+                hook.Remove("PostPlayerDeath", playerDeathHookname)
+
+                return
+            end
+
+            local heldPlayer = self:GetNWEntity("HeldPlayer")
+
+            if IsValid(heldPlayer) and heldPlayer == ply then
+                self:SetNWEntity("HeldPlayer", NULL)
+            end
+        end)
+
+        hook.Add("TTTPrepareRound", "TF2IntelligenceReset", function()
+            for _, ply in player.Iterator() do
+                ply:SetNWEntity("TF2Intelligence", NULL)
+                ply:StopParticles()
+            end
+
+            hook.Remove("TTTPrepareRound", "TF2IntelligenceReset")
+        end)
     end
 
     if CLIENT then
-        local haloEnts = {self}
-
         local BLUColour = Color(0, 255, 255)
         local REDColour = Color(255, 0, 0)
         local hookname = "TF2IntelligenceOutline" .. self:EntIndex()
@@ -48,10 +69,28 @@ function ENT:Initialize()
                 return
             end
 
+            local haloEnts = {}
             colour = REDColour
 
-            if self:GetMaterial() == "models/flag/briefcase_blue" then
+            if self:GetNWBool("IsBLU") then
                 colour = BLUColour
+            end
+
+            local heldPlayer
+
+            for _, ply in player.Iterator() do
+                local intelEnt = ply:GetNWEntity("TF2Intelligence")
+
+                if IsValid(intelEnt) and intelEnt == self then
+                    heldPlayer = ply
+                    break
+                end
+            end
+
+            if IsValid(heldPlayer) then
+                table.insert(haloEnts, heldPlayer)
+            else
+                table.insert(haloEnts, self)
             end
 
             halo.Add(haloEnts, colour, 1, 1, 3, true, true)
@@ -60,7 +99,7 @@ function ENT:Initialize()
 end
 
 function ENT:SetBLU(setBLU)
-    self:SetIsBLU(setBLU)
+    self:SetNWBool("IsBLU", true)
 
     if setBLU then
         self:SetMaterial("models/flag/briefcase_blue")
@@ -70,14 +109,17 @@ function ENT:SetBLU(setBLU)
 end
 
 function ENT:Think()
-    if CLIENT and CurTime() > self.NextSpin and not IsValid(self:GetParent()) then
+    if CLIENT and CurTime() > self.NextSpin then
         self.NextSpin = CurTime() + self.SpinDelay
         self:SetAngles(self:GetAngles() + self.SpinAngles)
     end
 end
 
 function ENT:StartTouch(ply)
-    print("Touched:", ply)
+    if IsValid(self:GetNWEntity("HeldPlayer")) then return end
     if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
-    self:FollowBone(ply, ply:LookupBone("ValveBiped.Bip01_Spine"))
+    if ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam()) and self:GetNWBool("IsBLU") then return end
+    if ply:GetRole() == ROLE_DETECTIVE or (ply.IsDetectiveTeam and ply:IsDetectiveTeam()) and not self:GetNWBool("IsBLU") then return end
+    ply:SetNWEntity("TF2Intelligence", self)
+    ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
 end
