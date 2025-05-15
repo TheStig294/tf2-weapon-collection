@@ -118,8 +118,30 @@ end
 function ENT:StartTouch(ply)
     if IsValid(self:GetNWEntity("HeldPlayer")) then return end
     if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
-    if ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam()) and self:GetNWBool("IsBLU") then return end
-    if ply:GetRole() == ROLE_DETECTIVE or (ply.IsDetectiveTeam and ply:IsDetectiveTeam()) and not self:GetNWBool("IsBLU") then return end
+
+    -- Returning the enemy intel
+    if (ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam())) and not self:GetNWBool("IsBLU") then
+        local intelEnt = ply:GetNWEntity("TF2Intelligence")
+
+        if IsValid(intelEnt) and intelEnt:GetNWBool("IsBLU") then
+            ply:SetNWEntity("TF2Intelligence", NULL)
+            hook.Run("TF2IntelligenceReturned", ply, self:GetNWBool("IsBLU"))
+        end
+
+        return
+    end
+
+    if (ply:GetRole() == ROLE_DETECTIVE or (ply.IsDetectiveTeam and ply:IsDetectiveTeam())) and self:GetNWBool("IsBLU") then
+        local intelEnt = ply:GetNWEntity("TF2Intelligence")
+
+        if IsValid(intelEnt) and not intelEnt:GetNWBool("IsBLU") then
+            ply:SetNWEntity("TF2Intelligence", NULL)
+            hook.Run("TF2IntelligenceReturned", ply, self:GetNWBool("IsBLU"))
+        end
+
+        return
+    end
+
     ply:SetNWEntity("TF2Intelligence", self)
     ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
 end

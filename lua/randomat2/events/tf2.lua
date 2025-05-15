@@ -44,6 +44,19 @@ function EVENT:Begin()
     BLUIntel:SetPos(BLUSpawn)
     BLUIntel:Spawn()
     BLUIntel:SetBLU(true)
+
+    self:AddHook("TF2IntelligenceReturned", function(ply, isBLU)
+        local str = ply:Nick() .. " has returned the intelligence for the"
+
+        if isBLU then
+            str = str .. " BLU team!"
+        else
+            str = str .. " RED team!"
+        end
+
+        PrintMessage(HUD_PRINTCENTER, str)
+        PrintMessage(HUD_PRINTTALK, str)
+    end)
 end
 
 Randomat:register(EVENT)
