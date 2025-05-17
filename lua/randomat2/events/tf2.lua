@@ -7,6 +7,7 @@ EVENT.id = "tf2"
 EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
 local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE, "Number of intel captures to win", 1, 10)
+local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds until respawning", 1, 60)
 
 function EVENT:Begin()
     local REDSpawn, BLUSpawn
@@ -72,6 +73,37 @@ function EVENT:Begin()
         if REDIntelCaptures >= capturesToWin:GetInt() then return WIN_TRAITOR end
         if BLUIntelCaptures >= capturesToWin:GetInt() then return WIN_INNOCENT end
     end)
+
+    util.AddNetworkString("TF2RandomatRespawnTimer")
+
+    self:AddHook("PostPlayerDeath", function(ply)
+        local timername = "TF2RandomatRespawnTimer" .. ply:SteamID64()
+        local respawnTime = respawnSecs:GetInt()
+        net.Start("TF2RandomatRespawnTimer")
+        net.WriteUInt(respawnTime, 6)
+        net.Send(ply)
+
+        timer.Create(timername, 1, respawnTime, function()
+            if not IsValid(ply) or ply:Alive() or not ply:IsSpec() then
+                timer.Remove(timername)
+
+                return
+            end
+
+            if timer.RepsLeft(timername) > 0 then return end
+            ply:SpawnForRound(true)
+            -- Make the player face the enemy intel on respawning
+            local intel = Randomat:IsTraitorTeam(ply) and BLUIntel or REDIntel
+            local direction = intel:GetPos() - ply:GetPos()
+            ply:SetEyeAngles(direction:Angle())
+        end)
+    end)
+end
+
+function EVENT:End()
+    for _, ply in player.Iterator() do
+        timer.Remove("TF2RandomatRespawnTimer" .. ply:SteamID64())
+    end
 end
 
 Randomat:register(EVENT)
