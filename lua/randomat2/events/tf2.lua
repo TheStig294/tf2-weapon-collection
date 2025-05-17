@@ -3,6 +3,7 @@ EVENT.Title = ""
 -- EVENT.Title = "It's time to..."
 EVENT.AltTitle = "Meet The Randomat!"
 EVENT.id = "tf2"
+EVENT.Type = EVENT_TYPE_RESPAWN
 
 EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
