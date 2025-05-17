@@ -8,7 +8,7 @@ EVENT.Type = EVENT_TYPE_RESPAWN
 EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
 local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE, "Number of intel captures to win", 1, 10)
-local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds until respawning", 1, 60)
+local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds to wait until respawning", 1, 60)
 
 function EVENT:Begin()
     local REDSpawn, BLUSpawn
@@ -70,9 +70,11 @@ function EVENT:Begin()
         end
     end)
 
+    -- Only allow for a win through getting enough captures, or the round time running out
     self:AddHook("TTTCheckForWin", function()
         if REDIntelCaptures >= capturesToWin:GetInt() then return WIN_TRAITOR end
         if BLUIntelCaptures >= capturesToWin:GetInt() then return WIN_INNOCENT end
+        if GetGlobalFloat("ttt_round_end") > CurTime() then return WIN_NONE end
     end)
 
     util.AddNetworkString("TF2RandomatRespawnTimer")
