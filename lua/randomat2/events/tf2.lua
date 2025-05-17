@@ -101,6 +101,18 @@ function EVENT:Begin()
             ply:SetEyeAngles(direction:Angle())
         end)
     end)
+
+    local halfPlayerCount = player.GetCount() / 2
+    local REDRole = ROLE_REDMANN or ROLE_TRAITOR
+    local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
+
+    for i, ply in player.Iterator() do
+        if i < halfPlayerCount then
+            Randomat:SetRole(ply, REDRole)
+        else
+            Randomat:SetRole(ply, BLURole)
+        end
+    end
 end
 
 function EVENT:End()
