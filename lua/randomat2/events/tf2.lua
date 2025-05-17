@@ -106,4 +106,31 @@ function EVENT:End()
     end
 end
 
+-- Don't run at the same time as other gamemode randomats, since this randomat completely changes the game
+function EVENT:Condition()
+    return not Randomat:IsEventCategoryActive("gamemode")
+end
+
+function EVENT:GetConVars()
+    local sliders = {}
+
+    for _, v in pairs({"captures_to_win", "respawn_seconds"}) do
+        local name = "randomat_" .. self.id .. "_" .. v
+
+        if ConVarExists(name) then
+            local convar = GetConVar(name)
+
+            table.insert(sliders, {
+                cmd = v,
+                dsc = convar:GetHelpText(),
+                min = convar:GetMin(),
+                max = convar:GetMax(),
+                dcm = 0
+            })
+        end
+    end
+
+    return sliders
+end
+
 Randomat:register(EVENT)
