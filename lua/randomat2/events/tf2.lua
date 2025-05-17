@@ -78,12 +78,13 @@ function EVENT:Begin()
     end)
 
     util.AddNetworkString("TF2RandomatRespawnTimer")
+    local respawnTime = respawnSecs:GetInt()
 
     self:AddHook("PostPlayerDeath", function(ply)
         local timername = "TF2RandomatRespawnTimer" .. ply:SteamID64()
-        local respawnTime = respawnSecs:GetInt()
         net.Start("TF2RandomatRespawnTimer")
         net.WriteUInt(respawnTime, 6)
+        net.WriteBool(false)
         net.Send(ply)
 
         timer.Create(timername, 1, respawnTime, function()
@@ -107,18 +108,53 @@ function EVENT:Begin()
     local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
 
     for i, ply in player.Iterator() do
+        local enemyIntel
+
         if i < halfPlayerCount then
             Randomat:SetRole(ply, REDRole)
+            enemyIntel = BLUIntel
         else
             Randomat:SetRole(ply, BLURole)
+            enemyIntel = REDIntel
         end
+
+        local direction = enemyIntel:GetPos() - ply:GetPos()
+        ply:SetEyeAngles(direction:Angle())
+        ply:Freeze(true)
     end
+
+    net.Start("TF2ClassChangerScreen")
+    net.Broadcast()
+
+    timer.Simple(0.1, function()
+        net.Start("TF2RandomatRespawnTimer")
+        net.WriteUInt(respawnTime, 6)
+        net.WriteBool(true)
+        net.Broadcast()
+    end)
+
+    timer.Create("TF2RandomatRoundBeginUnfreeze", respawnTime, 1, function()
+        for _, ply in player.Iterator() do
+            ply:Freeze(false)
+        end
+    end)
+
+    self:AddHook("PlayerButtonDown", function(ply, button)
+        if button ~= KEY_COMMA then return end
+
+        if not ply:Alive() or ply:IsSpec() then
+            net.Start("TF2ClassChangerScreen")
+            net.Send(ply)
+        end
+    end)
 end
 
 function EVENT:End()
     for _, ply in player.Iterator() do
         timer.Remove("TF2RandomatRespawnTimer" .. ply:SteamID64())
     end
+
+    timer.Remove("TF2RandomatRoundBeginUnfreeze")
 end
 
 -- Don't run at the same time as other gamemode randomats, since this randomat completely changes the game

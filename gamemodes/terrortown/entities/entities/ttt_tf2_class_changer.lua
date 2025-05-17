@@ -48,7 +48,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
         net.Receive("TF2ClassChangerScreen", function(_, ply)
             local class = net.ReadUInt(4)
 
-            if ply:IsTraitorTeam() then
+            if not CR_VERSION then
+                TF2WC:StripAndGiveLoadout(ply, class.loadout)
+            elseif ply:IsTraitorTeam() then
                 ply:SetRole(TF2WC.Classes[class].roles[1])
             else
                 ply:SetRole(TF2WC.Classes[class].roles[2])
