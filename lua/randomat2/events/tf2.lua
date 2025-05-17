@@ -51,7 +51,7 @@ function EVENT:Begin()
     local BLUIntelCaptures = 0
 
     self:AddHook("TF2IntelligenceCaptured", function(ply, isBLU)
-        local str = ply:Nick() .. " has returned the intelligence for the"
+        local str = ply:Nick() .. " has captured the enemy intelligence for the"
 
         if isBLU then
             str = str .. " BLU team!"

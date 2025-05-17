@@ -6,6 +6,7 @@ ENT.PrintName = "Intelligence Briefcase"
 ENT.Model = "models/flag/briefcase.mdl"
 ENT.SpinDelay = 0.01
 ENT.SpinAngles = Angle(0, 1, 0)
+ENT.DroppedOldIntel = NULL
 
 function ENT:Initialize()
     self:SetModel(self.Model)
@@ -30,6 +31,23 @@ function ENT:Initialize()
         local playerDeathHookname = "TF2IntelligenceDeath" .. self:EntIndex()
 
         hook.Add("PostPlayerDeath", playerDeathHookname, function(ply)
+            local oldIntel = ply:GetNWEntity("TF2Intelligence")
+
+            if IsValid(oldIntel) then
+                local droppedIntel = ents.Create("ttt_tf2_intelligence")
+                droppedIntel.DroppedOldIntel = oldIntel
+                droppedIntel:SetPos(ply:GetPos())
+                droppedIntel:Spawn()
+
+                if oldIntel:GetBLU() then
+                    droppedIntel:SetBLU(true)
+                    SetGlobalEntity("TF2IntelligenceDroppedBLU", droppedIntel)
+                else
+                    droppedIntel:SetBLU(false)
+                    SetGlobalEntity("TF2IntelligenceDroppedRED", droppedIntel)
+                end
+            end
+
             ply:SetNWEntity("TF2Intelligence", NULL)
             ply:StopParticles()
 
@@ -71,8 +89,9 @@ function ENT:Initialize()
 
             local haloEnts = {}
             colour = REDColour
+            local isBLU = self:GetNWBool("IsBLU")
 
-            if self:GetNWBool("IsBLU") then
+            if isBLU then
                 colour = BLUColour
             end
 
@@ -87,9 +106,20 @@ function ENT:Initialize()
                 end
             end
 
+            local droppedBLUIntel = GetGlobalEntity("TF2IntelligenceDroppedBLU")
+            local droppedREDIntel = GetGlobalEntity("TF2IntelligenceDroppedRED")
+
+            if IsValid(droppedREDIntel) then
+                table.insert(haloEnts, droppedREDIntel)
+            end
+
+            if IsValid(droppedBLUIntel) then
+                table.insert(haloEnts, droppedBLUIntel)
+            end
+
             if IsValid(heldPlayer) then
                 table.insert(haloEnts, heldPlayer)
-            else
+            elseif (isBLU and not IsValid(droppedBLUIntel)) or (not isBLU and not IsValid(droppedREDIntel)) then
                 table.insert(haloEnts, self)
             end
 
@@ -99,7 +129,7 @@ function ENT:Initialize()
 end
 
 function ENT:SetBLU(setBLU)
-    self:SetNWBool("IsBLU", true)
+    self:SetNWBool("IsBLU", setBLU)
 
     if setBLU then
         self:SetMaterial("models/flag/briefcase_blue")
@@ -115,32 +145,55 @@ function ENT:Think()
     end
 end
 
+function ENT:GetBLU()
+    return self:GetNWBool("IsBLU")
+end
+
+function ENT:IsPlayerInnocent(ply)
+    return ply:GetRole() == ROLE_DETECTIVE or ply:GetRole() == ROLE_INNOCENT or (ply.IsInnocentTeam and ply:IsInnocentTeam())
+end
+
+function ENT:IsPlayerTraitor(ply)
+    return ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam())
+end
+
+function ENT:CanPickupEnemyIntel(ply)
+    local droppedIntel = self:GetBLU() and GetGlobalEntity("TF2IntelligenceDroppedBLU") or GetGlobalEntity("TF2IntelligenceDroppedRED")
+
+    if IsValid(droppedIntel) and self ~= droppedIntel then
+        return false
+    else
+        return (self:IsPlayerTraitor(ply) and self:GetBLU()) or (self:IsPlayerInnocent(ply) and not self:GetBLU())
+    end
+end
+
 function ENT:StartTouch(ply)
     local intelEnt = ply:GetNWEntity("TF2Intelligence")
     if IsValid(intelEnt) and intelEnt == self then return end
     if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
 
-    -- Capturing the enemy intel
-    if (ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam())) and not self:GetNWBool("IsBLU") then
-        if IsValid(intelEnt) and intelEnt:GetNWBool("IsBLU") then
-            ply:SetNWEntity("TF2Intelligence", NULL)
-            hook.Run("TF2IntelligenceCaptured", ply, false)
+    if IsValid(self.DroppedOldIntel) and ((self:IsPlayerTraitor(ply) and not self:GetBLU()) or (self:IsPlayerInnocent(ply) and self:GetBLU())) then
+        -- Returning friendly intel
+        local intelTeamName = self:GetBLU() and "BLU" or "RED"
+        local msg = ply:Nick() .. " has returned the " .. intelTeamName .. " intelligence!"
+        PrintMessage(HUD_PRINTCENTER, msg)
+        PrintMessage(HUD_PRINTTALK, msg)
+        self:Remove()
+    elseif IsValid(intelEnt) and ((intelEnt:GetBLU() and not self:GetBLU()) or (not intelEnt:GetBLU() and self:GetBLU())) then
+        -- Returning enemy intel
+        ply:SetNWEntity("TF2Intelligence", NULL)
+        hook.Run("TF2IntelligenceCaptured", ply, self:GetBLU())
+    elseif self:CanPickupEnemyIntel(ply) then
+        -- Picking up the enemy intel
+        ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
+        ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
+        ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
+
+        if IsValid(self.DroppedOldIntel) then
+            ply:SetNWEntity("TF2Intelligence", self.DroppedOldIntel)
+            self:Remove()
+        else
+            ply:SetNWEntity("TF2Intelligence", self)
         end
-
-        return
     end
-
-    if (ply:GetRole() == ROLE_DETECTIVE or ply:GetRole() == ROLE_INNOCENT or (ply.IsInnocentTeam and ply:IsInnocentTeam())) and self:GetNWBool("IsBLU") then
-        if IsValid(intelEnt) and not intelEnt:GetNWBool("IsBLU") then
-            ply:SetNWEntity("TF2Intelligence", NULL)
-            hook.Run("TF2IntelligenceCaptured", ply, true)
-        end
-
-        return
-    end
-
-    ply:SetNWEntity("TF2Intelligence", self)
-    ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
-    ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
-    ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
 end
