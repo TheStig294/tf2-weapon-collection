@@ -160,6 +160,20 @@ function EVENT:Begin()
             net.Send(ply)
         end
     end)
+
+    self:DisableRoundEndSounds()
+
+    self:AddHook("TTTEndRound", function(wintype)
+        for _, ply in player.Iterator() do
+            if wintype == WIN_TIMELIMIT then
+                ply:SendLua("surface.PlaySound(\"misc/your_team_stalemate.wav\")")
+            elseif (Randomat:IsTraitorTeam(ply) and wintype == WIN_TRAITOR) or (Randomat:IsInnocentTeam(ply) and wintype == WIN_INNOCENT) then
+                ply:SendLua("surface.PlaySound(\"misc/your_team_won.wav\")")
+            else
+                ply:SendLua("surface.PlaySound(\"misc/your_team_lost.wav\")")
+            end
+        end
+    end)
 end
 
 function EVENT:End()
