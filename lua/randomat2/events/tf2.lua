@@ -55,6 +55,7 @@ function EVENT:Begin()
     BLUIntel:SetBLU(true)
     local REDIntelCaptures = 0
     local BLUIntelCaptures = 0
+    util.AddNetworkString("TF2RandomatIntelCaptured")
 
     self:AddHook("TF2IntelligenceCaptured", function(ply, isBLU)
         local str = ply:Nick() .. " has captured the enemy intelligence for the"
@@ -84,6 +85,10 @@ function EVENT:Begin()
                 end
             end
         end
+
+        net.Start("TF2RandomatIntelCaptured")
+        net.WriteBool(isBLU)
+        net.Broadcast()
     end)
 
     -- Only allow for a win through getting enough captures, or the round time running out
@@ -102,6 +107,7 @@ function EVENT:Begin()
         net.WriteUInt(respawnTime, 6)
         net.WriteBool(false)
         net.WriteBool(false)
+        net.WriteInt(capturesToWin:GetInt(), 6)
         net.Send(ply)
 
         timer.Create(timername, 1, respawnTime, function()
@@ -228,6 +234,7 @@ function EVENT:Begin()
             net.WriteUInt(15, 6)
             net.WriteBool(true)
             net.WriteBool(playMusic:GetBool())
+            net.WriteInt(capturesToWin:GetInt(), 6)
             net.Broadcast()
         end)
     end)

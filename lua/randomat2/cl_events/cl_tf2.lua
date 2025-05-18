@@ -22,6 +22,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
     local respawnTime = net.ReadUInt(6)
     local isEventBegin = net.ReadBool()
     local playMusic = net.ReadBool()
+    local capturesToWin = net.ReadUInt(6)
     local client = LocalPlayer()
 
     timer.Create("TF2RandomatRespawnTimer", 1, respawnTime, function()
@@ -39,6 +40,24 @@ net.Receive("TF2RandomatRespawnTimer", function()
                 surface.PlaySound("misc/announcer_begins_10sec.wav")
             elseif respawnTime == 5 then
                 surface.PlaySound("misc/announcer_begins_5sec.wav")
+            elseif respawnTime == 0 then
+                local REDIntelCaptures = 0
+                local BLUIntelCaptures = 0
+
+                net.Receive("TF2RandomatIntelCaptured", function()
+                    local isBLUCapture = net.ReadBool()
+
+                    if isBLUCapture then
+                        BLUIntelCaptures = BLUIntelCaptures + 1
+                    else
+                        REDIntelCaptures = REDIntelCaptures + 1
+                    end
+                end)
+
+                hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
+                    draw.WordBox(8, (ScrW() / 2) - 50, 50, "RED: " .. REDIntelCaptures .. "/" .. capturesToWin, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) + 50, 50, "BLU: " .. BLUIntelCaptures .. "/" .. capturesToWin, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                end)
             end
         end
     end)
@@ -160,6 +179,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
 
         hook.Add("TTTPrepareRound", "TF2RandomatReset", function()
             timer.Remove("TF2RandomatRespawnTimer")
+            hook.Remove("HUDPaint", "TF2RandomatScoreHUD")
             hook.Remove("PostDrawHUD", "TF2RandomatRespawnTimerHUD")
             hook.Remove("TTTScoringWinTitleOverride", "TF2RandomatWinTitle")
             hook.Remove("RenderScreenspaceEffects", "TF2RandomatIntroGreyscale")
