@@ -55,8 +55,9 @@ net.Receive("TF2RandomatRespawnTimer", function()
                 end)
 
                 hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                    draw.WordBox(8, (ScrW() / 2) - 50, 50, "RED: " .. REDIntelCaptures .. "/" .. capturesToWin, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                    draw.WordBox(8, (ScrW() / 2) + 50, 50, "BLU: " .. BLUIntelCaptures .. "/" .. capturesToWin, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) - 50, 50, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) + 50, 50, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, ScrW() / 2, 15, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end)
             end
         end
@@ -75,7 +76,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
         local alignment = TEXT_ALIGN_LEFT
 
         if isEventBegin then
-            message = "Round beginning in " .. respawnTime .. " seconds..."
+            message = "Capture The Flag begins in " .. respawnTime .. " seconds..."
             xPos = ScrW() / 2
             yPos = 50
             alignment = TEXT_ALIGN_CENTER
