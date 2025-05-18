@@ -15,6 +15,7 @@ hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equ
     if equipment == EQUIP_TF2_CLASS_CHANGER then
         -- This is defined below, where all the magic happens...
         net.Start("TF2ClassChangerScreen")
+        net.WriteBool(false)
         net.Send(ply)
 
         -- Removes the equipment from the player, to make the item re-buyable
@@ -49,9 +50,12 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
 
         net.Receive("TF2ClassChangerScreen", function(_, ply)
             local class = net.ReadUInt(4)
+            ply.TF2LastSelectedClass = class
 
             if not CR_VERSION then
-                TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class].loadout)
+                if ply:Alive() and not ply:IsSpec() then
+                    TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class].loadout)
+                end
             elseif ply:IsTraitorTeam() then
                 ply:SetRole(TF2WC.Classes[class].roles[1])
             else
@@ -62,12 +66,19 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                 SendFullStateUpdate()
             end)
         end)
+
+        hook.Add("TTTPrepareRound", "TF2ClassChangerReset", function()
+            for _, ply in player.Iterator() do
+                ply.TF2LastSelectedClass = nil
+            end
+        end)
     end
 
     if CLIENT then
         local client = LocalPlayer()
 
         net.Receive("TF2ClassChangerScreen", function()
+            local allowDeadPlayer = net.ReadBool()
             -- Playing the looping background music
             client:EmitSound("music/class_menu_bg.wav")
             gui.EnableScreenClicker(true)
@@ -110,7 +121,7 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             end)
 
             hook.Add("DrawOverlay", "TF2ClassChangerScreen", function()
-                if client:GetRole() ~= originalRole or not client:Alive() or client:IsSpec() then
+                if client:GetRole() ~= originalRole or (not allowDeadPlayer and (not client:Alive() or client:IsSpec())) then
                     client:StopSound("music/class_menu_bg.wav")
                     gui.EnableScreenClicker(false)
                     hook.Remove("DrawOverlay", "TF2ClassChangerScreen")

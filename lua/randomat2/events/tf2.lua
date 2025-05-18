@@ -100,6 +100,15 @@ function EVENT:Begin()
             local intel = Randomat:IsTraitorTeam(ply) and BLUIntel or REDIntel
             local direction = intel:GetPos() - ply:GetPos()
             ply:SetEyeAngles(direction:Angle())
+
+            -- Give the player their last selected class's loadout weapons
+            if ply.TF2LastSelectedClass then
+                timer.Simple(1, function()
+                    local class = TF2WC.Classes[ply.TF2LastSelectedClass]
+                    TF2WC:StripAndGiveLoadout(ply, class.loadout)
+                    ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
+                end)
+            end
         end)
     end)
 
@@ -124,6 +133,7 @@ function EVENT:Begin()
     end
 
     net.Start("TF2ClassChangerScreen")
+    net.WriteBool(true)
     net.Broadcast()
 
     timer.Simple(0.1, function()
@@ -144,6 +154,7 @@ function EVENT:Begin()
 
         if not ply:Alive() or ply:IsSpec() then
             net.Start("TF2ClassChangerScreen")
+            net.WriteBool(true)
             net.Send(ply)
         end
     end)
