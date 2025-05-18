@@ -136,14 +136,16 @@ function EVENT:Begin()
     net.WriteBool(true)
     net.Broadcast()
 
+    -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
+    -- (The "Meet the randomat" splash screen, etc.)
     timer.Simple(0.1, function()
         net.Start("TF2RandomatRespawnTimer")
-        net.WriteUInt(respawnTime, 6)
+        net.WriteUInt(15, 6)
         net.WriteBool(true)
         net.Broadcast()
     end)
 
-    timer.Create("TF2RandomatRoundBeginUnfreeze", respawnTime, 1, function()
+    timer.Create("TF2RandomatRoundBeginUnfreeze", 15, 1, function()
         for _, ply in player.Iterator() do
             ply:Freeze(false)
         end
