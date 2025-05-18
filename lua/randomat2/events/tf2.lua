@@ -9,8 +9,12 @@ EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
 local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE, "Number of intel captures to win", 1, 10)
 local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds to wait until respawning", 1, 60)
+local hasteModeCvar
 
 function EVENT:Begin()
+    local hasteMode = GetConVar("ttt_haste")
+    hasteModeCvar = hasteMode:GetBool()
+    hasteMode:SetBool(false)
     local REDSpawn, BLUSpawn
     local playerSpawns = ents.FindByClass("info_player_start")
 
@@ -144,7 +148,6 @@ function EVENT:Begin()
     end
 
     net.Start("TF2ClassChangerScreen")
-    net.WriteBool(true)
     net.Broadcast()
 
     -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
@@ -167,7 +170,6 @@ function EVENT:Begin()
 
         if not ply:Alive() or ply:IsSpec() then
             net.Start("TF2ClassChangerScreen")
-            net.WriteBool(true)
             net.Send(ply)
         end
     end)
@@ -187,27 +189,32 @@ function EVENT:Begin()
         end
     end)
 
-    self:AddHook("Think", function()
-        local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
+    local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
 
-        if roundTime == 60 then
+    timer.Create("TF2RandomatRoundTimeAnnouncements", 1, roundTime, function()
+        if timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 60 then
             BroadcastLua("surface.PlaySound(\"misc/announcer_ends_60sec.wav\")")
-        elseif roundTime == 30 then
+        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 30 then
             BroadcastLua("surface.PlaySound(\"misc/announcer_ends_30sec.wav\")")
-        elseif roundTime == 10 then
+        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 10 then
             BroadcastLua("surface.PlaySound(\"misc/announcer_ends_10sec.wav\")")
-        elseif roundTime == 5 then
+        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 5 then
             BroadcastLua("surface.PlaySound(\"misc/announcer_ends_5sec.wav\")")
         end
     end)
 end
 
 function EVENT:End()
+    if hasteModeCvar then
+        GetConVar("ttt_haste"):SetBool(hasteModeCvar)
+    end
+
     for _, ply in player.Iterator() do
         timer.Remove("TF2RandomatRespawnTimer" .. ply:SteamID64())
     end
 
     timer.Remove("TF2RandomatRoundBeginUnfreeze")
+    timer.Remove("TF2RandomatRoundTimeAnnouncements")
 end
 
 -- Don't run at the same time as other gamemode randomats, since this randomat completely changes the game

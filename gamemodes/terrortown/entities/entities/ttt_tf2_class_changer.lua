@@ -15,7 +15,6 @@ hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equ
     if equipment == EQUIP_TF2_CLASS_CHANGER then
         -- This is defined below, where all the magic happens...
         net.Start("TF2ClassChangerScreen")
-        net.WriteBool(false)
         net.Send(ply)
 
         -- Removes the equipment from the player, to make the item re-buyable
@@ -78,12 +77,10 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
         local client = LocalPlayer()
 
         net.Receive("TF2ClassChangerScreen", function()
-            local allowDeadPlayer = net.ReadBool()
             -- Playing the looping background music
             client:EmitSound("music/class_menu_bg.wav")
             gui.EnableScreenClicker(true)
             -- Selecting a class
-            local originalRole = client:GetRole()
             local screenMats = {}
             local screenSounds = {}
 
@@ -121,16 +118,6 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             end)
 
             hook.Add("DrawOverlay", "TF2ClassChangerScreen", function()
-                if client:GetRole() ~= originalRole or (not allowDeadPlayer and (not client:Alive() or client:IsSpec())) then
-                    client:StopSound("music/class_menu_bg.wav")
-                    gui.EnableScreenClicker(false)
-                    hook.Remove("DrawOverlay", "TF2ClassChangerScreen")
-                    hook.Remove("TTTPrepareRound", "TF2ClassChangerReset")
-                    timer.Remove("TF2ClassChangerScreenTimeout")
-
-                    return
-                end
-
                 cursorX, cursorY = gui.MouseX(), gui.MouseY()
 
                 -- If the mouse is in the top part of the screen, start switching the class selected
