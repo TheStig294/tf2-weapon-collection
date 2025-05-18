@@ -74,9 +74,9 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     end
 
     if CLIENT then
-        local client = LocalPlayer()
-
         net.Receive("TF2ClassChangerScreen", function()
+            local client = LocalPlayer()
+
             -- Playing the looping background music
             if not GetGlobal2Bool("TF2ClassChangerDisableMusic") then
                 client:EmitSound("music/class_menu_bg.wav")
