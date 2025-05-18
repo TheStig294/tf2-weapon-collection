@@ -177,7 +177,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
 
     hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker, dmg)
         timer.Simple(1, function()
-            if not IsValid(ply) or (not ply.TF2Class and not ply:IsREDMann() and not ply:IsBLUMann()) then return end
+            if (not Randomat or not Randomat.IsEventActive or not Randomat:IsEventActive("tf2")) and (not IsValid(ply) or (not ply.TF2Class and not ply:IsREDMann() and not ply:IsBLUMann())) then return end
             if ply:Alive() or not ply:IsSpec() then return end
 
             if not IsValid(attacker) and IsValid(dmg) then

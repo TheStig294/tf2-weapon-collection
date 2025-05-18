@@ -179,6 +179,10 @@ function EVENT:Begin()
         local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
 
         for i, ply in player.Iterator() do
+            if not ply:Alive() or ply:IsSpec() then
+                ply:SpawnForRound(true)
+            end
+
             local enemyIntel
 
             if i <= halfPlayerCount then
