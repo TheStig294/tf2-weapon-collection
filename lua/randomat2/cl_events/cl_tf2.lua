@@ -1,6 +1,28 @@
+net.Receive("TF2RandomatIntro", function()
+    print("Received intro net message")
+    surface.PlaySound("music/meet_the_randomat.mp3")
+
+    timer.Create("TF2RandomatIntroSplashScreen", 2, 1, function()
+        local splashScreenMaterial = Material("vgui/ttt/meet_the_randomat.png")
+
+        hook.Add("DrawOverlay", "TF2RandomatIntroSplashScreen", function()
+            surface.SetDrawColor(255, 255, 255, 255)
+            surface.SetMaterial(splashScreenMaterial)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        end)
+    end)
+
+    hook.Add("TTTPrepareRound", "TF2RandomatIntoReset", function()
+        timer.Remove("TF2RandomatIntroSplashScreen")
+        hook.Remove("DrawOverlay", "TF2RandomatIntroSplashScreen")
+        hook.Remove("TTTPrepareRound", "TF2RandomatIntoReset")
+    end)
+end)
+
 net.Receive("TF2RandomatRespawnTimer", function()
     local respawnTime = net.ReadUInt(6)
     local isEventBegin = net.ReadBool()
+    local playMusic = net.ReadBool()
     local client = LocalPlayer()
 
     timer.Create("TF2RandomatRespawnTimer", 1, respawnTime, function()
@@ -30,41 +52,123 @@ net.Receive("TF2RandomatRespawnTimer", function()
         end
 
         local message = "Respawning in " .. respawnTime .. " seconds, press [,] to change class"
+        local xPos = 265
+        local yPos = ScrH() - 50
+        local alignment = TEXT_ALIGN_LEFT
 
         if isEventBegin then
             message = "Round beginning in " .. respawnTime .. " seconds..."
+            xPos = ScrW() / 2
+            yPos = 50
+            alignment = TEXT_ALIGN_CENTER
         end
 
-        draw.WordBox(8, 265, ScrH() - 50, message, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, xPos, yPos, message, "TF2Font", COLOR_BLACK, COLOR_WHITE, alignment)
     end)
 
-    if CR_VERSION then
-        LANG.AddToLanguage("english", "win_tf2_randomat_tie", "IT'S A TIE")
-        LANG.AddToLanguage("english", "win_tf2_randomat_red", "RED TEAM WINS")
-        LANG.AddToLanguage("english", "win_tf2_randomat_blu", "BLU TEAM WINS")
+    if isEventBegin then
+        hook.Remove("DrawOverlay", "TF2RandomatIntroSplashScreen")
 
-        hook.Add("TTTScoringWinTitleOverride", "TF2RandomatWinTitle", function(wintype)
-            local newTitle = {}
+        if CR_VERSION then
+            LANG.AddToLanguage("english", "win_tf2_randomat_tie", "IT'S A TIE")
+            LANG.AddToLanguage("english", "win_tf2_randomat_red", "RED TEAM WINS")
+            LANG.AddToLanguage("english", "win_tf2_randomat_blu", "BLU TEAM WINS")
 
-            if wintype == WIN_TIMELIMIT then
-                newTitle.c = ROLE_COLORS[ROLE_NONE]
-                newTitle.txt = "win_tf2_randomat_tie"
-            elseif wintype == WIN_TRAITOR then
-                newTitle.c = GetRoleTeamColor(ROLE_TEAM_TRAITOR)
-                newTitle.txt = "win_tf2_randomat_red"
-            elseif wintype == WIN_INNOCENT then
-                newTitle.c = GetRoleTeamColor(ROLE_TEAM_DETECTIVE)
-                newTitle.txt = "win_tf2_randomat_blu"
-            end
+            hook.Add("TTTScoringWinTitleOverride", "TF2RandomatWinTitle", function(wintype)
+                local newTitle = {}
 
-            return newTitle
+                if wintype == WIN_TIMELIMIT then
+                    newTitle.c = ROLE_COLORS[ROLE_NONE]
+                    newTitle.txt = "win_tf2_randomat_tie"
+                elseif wintype == WIN_TRAITOR then
+                    newTitle.c = GetRoleTeamColor(ROLE_TEAM_TRAITOR)
+                    newTitle.txt = "win_tf2_randomat_red"
+                elseif wintype == WIN_INNOCENT then
+                    newTitle.c = GetRoleTeamColor(ROLE_TEAM_DETECTIVE)
+                    newTitle.txt = "win_tf2_randomat_blu"
+                end
+
+                return newTitle
+            end)
+        end
+
+        -- Adds a near-black-and-white filter to the screen
+        local color_tbl = {
+            ["$pp_colour_addr"] = 0,
+            ["$pp_colour_addg"] = 0,
+            ["$pp_colour_addb"] = 0,
+            ["$pp_colour_brightness"] = 0,
+            ["$pp_colour_contrast"] = 1,
+            ["$pp_colour_colour"] = 0,
+            ["$pp_colour_mulr"] = 0,
+            ["$pp_colour_mulg"] = 0,
+            ["$pp_colour_mulb"] = 0
+        }
+
+        hook.Add("RenderScreenspaceEffects", "TF2RandomatIntroGreyscale", function()
+            DrawColorModify(color_tbl)
+            cam.Start3D(EyePos(), EyeAngles())
+            render.SuppressEngineLighting(true)
+            render.SetColorModulation(1, 1, 1)
+            render.SuppressEngineLighting(false)
+            cam.End3D()
+        end)
+
+        -- Draws 2 black bars on the screen, to make a cinematic letterbox effect
+        local xPos = 0
+        local yPos = 0
+        local width = ScrW()
+        local height = ScrH() / 7
+        local xPos2 = 0
+        local yPos2 = ScrH() - (ScrH() / 7)
+        local width2 = ScrW()
+        local height2 = ScrH() / 6
+
+        hook.Add("HUDPaintBackground", "TF2RandomatIntroBlackBars", function()
+            surface.SetDrawColor(0, 0, 0)
+            surface.DrawRect(xPos, yPos, width, height)
+            surface.DrawRect(xPos2, yPos2, width2, height2)
+        end)
+
+        -- Fades in colour and moves black bars off the screen over 3 seconds
+        timer.Create("TF2RandomatIntroFadeInBegin", 12, 1, function()
+            timer.Create("TF2RandomatIntroFadeIn", 0.01, 200, function()
+                if color_tbl["$pp_colour_colour"] + 0.005 <= 1 then
+                    color_tbl["$pp_colour_colour"] = color_tbl["$pp_colour_colour"] + 0.005
+                end
+
+                height = height - 1
+                yPos2 = yPos2 + 1
+            end)
+        end)
+
+        if playMusic then
+            surface.PlaySound("music/tf2_theme.mp3")
+
+            timer.Simple(5, function()
+                chat.AddText("Press 'M' to mute music")
+            end)
+
+            hook.Add("PlayerButtonDown", "TF2RandomatMusicMuteButton", function(_, button)
+                if button == KEY_M then
+                    RunConsoleCommand("stopsound")
+                    chat.AddText("Music muted")
+                    music = false
+                    hook.Remove("PlayerButtonDown", "TF2RandomatMusicMuteButton")
+                end
+            end)
+        end
+
+        hook.Add("TTTPrepareRound", "TF2RandomatReset", function()
+            timer.Remove("TF2RandomatRespawnTimer")
+            hook.Remove("PostDrawHUD", "TF2RandomatRespawnTimerHUD")
+            hook.Remove("TTTScoringWinTitleOverride", "TF2RandomatWinTitle")
+            hook.Remove("RenderScreenspaceEffects", "TF2RandomatIntroGreyscale")
+            hook.Remove("HUDPaintBackground", "TF2RandomatIntroBlackBars")
+            timer.Remove("TF2RandomatIntroFadeInBegin")
+            timer.Remove("TF2RandomatIntroFadeIn")
+            hook.Remove("PlayerButtonDown", "TF2RandomatMusicMuteButton")
+            hook.Remove("TTTPrepareRound", "TF2RandomatReset")
         end)
     end
-
-    hook.Add("TTTPrepareRound", "TF2RandomatReset", function()
-        timer.Remove("TF2RandomatRespawnTimer")
-        hook.Remove("PostDrawHUD", "TF2RandomatRespawnTimerHUD")
-        hook.Remove("TTTScoringWinTitleOverride", "TF2RandomatWinTitle")
-        hook.Remove("TTTPrepareRound", "TF2RandomatReset")
-    end)
 end)

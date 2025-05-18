@@ -26,6 +26,7 @@ if SERVER then
         if button ~= KEY_COMMA or (not ply:IsREDMann() and not ply:IsBLUMann()) or ply.TF2ClassChanged then return end
         ply:SetProperty("TF2ClassChanged", true)
         net.Start("TF2ClassChangerScreen")
+        net.WriteBool(true)
         net.Send(ply)
     end)
 

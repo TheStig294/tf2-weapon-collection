@@ -1,6 +1,6 @@
 local EVENT = {}
 EVENT.Title = ""
--- EVENT.Title = "It's time to..."
+EVENT.Title = "It's time to..."
 EVENT.AltTitle = "Meet The Randomat!"
 EVENT.id = "tf2"
 EVENT.Type = EVENT_TYPE_RESPAWN
@@ -9,6 +9,7 @@ EVENT.Categories = {"gamemode", "rolechange", "largeimpact"}
 
 local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE, "Number of intel captures to win", 1, 10)
 local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds to wait until respawning", 1, 60)
+local playMusic = CreateConVar("randomat_tf2_play_music", 1, FCVAR_NONE, "Play music during the event", 0, 1)
 local hasteModeCvar
 
 function EVENT:Begin()
@@ -100,6 +101,7 @@ function EVENT:Begin()
         net.Start("TF2RandomatRespawnTimer")
         net.WriteUInt(respawnTime, 6)
         net.WriteBool(false)
+        net.WriteBool(false)
         net.Send(ply)
 
         timer.Create(timername, 1, respawnTime, function()
@@ -127,49 +129,12 @@ function EVENT:Begin()
         end)
     end)
 
-    local halfPlayerCount = player.GetCount() / 2
-    local REDRole = ROLE_REDMANN or ROLE_TRAITOR
-    local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
-
-    for i, ply in player.Iterator() do
-        local enemyIntel
-
-        if i <= halfPlayerCount then
-            Randomat:SetRole(ply, REDRole)
-            enemyIntel = BLUIntel
-        else
-            Randomat:SetRole(ply, BLURole)
-            enemyIntel = REDIntel
-        end
-
-        local direction = enemyIntel:GetPos() - ply:GetPos()
-        ply:SetEyeAngles(direction:Angle())
-        ply:Freeze(true)
-    end
-
-    net.Start("TF2ClassChangerScreen")
-    net.Broadcast()
-
-    -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
-    -- (The "Meet the randomat" splash screen, etc.)
-    timer.Simple(0.1, function()
-        net.Start("TF2RandomatRespawnTimer")
-        net.WriteUInt(15, 6)
-        net.WriteBool(true)
-        net.Broadcast()
-    end)
-
-    timer.Create("TF2RandomatRoundBeginUnfreeze", 15, 1, function()
-        for _, ply in player.Iterator() do
-            ply:Freeze(false)
-        end
-    end)
-
     self:AddHook("PlayerButtonDown", function(ply, button)
         if button ~= KEY_COMMA then return end
 
         if not ply:Alive() or ply:IsSpec() then
             net.Start("TF2ClassChangerScreen")
+            net.WriteBool(true)
             net.Send(ply)
         end
     end)
@@ -179,28 +144,82 @@ function EVENT:Begin()
     -- TTTEndRound doesn't pass the win type to clients, so we have to check on the server
     self:AddHook("TTTEndRound", function(wintype)
         for _, ply in player.Iterator() do
-            if wintype == WIN_TIMELIMIT then
-                ply:SendLua("surface.PlaySound(\"misc/your_team_stalemate.wav\")")
-            elseif (Randomat:IsTraitorTeam(ply) and wintype == WIN_TRAITOR) or (Randomat:IsInnocentTeam(ply) and wintype == WIN_INNOCENT) then
-                ply:SendLua("surface.PlaySound(\"misc/your_team_won.wav\")")
-            else
-                ply:SendLua("surface.PlaySound(\"misc/your_team_lost.wav\")")
-            end
+            ply:ConCommand("stopsound")
+
+            timer.Simple(0.1, function()
+                if wintype == WIN_TIMELIMIT then
+                    ply:SendLua("surface.PlaySound(\"misc/your_team_stalemate.wav\")")
+                elseif (Randomat:IsTraitorTeam(ply) and wintype == WIN_TRAITOR) or (Randomat:IsInnocentTeam(ply) and wintype == WIN_INNOCENT) then
+                    ply:SendLua("surface.PlaySound(\"misc/your_team_won.wav\")")
+                else
+                    ply:SendLua("surface.PlaySound(\"misc/your_team_lost.wav\")")
+                end
+            end)
         end
     end)
 
-    local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
+    util.AddNetworkString("TF2RandomatIntro")
 
-    timer.Create("TF2RandomatRoundTimeAnnouncements", 1, roundTime, function()
-        if timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 60 then
-            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_60sec.wav\")")
-        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 30 then
-            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_30sec.wav\")")
-        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 10 then
-            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_10sec.wav\")")
-        elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 5 then
-            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_5sec.wav\")")
+    timer.Simple(0, function()
+        print("Sending intro net message")
+        net.Start("TF2RandomatIntro")
+        net.Broadcast()
+    end)
+
+    timer.Create("TF2RandomatEventStartCountdown", 7, 1, function()
+        local halfPlayerCount = player.GetCount() / 2
+        local REDRole = ROLE_REDMANN or ROLE_TRAITOR
+        local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
+
+        for i, ply in player.Iterator() do
+            local enemyIntel
+
+            if i <= halfPlayerCount then
+                Randomat:SetRole(ply, REDRole)
+                enemyIntel = BLUIntel
+            else
+                Randomat:SetRole(ply, BLURole)
+                enemyIntel = REDIntel
+            end
+
+            local direction = enemyIntel:GetPos() - ply:GetPos()
+            ply:SetEyeAngles(direction:Angle())
+            ply:Freeze(true)
         end
+
+        timer.Create("TF2RandomatRoundBeginUnfreeze", 15, 1, function()
+            for _, ply in player.Iterator() do
+                ply:Freeze(false)
+            end
+        end)
+
+        local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
+
+        timer.Create("TF2RandomatRoundTimeAnnouncements", 1, roundTime, function()
+            if timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 60 then
+                BroadcastLua("surface.PlaySound(\"misc/announcer_ends_60sec.wav\")")
+            elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 30 then
+                BroadcastLua("surface.PlaySound(\"misc/announcer_ends_30sec.wav\")")
+            elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 10 then
+                BroadcastLua("surface.PlaySound(\"misc/announcer_ends_10sec.wav\")")
+            elseif timer.RepsLeft("TF2RandomatRoundTimeAnnouncements") == 5 then
+                BroadcastLua("surface.PlaySound(\"misc/announcer_ends_5sec.wav\")")
+            end
+        end)
+
+        net.Start("TF2ClassChangerScreen")
+        net.WriteBool(false)
+        net.Broadcast()
+
+        -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
+        -- (The "Meet the randomat" splash screen, etc.)
+        timer.Simple(0.1, function()
+            net.Start("TF2RandomatRespawnTimer")
+            net.WriteUInt(15, 6)
+            net.WriteBool(true)
+            net.WriteBool(playMusic:GetBool())
+            net.Broadcast()
+        end)
     end)
 end
 
@@ -214,6 +233,7 @@ function EVENT:End()
     end
 
     timer.Remove("TF2RandomatRoundBeginUnfreeze")
+    timer.Remove("TF2RandomatEventStartCountdown")
     timer.Remove("TF2RandomatRoundTimeAnnouncements")
 end
 
@@ -241,7 +261,22 @@ function EVENT:GetConVars()
         end
     end
 
-    return sliders
+    local checks = {}
+
+    for _, v in pairs({"play_music"}) do
+        local name = "randomat_" .. self.id .. "_" .. v
+
+        if ConVarExists(name) then
+            local convar = GetConVar(name)
+
+            table.insert(checks, {
+                cmd = v,
+                dsc = convar:GetHelpText()
+            })
+        end
+    end
+
+    return sliders, checks
 end
 
 Randomat:register(EVENT)
