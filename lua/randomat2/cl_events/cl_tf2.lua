@@ -12,6 +12,14 @@ net.Receive("TF2RandomatRespawnTimer", function()
         end
 
         respawnTime = timer.RepsLeft("TF2RandomatRespawnTimer")
+
+        if isEventBegin then
+            if respawnTime == 10 then
+                surface.PlaySound("misc/announcer_begins_10sec.wav")
+            elseif respawnTime == 5 then
+                surface.PlaySound("misc/announcer_begins_5sec.wav")
+            end
+        end
     end)
 
     hook.Add("PostDrawHUD", "TF2RandomatRespawnTimerHUD", function()

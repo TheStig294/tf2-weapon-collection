@@ -68,6 +68,17 @@ function EVENT:Begin()
         else
             REDIntelCaptures = REDIntelCaptures + 1
         end
+
+        -- Don't let the last intel capture announcement overlap with the victory/defeat round end sounds
+        if REDIntelCaptures < capturesToWin:GetInt() and BLUIntelCaptures < capturesToWin:GetInt() then
+            for _, p in player.Iterator() do
+                if (isBLU and Randomat:IsInnocentTeam(p)) or (not isBLU and Randomat:IsTraitorTeam(p)) then
+                    p:SendLua("surface.PlaySound(\"misc/intel_teamcaptured.wav\")")
+                elseif (isBLU and not Randomat:IsInnocentTeam(p)) or (not isBLU and not Randomat:IsTraitorTeam(p)) then
+                    p:SendLua("surface.PlaySound(\"misc/intel_enemycaptrued.wav\")")
+                end
+            end
+        end
     end)
 
     -- Only allow for a win through getting enough captures, or the round time running out
@@ -119,7 +130,7 @@ function EVENT:Begin()
     for i, ply in player.Iterator() do
         local enemyIntel
 
-        if i < halfPlayerCount then
+        if i <= halfPlayerCount then
             Randomat:SetRole(ply, REDRole)
             enemyIntel = BLUIntel
         else
@@ -163,6 +174,7 @@ function EVENT:Begin()
 
     self:DisableRoundEndSounds()
 
+    -- TTTEndRound doesn't pass the win type to clients, so we have to check on the server
     self:AddHook("TTTEndRound", function(wintype)
         for _, ply in player.Iterator() do
             if wintype == WIN_TIMELIMIT then
@@ -172,6 +184,20 @@ function EVENT:Begin()
             else
                 ply:SendLua("surface.PlaySound(\"misc/your_team_lost.wav\")")
             end
+        end
+    end)
+
+    self:AddHook("Think", function()
+        local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
+
+        if roundTime == 60 then
+            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_60sec.wav\")")
+        elseif roundTime == 30 then
+            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_30sec.wav\")")
+        elseif roundTime == 10 then
+            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_10sec.wav\")")
+        elseif roundTime == 5 then
+            BroadcastLua("surface.PlaySound(\"misc/announcer_ends_5sec.wav\")")
         end
     end)
 end

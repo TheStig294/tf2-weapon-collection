@@ -46,6 +46,14 @@ function ENT:Initialize()
                     droppedIntel:SetBLU(false)
                     SetGlobalEntity("TF2IntelligenceDroppedRED", droppedIntel)
                 end
+
+                for _, p in player.Iterator() do
+                    if (droppedIntel:GetBLU() and droppedIntel:IsPlayerTraitor(p)) or (not droppedIntel:GetBLU() and droppedIntel:IsPlayerInnocent(p)) then
+                        p:SendLua("surface.PlaySound(\"misc/intel_teamdropped.wav\")")
+                    elseif (droppedIntel:GetBLU() and droppedIntel:IsPlayerInnocent(p)) or (not droppedIntel:GetBLU() and droppedIntel:IsPlayerTraitor(p)) then
+                        p:SendLua("surface.PlaySound(\"misc/intel_enemydropped.wav\")")
+                    end
+                end
             end
 
             ply:SetNWEntity("TF2Intelligence", NULL)
@@ -178,6 +186,15 @@ function ENT:StartTouch(ply)
         local msg = ply:Nick() .. " has returned the " .. intelTeamName .. " intelligence!"
         PrintMessage(HUD_PRINTCENTER, msg)
         PrintMessage(HUD_PRINTTALK, msg)
+
+        for _, p in player.Iterator() do
+            if (self:GetBLU() and self:IsPlayerInnocent(p)) or (not self:GetBLU() and self:IsPlayerTraitor(p)) then
+                p:SendLua("surface.PlaySound(\"misc/intel_enemyreturned.wav\")")
+            elseif (self:GetBLU() and not self:IsPlayerInnocent(p)) or (not self:GetBLU() and not self:IsPlayerTraitor(p)) then
+                p:SendLua("surface.PlaySound(\"misc/intel_teamreturned.wav\")")
+            end
+        end
+
         self:Remove()
     elseif IsValid(intelEnt) and ((intelEnt:GetBLU() and not self:GetBLU()) or (not intelEnt:GetBLU() and self:GetBLU())) then
         -- Returning enemy intel
@@ -188,6 +205,14 @@ function ENT:StartTouch(ply)
         ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
         ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
         ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
+
+        for _, p in player.Iterator() do
+            if (self:GetBLU() and self:IsPlayerInnocent(p)) or (not self:GetBLU() and self:IsPlayerTraitor(p)) then
+                p:SendLua("surface.PlaySound(\"misc/intel_enemystolen.wav\")")
+            elseif (self:GetBLU() and not self:IsPlayerInnocent(p)) or (not self:GetBLU() and not self:IsPlayerTraitor(p)) then
+                p:SendLua("surface.PlaySound(\"misc/intel_teamstolen.wav\")")
+            end
+        end
 
         if IsValid(self.DroppedOldIntel) then
             ply:SetNWEntity("TF2Intelligence", self.DroppedOldIntel)
