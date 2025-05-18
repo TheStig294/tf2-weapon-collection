@@ -32,12 +32,14 @@ hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equ
 end)
 
 hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
-    table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
-    table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
+    if CR_VERSION then
+        table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
+        table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
 
-    for _, class in ipairs(TF2WC.Classes) do
-        table.insert(EquipmentItems[class.roles[1]], TF2ClassChanger)
-        table.insert(EquipmentItems[class.roles[2]], TF2ClassChanger)
+        for _, class in ipairs(TF2WC.Classes) do
+            table.insert(EquipmentItems[class.roles[1]], TF2ClassChanger)
+            table.insert(EquipmentItems[class.roles[2]], TF2ClassChanger)
+        end
     end
 
     hook.Remove("TTTPrepareRound", "TF2ClassChangerItemRegister")
@@ -49,7 +51,7 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             local class = net.ReadUInt(4)
 
             if not CR_VERSION then
-                TF2WC:StripAndGiveLoadout(ply, class.loadout)
+                TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class].loadout)
             elseif ply:IsTraitorTeam() then
                 ply:SetRole(TF2WC.Classes[class].roles[1])
             else
