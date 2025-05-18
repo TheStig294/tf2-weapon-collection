@@ -185,6 +185,7 @@ function SWEP:Think()
 			self:SetReloadingTimer(CurTime() + 0.6)
 			self:SetIdleTimer(CurTime() + 0.6)
 			owner:RemoveAmmo(1, self.Primary.Ammo, false)
+			self.ReserveAmmo = self.ReserveAmmo - 1
 			self:SetClip1(self:Clip1() + 1)
 		end
 	else
