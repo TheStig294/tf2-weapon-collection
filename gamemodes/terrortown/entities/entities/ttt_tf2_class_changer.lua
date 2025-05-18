@@ -15,7 +15,6 @@ hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equ
     if equipment == EQUIP_TF2_CLASS_CHANGER then
         -- This is defined below, where all the magic happens...
         net.Start("TF2ClassChangerScreen")
-        net.WriteBool(true)
         net.Send(ply)
 
         -- Removes the equipment from the player, to make the item re-buyable
@@ -78,10 +77,8 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
         local client = LocalPlayer()
 
         net.Receive("TF2ClassChangerScreen", function()
-            local playMusic = net.ReadBool()
-
             -- Playing the looping background music
-            if playMusic then
+            if not GetGlobal2Bool("TF2ClassChangerDisableMusic") then
                 client:EmitSound("music/class_menu_bg.wav")
             end
 

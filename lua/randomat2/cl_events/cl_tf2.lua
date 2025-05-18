@@ -1,5 +1,4 @@
 net.Receive("TF2RandomatIntro", function()
-    print("Received intro net message")
     surface.PlaySound("music/meet_the_randomat.mp3")
 
     timer.Create("TF2RandomatIntroSplashScreen", 2, 1, function()

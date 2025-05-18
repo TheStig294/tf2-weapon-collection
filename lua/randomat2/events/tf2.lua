@@ -134,7 +134,6 @@ function EVENT:Begin()
 
         if not ply:Alive() or ply:IsSpec() then
             net.Start("TF2ClassChangerScreen")
-            net.WriteBool(true)
             net.Send(ply)
         end
     end)
@@ -158,10 +157,18 @@ function EVENT:Begin()
         end
     end)
 
+    if playMusic:GetBool() then
+        SetGlobal2Bool("TF2ClassChangerDisableMusic", true)
+
+        -- The TF2 music that plays in the TF2RandomatIntro net message is about 75 seconds long
+        timer.Create("TF2RandomatEnableClassChangeMusic", 75, 1, function()
+            SetGlobal2Bool("TF2ClassChangerDisableMusic", nil)
+        end)
+    end
+
     util.AddNetworkString("TF2RandomatIntro")
 
-    timer.Simple(0, function()
-        print("Sending intro net message")
+    timer.Simple(0.1, function()
         net.Start("TF2RandomatIntro")
         net.Broadcast()
     end)
@@ -208,7 +215,6 @@ function EVENT:Begin()
         end)
 
         net.Start("TF2ClassChangerScreen")
-        net.WriteBool(false)
         net.Broadcast()
 
         -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
@@ -233,6 +239,8 @@ function EVENT:End()
     end
 
     timer.Remove("TF2RandomatRoundBeginUnfreeze")
+    timer.Remove("TF2RandomatEnableClassChangeMusic")
+    SetGlobal2Bool("TF2ClassChangerDisableMusic", nil)
     timer.Remove("TF2RandomatEventStartCountdown")
     timer.Remove("TF2RandomatRoundTimeAnnouncements")
 end
