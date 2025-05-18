@@ -199,6 +199,7 @@ function ENT:StartTouch(ply)
     elseif IsValid(intelEnt) and ((intelEnt:GetBLU() and not self:GetBLU()) or (not intelEnt:GetBLU() and self:GetBLU())) then
         -- Returning enemy intel
         ply:SetNWEntity("TF2Intelligence", NULL)
+        ply:StopParticles()
         hook.Run("TF2IntelligenceCaptured", ply, self:GetBLU())
     elseif self:CanPickupEnemyIntel(ply) then
         -- Picking up the enemy intel

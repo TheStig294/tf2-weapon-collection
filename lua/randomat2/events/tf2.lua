@@ -75,7 +75,7 @@ function EVENT:Begin()
                 if (isBLU and Randomat:IsInnocentTeam(p)) or (not isBLU and Randomat:IsTraitorTeam(p)) then
                     p:SendLua("surface.PlaySound(\"misc/intel_teamcaptured.wav\")")
                 elseif (isBLU and not Randomat:IsInnocentTeam(p)) or (not isBLU and not Randomat:IsTraitorTeam(p)) then
-                    p:SendLua("surface.PlaySound(\"misc/intel_enemycaptrued.wav\")")
+                    p:SendLua("surface.PlaySound(\"misc/intel_enemycaptured.wav\")")
                 end
             end
         end
