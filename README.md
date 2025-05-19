@@ -8,7 +8,7 @@ Includes...
 - 11 Floor weapons, that spawn on the ground
 - 4 Detective weapons, that detectives can buy
 - 4 Traitor weapons, that traitors can buy
-- Weapon upgrades for all 24 weapons, for the "Pack-a-Punch" mod:\
+- 24 Weapon upgrades, one for each weapon, for the "Pack-a-Punch" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3043605644>
 - 2+ Roles using weapons and abilities from each of the TF2 classes (The "REDMann" and "BLUMann" roles), for the "Custom Roles for TTT" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=2404251054>
