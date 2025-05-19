@@ -95,7 +95,8 @@ function ENT:Initialize()
                 return
             end
 
-            local haloEnts = {}
+            local haloEnts = {self}
+
             colour = REDColour
             local isBLU = self:GetNWBool("IsBLU")
 
@@ -127,8 +128,6 @@ function ENT:Initialize()
 
             if IsValid(heldPlayer) then
                 table.insert(haloEnts, heldPlayer)
-            elseif (isBLU and not IsValid(droppedBLUIntel)) or (not isBLU and not IsValid(droppedREDIntel)) then
-                table.insert(haloEnts, self)
             end
 
             halo.Add(haloEnts, colour, 1, 1, 3, true, true)
