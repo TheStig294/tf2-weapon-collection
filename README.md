@@ -243,3 +243,6 @@ PaP Upgrade: Immune to fall & self-damage while held, launches players hilarious
 Traitor, shoots bombs that can be remotely detonated, max 8 at a time\
 PaP Upgrade: No self-damage, more damage and push force, infinite ammo!\
 *ttt_pap_sticky_jumper* - Default: 1 - Whether this upgrade is enabled
+
+## Steam Workshop Link
+<https://steamcommunity.com/sharedfiles/filedetails/?id=3484716425>
