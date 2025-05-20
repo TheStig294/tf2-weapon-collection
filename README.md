@@ -30,7 +30,11 @@ Credit goes to [Malivil](https://steamcommunity.com/id/malivil) for creating the
 
 The REDMann is a Traitor role, the BLUMann is a Detective role\
 On dying, you see a "Freeze cam" of the player that killed you!\
-Instead of buying items, you choose a TF2 class to play as! (Press ',')
+Instead of buying items, you choose a TF2 class to play as!\
+\
+**To use the RED/BLU Mann roles, you must enable them!**\
+*ttt_redmann_enabled* - Default: 0 - Whether the RED Mann role is enabled\
+*ttt_blumann_enabled* - Default: 0 - Whether the BLU Mann role is enabled
 
 ### Classes
 
@@ -245,4 +249,5 @@ PaP Upgrade: No self-damage, more damage and push force, infinite ammo!\
 *ttt_pap_sticky_jumper* - Default: 1 - Whether this upgrade is enabled
 
 ## Steam Workshop Link
+
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3484716425>
