@@ -32,7 +32,7 @@ hook.Add("TTTOrderedEquipment", "TF2ClassChangerItemPurchase", function(ply, equ
 end)
 
 hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
-    if CR_VERSION then
+    if ROLE_REDMANN then
         table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
         table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
 
@@ -51,9 +51,10 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
             local class = net.ReadUInt(4)
             ply.TF2LastSelectedClass = class
 
-            if not CR_VERSION then
+            if not ROLE_REDMANN then
                 if ply:Alive() and not ply:IsSpec() then
                     TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class].loadout)
+                    TF2WC:DoSpawnSound(ply, TF2WC.Classes[class])
                 end
             elseif ply:IsTraitorTeam() then
                 ply:SetRole(TF2WC.Classes[class].roles[1])

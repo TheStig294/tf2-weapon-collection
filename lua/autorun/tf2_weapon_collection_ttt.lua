@@ -131,15 +131,8 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                     SetRoleHealth(ply)
                     -- For some reason, TTTPlayerRoleChanged gets called multiple times after setting a player's role,
                     -- so we have to set a cooldown here to prevent the player from continually blabbing
-                elseif not ply.TF2NoSpawnSound and ply:Alive() and not ply:IsSpec() then
-                    ply.TF2NoSpawnSound = true
-                    ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
-
-                    timer.Create("TF2EnableSpawnSound", 12, 1, function()
-                        if IsValid(ply) then
-                            ply.TF2NoSpawnSound = nil
-                        end
-                    end)
+                else
+                    TF2WC:DoSpawnSound(ply, class)
                 end
 
                 if CLIENT and class.prompt then
@@ -238,5 +231,18 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
 
             ply:SelectWeapon(loadout[1])
         end)
+    end
+
+    function TF2WC:DoSpawnSound(ply, class)
+        if not ply.TF2NoSpawnSound and ply:Alive() and not ply:IsSpec() then
+            ply.TF2NoSpawnSound = true
+            ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
+
+            timer.Create("TF2EnableSpawnSound", 12, 1, function()
+                if IsValid(ply) then
+                    ply.TF2NoSpawnSound = nil
+                end
+            end)
+        end
     end
 end)
