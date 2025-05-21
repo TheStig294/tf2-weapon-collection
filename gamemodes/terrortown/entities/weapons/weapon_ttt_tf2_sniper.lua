@@ -111,7 +111,7 @@ function SWEP:DrawHUD()
         surface.DrawTexturedRect(x - 32, y - 32, 64, 64)
         local text
 
-        if (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper()) then
+        if TF2WC:IsClass(owner, "sniper") then
             text = "Damage: locked at 100%, Sniper role"
         else
             text = "Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%"
@@ -256,7 +256,7 @@ function SWEP:OwnerIsSniper()
     local owner = self:GetOwner()
     if not IsValid(owner) then return false end
 
-    return (owner.IsREDSniper and owner:IsREDSniper()) or (owner.IsBLUSniper and owner:IsBLUSniper())
+    return TF2WC:IsClass(owner, "sniper")
 end
 
 function SWEP:Think()

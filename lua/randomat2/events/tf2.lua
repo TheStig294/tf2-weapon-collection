@@ -125,11 +125,10 @@ function EVENT:Begin()
             ply:SetEyeAngles(direction:Angle())
 
             -- Give the player their last selected class's loadout weapons
-            if ply.TF2LastSelectedClass then
+            if ply.TF2Class then
                 timer.Simple(1, function()
-                    local class = TF2WC.Classes[ply.TF2LastSelectedClass]
-                    TF2WC:StripAndGiveLoadout(ply, class.loadout)
-                    ply:EmitSound("player/" .. class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
+                    TF2WC:StripAndGiveLoadout(ply, ply.TF2Class)
+                    ply:EmitSound("player/" .. ply.TF2Class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
                 end)
             end
         end)

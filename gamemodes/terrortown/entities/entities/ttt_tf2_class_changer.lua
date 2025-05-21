@@ -35,11 +35,6 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
     if ROLE_REDMANN then
         table.insert(EquipmentItems[ROLE_REDMANN], TF2ClassChanger)
         table.insert(EquipmentItems[ROLE_BLUMANN], TF2ClassChanger)
-
-        for _, class in ipairs(TF2WC.Classes) do
-            table.insert(EquipmentItems[class.roles[1]], TF2ClassChanger)
-            table.insert(EquipmentItems[class.roles[2]], TF2ClassChanger)
-        end
     end
 
     hook.Remove("TTTPrepareRound", "TF2ClassChangerItemRegister")
@@ -49,7 +44,6 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
 
         net.Receive("TF2ClassChangerScreen", function(_, ply)
             local class = net.ReadUInt(4)
-            ply.TF2LastSelectedClass = class
 
             if not ROLE_REDMANN then
                 if ply:Alive() and not ply:IsSpec() then
@@ -57,19 +51,25 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
                     TF2WC:DoSpawnSound(ply, TF2WC.Classes[class])
                 end
             elseif ply:IsTraitorTeam() then
-                ply:SetRole(TF2WC.Classes[class].roles[1])
+                if ply:GetRole() ~= ROLE_REDMANN then
+                    ply:SetRole(ROLE_REDMANN)
+
+                    timer.Simple(1, function()
+                        SendFullStateUpdate()
+                    end)
+                end
+
+                TF2WC:SetClass(ply, class)
             else
-                ply:SetRole(TF2WC.Classes[class].roles[2])
-            end
+                if ply:GetRole() ~= ROLE_BLUMANN then
+                    ply:SetRole(ROLE_BLUMANN)
 
-            timer.Simple(1, function()
-                SendFullStateUpdate()
-            end)
-        end)
+                    timer.Simple(1, function()
+                        SendFullStateUpdate()
+                    end)
+                end
 
-        hook.Add("TTTPrepareRound", "TF2ClassChangerReset", function()
-            for _, ply in player.Iterator() do
-                ply.TF2LastSelectedClass = nil
+                TF2WC:SetClass(ply, class)
             end
         end)
     end

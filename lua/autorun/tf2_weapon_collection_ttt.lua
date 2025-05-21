@@ -65,102 +65,63 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     TF2WC.Classes = {
         {
             name = "scout",
-            roles = {ROLE_REDSCOUT, ROLE_BLUSCOUT},
             loadout = {"weapon_ttt_tf2_sandman", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_scattergun"},
             speed = 1.33,
+            health = 66,
             prompt = "+1 jump, extra speed"
         },
         {
             name = "soldier",
-            roles = {ROLE_REDSOLDIER, ROLE_BLUSOLDIER},
             loadout = {"weapon_ttt_tf2_rpg", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_escapeplan"},
             speed = 0.8,
+            health = 120,
             prompt = "No fall damage"
         },
         {
             name = "pyro",
-            roles = {ROLE_REDPYRO, ROLE_BLUPYRO},
             loadout = {"weapon_ttt_tf2_flamethrower", "weapon_ttt_tf2_shotgun", "weapon_ttt_tf2_lollichop"},
+            health = 100,
             prompt = "No fire damage"
         },
         {
             name = "demoman",
-            roles = {ROLE_REDDEMOMAN, ROLE_BLUDEMOMAN},
             loadout = {"weapon_ttt_tf2_grenadelauncher", "weapon_ttt_tf2_stickybomblauncher", "weapon_ttt_tf2_caber"},
             speed = 0.93,
+            health = 100,
             prompt = "No explosion damage"
         },
         {
             name = "heavy",
-            roles = {ROLE_REDHEAVY, ROLE_BLUHEAVY},
             loadout = {"weapon_ttt_tf2_minigun", "weapon_ttt_tf2_sandvich", "weapon_ttt_tf2_goldenfryingpan"},
             speed = 0.77,
+            health = 200,
             prompt = "More health, less speed"
         },
         {
             name = "engineer",
-            roles = {ROLE_REDENGINEER, ROLE_BLUENGINEER},
-            loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"}
+            loadout = {"weapon_ttt_tf2_eurekaeffect", "weapon_ttt_tf2_pistol", "weapon_ttt_tf2_shotgun"},
+            health = 66
         },
         {
             name = "medic",
-            roles = {ROLE_REDMEDIC, ROLE_BLUMEDIC},
             loadout = {"weapon_ttt_tf2_medigun", "weapon_ttt_tf2_syringegun", "weapon_ttt_tf2_bonesaw"},
             speed = 1.07,
+            health = 80,
             prompt = "Passive health regen"
         },
         {
             name = "sniper",
-            roles = {ROLE_REDSNIPER, ROLE_BLUSNIPER},
             loadout = {"weapon_ttt_tf2_sniper", "weapon_ttt_tf2_smg", "weapon_ttt_tf2_machete"},
+            health = 66,
             prompt = "No rifle charge"
         },
         {
             name = "spy",
-            roles = {ROLE_REDSPY, ROLE_BLUSPY},
             loadout = {"weapon_ttt_tf2_knife", "weapon_ttt_tf2_revolver", "weapon_ttt_tf2_inviswatch"},
-            speed = 1.07
+            speed = 1.07,
+            health = 66
         }
     }
-
-    hook.Add("TTTPlayerRoleChanged", "TF2_ClassChangeReset", function(ply, _, newRole)
-        for _, class in ipairs(TF2WC.Classes) do
-            if newRole == class.roles[1] or newRole == class.roles[2] then
-                if SERVER then
-                    TF2WC:StripAndGiveLoadout(ply, class.loadout)
-                    SetRoleHealth(ply)
-                    -- For some reason, TTTPlayerRoleChanged gets called multiple times after setting a player's role,
-                    -- so we have to set a cooldown here to prevent the player from continually blabbing
-                else
-                    TF2WC:DoSpawnSound(ply, class)
-                end
-
-                if CLIENT and class.prompt then
-                    timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
-                        hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
-                            if GetRoundState() ~= ROUND_ACTIVE or ply:GetRole() ~= newRole then
-                                hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
-
-                                return
-                            end
-
-                            draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
-                        end)
-
-                        timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
-                            hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
-                        end)
-                    end)
-                end
-
-                ply.TF2Class = class
-
-                return
-            end
-        end
-
-        ply.TF2Class = nil
-    end)
 
     hook.Add("TTTSpeedMultiplier", "TF2_ClassSpeedMult", function(ply, mults)
         if ply.TF2Class and ply.TF2Class.speed then
@@ -209,11 +170,11 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end
     end
 
-    function TF2WC:StripAndGiveLoadout(ply, loadout)
+    function TF2WC:StripAndGiveLoadout(ply, class)
         local stripWepKinds = {}
 
-        for _, class in ipairs(loadout) do
-            local SWEP = weapons.Get(class)
+        for _, classname in ipairs(class.loadout) do
+            local SWEP = weapons.Get(classname)
             stripWepKinds[SWEP.Kind] = true
         end
 
@@ -224,12 +185,12 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end
 
         timer.Simple(0.1, function()
-            for _, class in ipairs(loadout) do
-                ply:Give(class)
-                self:DirectGiveAmmoBoxes(ply, class, 2)
+            for _, classname in ipairs(class.loadout) do
+                ply:Give(classname)
+                self:DirectGiveAmmoBoxes(ply, classname, 2)
             end
 
-            ply:SelectWeapon(loadout[1])
+            ply:SelectWeapon(class.loadout[1])
         end)
     end
 
@@ -244,5 +205,72 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                 end
             end)
         end
+    end
+
+    if SERVER then
+        util.AddNetworkString("TF2FullClassUpdate")
+    end
+
+    function TF2WC:SetClass(ply, class)
+        if isnumber(class) then
+            class = TF2WC.Classes[class]
+        end
+
+        if SERVER then
+            TF2WC:StripAndGiveLoadout(ply, class)
+            ply:SetHealth(class.health)
+            ply:SetMaxHealth(class.health)
+        else
+            TF2WC:DoSpawnSound(ply, class)
+        end
+
+        if CLIENT and class.prompt then
+            timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
+                hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
+                    if GetRoundState() ~= ROUND_ACTIVE then
+                        hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
+
+                        return
+                    end
+
+                    draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                end)
+
+                timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
+                    hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
+                end)
+            end)
+        end
+
+        hook.Run("TF2ClassChanged", ply, class, ply.TF2Class)
+        ply.TF2Class = class
+
+        if SERVER then
+            local classIndex = 1
+
+            for index, c in ipairs(TF2WC.Classes) do
+                if c.name == class.name then
+                    classIndex = index
+                    break
+                end
+            end
+
+            net.Start("TF2FullClassUpdate")
+            net.WriteUInt(classIndex, 4)
+            net.Send(ply)
+        end
+    end
+
+    if CLIENT then
+        net.Receive("TF2FullClassUpdate", function()
+            local classIndex = net.ReadUInt(4)
+            local client = LocalPlayer()
+            if not IsValid(client) then return end
+            TF2WC:SetClass(client, TF2WC.Classes[classIndex])
+        end)
+    end
+
+    function TF2WC:IsClass(ply, className, ignoreMannRole)
+        return ply.TF2Class and ply.TF2Class.name == className and (ignoreMannRole or (ply.IsBLUMann and ply:IsBLUMann()) or (ply.IsREDMann and ply:IsREDMann()))
     end
 end)
