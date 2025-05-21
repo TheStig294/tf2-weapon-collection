@@ -203,6 +203,10 @@ function EVENT:Begin()
             ply:Freeze(true)
         end
 
+        timer.Simple(1, function()
+            SendFullStateUpdate()
+        end)
+
         timer.Create("TF2RandomatRoundBeginUnfreeze", 15, 1, function()
             for _, ply in player.Iterator() do
                 ply:Freeze(false)
