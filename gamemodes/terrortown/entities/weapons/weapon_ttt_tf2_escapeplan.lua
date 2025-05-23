@@ -1,4 +1,4 @@
-SWEP.PrintName = "Escape Plan"
+SWEP.PrintName = "The Escape Plan"
 SWEP.Author = ""
 SWEP.Contact = ""
 SWEP.Purpose = ""

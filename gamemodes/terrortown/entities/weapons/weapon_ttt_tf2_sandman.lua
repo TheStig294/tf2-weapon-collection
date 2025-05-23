@@ -1,4 +1,4 @@
-SWEP.PrintName = "Sandman"
+SWEP.PrintName = "The Sandman"
 SWEP.Author = ""
 SWEP.Contact = ""
 SWEP.Purpose = ""
@@ -73,15 +73,15 @@ function SWEP:Initialize()
         local inflictor = dmg:GetInflictor()
 
         if IsValid(inflictor) and inflictor.TF2SandmanBall and IsValid(self) then
-            inflictor.TF2SandmanBall = nil
-            inflictor:EmitSound("Weapon_Baseball.HitWorld")
-            inflictor:EmitSound("player/scout/bonk2.wav")
             local attacker = inflictor.Owner
 
             if not IsValid(attacker) then
                 attacker = inflictor
             end
 
+            inflictor.TF2SandmanBall = nil
+            inflictor:EmitSound("Weapon_Baseball.HitWorld")
+            attacker:EmitSound("player/scout/bonk2.wav")
             local weapon = inflictor.Weapon
 
             if not IsValid(weapon) then

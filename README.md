@@ -112,7 +112,7 @@ Explodes on first hit and sends players flying\
 PaP Upgrade: No self-damage, infinite explosions!\
 *ttt_pap_the_boomstick* - Default: 1 - Whether this upgrade is enabled
 
-### Escape Plan
+### The Escape Plan
 
 Increases speed while held, speed scales with health lost\
 PaP Upgrade: Damage increases as health decreases as well!\
@@ -142,7 +142,7 @@ Does bleed damage over time\
 PaP Upgrade: Bleed lasts forever, kills are silent!\
 *ttt_pap_tribalmans_shiv* - Default: 1 - Whether this upgrade is enabled
 
-### Sandman
+### The Sandman
 
 Baseball bat that can launch a baseball, which temporarily slows players on hit\
 PaP Upgrade: Bigger balls... They do everything better!\
