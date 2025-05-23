@@ -166,11 +166,22 @@ end
 
 function ENT:CanPickupEnemyIntel(ply)
     local droppedIntel = self:GetBLU() and GetGlobalEntity("TF2IntelligenceDroppedBLU") or GetGlobalEntity("TF2IntelligenceDroppedRED")
+    local BLUCapturePlayer, REDCapturePlayer
+
+    for _, p in player.Iterator() do
+        if not IsValid(p:GetNWEntity("TF2Intelligence")) then continue end
+
+        if self:IsPlayerTraitor(p) then
+            REDCapturePlayer = p
+        elseif self:IsPlayerInnocent(p) then
+            BLUCapturePlayer = p
+        end
+    end
 
     if IsValid(droppedIntel) and self ~= droppedIntel then
         return false
     else
-        return (self:IsPlayerTraitor(ply) and self:GetBLU()) or (self:IsPlayerInnocent(ply) and not self:GetBLU())
+        return (self:IsPlayerTraitor(ply) and self:GetBLU() and not IsValid(REDCapturePlayer)) or (self:IsPlayerInnocent(ply) and not self:GetBLU() and not IsValid(BLUCapturePlayer))
     end
 end
 
