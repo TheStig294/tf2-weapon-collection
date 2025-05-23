@@ -60,7 +60,7 @@ function SWEP:SetHooks()
         util.AddNetworkString("TF2LollichopConfetti")
     else
         -- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
-        local confettiMat = Material("confetti.png")
+        local confettiMat = Material("effects/confetti.png")
         local balloonMat = Material("effects/balloon001")
 
         local balloonColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
