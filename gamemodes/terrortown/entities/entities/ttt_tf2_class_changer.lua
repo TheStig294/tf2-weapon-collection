@@ -47,7 +47,7 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
 
             if not ROLE_REDMANN then
                 if ply:Alive() and not ply:IsSpec() then
-                    TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class].loadout)
+                    TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class])
                     TF2WC:DoSpawnSound(ply, TF2WC.Classes[class])
                 end
             elseif ply:IsTraitorTeam() then
