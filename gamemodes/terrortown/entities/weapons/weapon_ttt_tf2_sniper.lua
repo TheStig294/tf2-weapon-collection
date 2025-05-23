@@ -136,6 +136,10 @@ function SWEP:SetScope(doScope)
         self.MouseSensitivity = 0.2
         self.AllowDrop = false
 
+        if SERVER then
+            self.RedDotSprite:Fire("ShowSprite")
+        end
+
         if IsValid(owner) then
             owner:SetFOV(owner:GetFOV() / 5, 0.1)
         end
@@ -143,6 +147,10 @@ function SWEP:SetScope(doScope)
         self.ScopedTimer = CurTime()
         self.MouseSensitivity = 1
         self.AllowDrop = true
+
+        if SERVER then
+            self.RedDotSprite:Fire("HideSprite")
+        end
 
         if IsValid(owner) then
             owner:SetFOV(0, 0.1)
@@ -284,13 +292,8 @@ function SWEP:Think()
         self.Primary.Damage = self.Primary.DamageOG
     end
 
-    if SERVER and IsValid(self.RedDotSprite) then
-        if self.Scoped then
-            self.RedDotSprite:Fire("ShowSprite")
-            self.RedDotSprite:SetPos(owner:GetEyeTrace().HitPos)
-        else
-            self.RedDotSprite:Fire("HideSprite")
-        end
+    if SERVER and IsValid(self.RedDotSprite) and self.Scoped then
+        self.RedDotSprite:SetPos(owner:GetEyeTrace().HitPos)
     end
 
     if not self.Idle and self.IdleTimer <= CurTime() then
