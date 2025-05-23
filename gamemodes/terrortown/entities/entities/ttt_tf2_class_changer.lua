@@ -44,32 +44,23 @@ hook.Add("TTTPrepareRound", "TF2ClassChangerItemRegister", function()
 
         net.Receive("TF2ClassChangerScreen", function(_, ply)
             local class = net.ReadUInt(4)
+            TF2WC:SetClass(ply, class)
+            if not ROLE_REDMANN then return end
 
-            if not ROLE_REDMANN then
-                if ply:Alive() and not ply:IsSpec() then
-                    TF2WC:StripAndGiveLoadout(ply, TF2WC.Classes[class])
-                    TF2WC:DoSpawnSound(ply, TF2WC.Classes[class])
-                end
-            elseif ply:IsTraitorTeam() then
-                if ply:GetRole() ~= ROLE_REDMANN then
-                    ply:SetRole(ROLE_REDMANN)
+            if ply:IsTraitorTeam() then
+                if ply:GetRole() == ROLE_REDMANN then return end
+                ply:SetRole(ROLE_REDMANN)
 
-                    timer.Simple(1, function()
-                        SendFullStateUpdate()
-                    end)
-                end
-
-                TF2WC:SetClass(ply, class)
+                timer.Simple(1, function()
+                    SendFullStateUpdate()
+                end)
             else
-                if ply:GetRole() ~= ROLE_BLUMANN then
-                    ply:SetRole(ROLE_BLUMANN)
+                if ply:GetRole() == ROLE_BLUMANN then return end
+                ply:SetRole(ROLE_BLUMANN)
 
-                    timer.Simple(1, function()
-                        SendFullStateUpdate()
-                    end)
-                end
-
-                TF2WC:SetClass(ply, class)
+                timer.Simple(1, function()
+                    SendFullStateUpdate()
+                end)
             end
         end)
     end

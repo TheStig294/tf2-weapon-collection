@@ -1,8 +1,6 @@
 if SERVER then
-    AddCSLuaFile()
-
     hook.Add("TF2ClassChanged", "TF2Spy_GiveDisguiser", function(ply, class)
-        if class.name == "spy" then
+        if class and class.name == "spy" then
             ply:GiveEquipmentItem(EQUIP_DISGUISE)
         end
     end)
@@ -10,7 +8,7 @@ end
 
 if CLIENT then
     hook.Add("TF2ClassChanged", "TF2Spy_DisguiserPrompt", function(ply, class)
-        if class.name == "spy" then
+        if class and class.name == "spy" then
             local hookname = "TF2Spy_DisguisePrompt"
 
             hook.Add("HUDPaint", hookname, function()

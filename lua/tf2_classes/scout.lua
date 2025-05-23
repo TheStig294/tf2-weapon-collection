@@ -1,8 +1,6 @@
 if SERVER then
-    AddCSLuaFile()
-
     hook.Add("TF2ClassChanged", "TF2Scout_ClassChangeReset", function(ply, class, oldClass)
-        if class.name == "scout" then
+        if class and class.name == "scout" then
             ply:SetMaxJumpLevel(ply:GetMaxJumpLevel() + 1)
         end
 

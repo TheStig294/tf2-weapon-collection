@@ -1,5 +1,4 @@
 if SERVER then
-    AddCSLuaFile()
     local immuneDamageTypes = DMG_BURN + DMG_SLOWBURN + DMG_PLASMA
 
     hook.Add("EntityTakeDamage", "TF2Pyro_FireDamageImmunity", function(ent, dmg)

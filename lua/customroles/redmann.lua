@@ -27,10 +27,12 @@ if SERVER then
         net.Send(ply)
     end)
 
-    hook.Add("TTTPlayerRoleChanged", "TF2Mann_ClassChangeReset", function(ply, _, newRole)
+    hook.Add("TTTPlayerRoleChanged", "TF2Mann_ClassChangeReset", function(ply, oldRole, newRole)
         if newRole == ROLE_REDMANN or newRole == ROLE_BLUMANN then
             ply:SetProperty("TF2ClassChanged", false)
-            ply.TF2Class = nil
+            TF2WC:SetClass(ply, nil)
+        elseif oldRole == ROLE_REDMANN or oldRole == ROLE_BLUMANN then
+            TF2WC:SetClass(ply, nil)
         end
     end)
 end

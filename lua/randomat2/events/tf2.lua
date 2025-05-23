@@ -127,8 +127,7 @@ function EVENT:Begin()
             -- Give the player their last selected class's loadout weapons
             if ply.TF2Class then
                 timer.Simple(1, function()
-                    TF2WC:StripAndGiveLoadout(ply, ply.TF2Class)
-                    ply:EmitSound("player/" .. ply.TF2Class.name .. "/spawn" .. math.random(5) .. ".wav", 0, 100, 100, CHAN_VOICE)
+                    TF2WC:SetClass(ply, ply.TF2Class)
                 end)
             end
         end)

@@ -1,9 +1,8 @@
 if SERVER then
-    AddCSLuaFile()
     util.AddNetworkString("TF2EngineerSetClientSentryWrench")
 
     hook.Add("TF2ClassChanged", "TF2Engineer_ClassChangeReset", function(ply, class)
-        if class.name == "engineer" then
+        if class and class.name == "engineer" then
             timer.Simple(1, function()
                 local wrench = ply:GetWeapon("weapon_ttt_tf2_eurekaeffect")
 

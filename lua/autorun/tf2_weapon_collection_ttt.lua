@@ -123,6 +123,14 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         }
     }
 
+    for _, classFile in ipairs(file.Find("tf2_classes/*.lua", "LUA")) do
+        if SERVER then
+            AddCSLuaFile("tf2_classes/" .. classFile)
+        end
+
+        include("tf2_classes/" .. classFile)
+    end
+
     hook.Add("TTTSpeedMultiplier", "TF2_ClassSpeedMult", function(ply, mults)
         if ply.TF2Class and ply.TF2Class.speed then
             table.insert(mults, ply.TF2Class.speed)
@@ -131,8 +139,8 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
 
     hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker, dmg)
         timer.Simple(1, function()
-            if (not Randomat or not Randomat.IsEventActive or not Randomat:IsEventActive("tf2")) and (not IsValid(ply) or (not ply.TF2Class and not ply:IsREDMann() and not ply:IsBLUMann())) then return end
-            if ply:Alive() or not ply:IsSpec() then return end
+            if not IsValid(ply) or ply:Alive() or not ply:IsSpec() then return end
+            if (not Randomat or not Randomat.IsEventActive or not Randomat:IsEventActive("tf2")) and not ply.TF2Class and not (ply.IsREDMann and ply:IsREDMann()) and not (ply.IsBLUMann and ply:IsBLUMann()) then return end
 
             if not IsValid(attacker) and IsValid(dmg) then
                 attacker = dmg:GetInflictor()
@@ -147,6 +155,12 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             ply:SetObserverMode(OBS_MODE_FREEZECAM)
             ply:SpectateEntity(attacker)
         end)
+    end)
+
+    hook.Add("TTTPrepareRound", "TF2_ClassReset", function()
+        for _, ply in player.Iterator() do
+            TF2WC:SetClass(ply, nil)
+        end
     end)
 
     -- Gives ammo to a player's gun equivalent to ammo boxes, without going over TTT's reserve ammo limits
@@ -216,42 +230,46 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             class = TF2WC.Classes[class]
         end
 
-        if SERVER then
-            TF2WC:StripAndGiveLoadout(ply, class)
-            ply:SetHealth(class.health)
-            ply:SetMaxHealth(class.health)
-        else
-            TF2WC:DoSpawnSound(ply, class)
-        end
+        if class then
+            if SERVER then
+                TF2WC:StripAndGiveLoadout(ply, class)
+                ply:SetHealth(class.health)
+                ply:SetMaxHealth(class.health)
+            else
+                TF2WC:DoSpawnSound(ply, class)
+            end
 
-        if CLIENT and class.prompt then
-            timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
-                hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
-                    if GetRoundState() ~= ROUND_ACTIVE then
+            if CLIENT and class.prompt then
+                timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
+                    hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
+                        if GetRoundState() ~= ROUND_ACTIVE then
+                            hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
+
+                            return
+                        end
+
+                        draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                    end)
+
+                    timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
                         hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
-
-                        return
-                    end
-
-                    draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                    end)
                 end)
-
-                timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
-                    hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
-                end)
-            end)
+            end
         end
 
         hook.Run("TF2ClassChanged", ply, class, ply.TF2Class)
         ply.TF2Class = class
 
         if SERVER then
-            local classIndex = 1
+            local classIndex = 0
 
-            for index, c in ipairs(TF2WC.Classes) do
-                if c.name == class.name then
-                    classIndex = index
-                    break
+            if class then
+                for index, c in ipairs(TF2WC.Classes) do
+                    if c.name == class.name then
+                        classIndex = index
+                        break
+                    end
                 end
             end
 
@@ -270,7 +288,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end)
     end
 
-    function TF2WC:IsClass(ply, className, ignoreMannRole)
-        return ply.TF2Class and ply.TF2Class.name == className and (ignoreMannRole or (ply.IsBLUMann and ply:IsBLUMann()) or (ply.IsREDMann and ply:IsREDMann()))
+    function TF2WC:IsClass(ply, className)
+        return ply.TF2Class and ply.TF2Class.name == className
     end
 end)
