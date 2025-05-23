@@ -135,6 +135,12 @@ function SWEP:Think()
 		if SERVER and tr.Hit then
 			if tr.Entity:IsNPC() or tr.Entity:IsPlayer() then
 				owner:EmitSound("Weapon_Club.HitFlesh")
+
+				timer.Simple(0, function()
+					if not tr.Entity:Alive() or tr.Entity:IsSpec() then
+						owner:EmitSound("player/medic/kill" .. math.random(3) .. ".wav")
+					end
+				end)
 			end
 
 			if not (tr.Entity:IsNPC() or tr.Entity:IsPlayer()) then
