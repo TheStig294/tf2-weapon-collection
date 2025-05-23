@@ -159,6 +159,24 @@ function SWEP:PrimaryAttack()
     end
 end
 
+function SWEP:SecondaryAttack()
+    if CLIENT then return end
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    local stickyExploded = false
+
+    for _, sticky in ipairs(self.StickyQueue) do
+        if IsValid(sticky) and sticky.Activation then
+            sticky:Remove()
+            stickyExploded = true
+        end
+    end
+
+    if stickyExploded then
+        owner:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
+    end
+end
+
 function SWEP:Think()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end

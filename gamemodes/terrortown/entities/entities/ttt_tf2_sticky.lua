@@ -31,20 +31,6 @@ function ENT:Think()
         ParticleEffectAttach("stickybomb_pulse_red", PATTACH_POINT_FOLLOW, self, 0)
         self.Activation = true
     end
-
-    if SERVER then
-        local owner = self.StickyOwner
-        if not IsValid(owner) then return end
-        local wep = owner:GetActiveWeapon()
-        if not IsValid(wep) then return end
-        local inflictorWep = self.Weapon
-        if not IsValid(inflictorWep) then return end
-
-        if owner:KeyDown(IN_ATTACK2) and self.Activation and WEPS.GetClass(wep) == WEPS.GetClass(inflictorWep) then
-            owner:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
-            self:Remove()
-        end
-    end
 end
 
 function ENT:PhysicsCollide()
