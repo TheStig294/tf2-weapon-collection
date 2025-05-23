@@ -84,8 +84,8 @@ function ENT:Explode()
     self:Remove()
 end
 
-function ENT:Touch()
-    if SERVER and self.StopExp == false then
+function ENT:Touch(ent)
+    if SERVER and self.StopExp == false and not (IsValid(self:GetOwner()) and self:GetOwner() == ent) then
         self:Explode()
     end
 end

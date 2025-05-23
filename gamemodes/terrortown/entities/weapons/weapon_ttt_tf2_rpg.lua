@@ -119,7 +119,6 @@ function SWEP:PrimaryAttack()
 	self:TakePrimaryAmmo(1)
 	self.StartReload = false
 	self:SetReloading(false)
-	owner:ViewPunch(Angle(0, 0, 0))
 end
 
 function SWEP:FireRocket()
@@ -127,9 +126,7 @@ function SWEP:FireRocket()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
 	local aim = owner:GetAimVector()
-	local side = aim:Cross(Vector(0, 0, 0))
-	local up = side:Cross(aim)
-	local pos = owner:GetShootPos() + aim * 0 + side * 0 + up * 0
+	local pos = owner:GetShootPos() + aim * 10
 	local rocket = ents.Create("ttt_tf2_rocket")
 	rocket.Weapon = self
 	rocket.Force = self.Primary.Force
