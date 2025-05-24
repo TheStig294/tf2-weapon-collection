@@ -1,6 +1,6 @@
 # TF2 Weapon Collection
 
-This is a mod for Garry's Mod TTT, adding 24 new weapons into the game, and more, all from Team Fortress 2!
+This is a mod for Garry's Mod TTT/Sandbox/TTT2/Custom Roles for TTT, adding 24 new weapons into the game, and more, all from Team Fortress 2!
 
 Includes...
 
