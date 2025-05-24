@@ -23,7 +23,7 @@ SWEP.HoldType = "shotgun"
 SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = false
@@ -43,7 +43,7 @@ SWEP.Primary.ExplosionDamage = 40
 SWEP.Primary.Radius = 200
 SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = "CombineCannon"
-SWEP.Primary.DefaultClip = 3
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 3 or 9999
 SWEP.Primary.Spread = 0
 SWEP.Primary.Automatic = false
 SWEP.Primary.Recoil = 0
@@ -52,6 +52,12 @@ SWEP.Primary.ChargeTime = 1
 SWEP.ReloadAnimDelay = 1
 SWEP.ChargeMult = 1
 SWEP.MaxChargeMult = 2
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -260,7 +266,7 @@ end
 
 if CLIENT then
     function SWEP:DrawHUD()
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

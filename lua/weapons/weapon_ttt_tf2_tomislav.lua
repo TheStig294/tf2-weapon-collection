@@ -1,6 +1,10 @@
 SWEP.PrintName = "Tomislav"
 SWEP.Purpose = ""
 SWEP.Instructions = ""
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -21,7 +25,7 @@ SWEP.HoldType = "shotgun"
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = false
@@ -42,8 +46,8 @@ SWEP.SpinTimer = 0
 SWEP.Idle = 0
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("weapons/tomislav_shoot.wav")
-SWEP.Primary.ClipSize = 200
-SWEP.Primary.DefaultClip = 200
+SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 9999
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "AR2"
 SWEP.Primary.Damage = 12
@@ -54,6 +58,7 @@ SWEP.Primary.Delay = 0.1
 SWEP.Primary.Force = 1
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 

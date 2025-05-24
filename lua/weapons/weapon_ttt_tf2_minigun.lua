@@ -1,4 +1,6 @@
 SWEP.PrintName = "Heavy Minigun"
+SWEP.Author = ""
+SWEP.Contact = ""
 SWEP.Purpose = ""
 SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
@@ -21,7 +23,7 @@ SWEP.HoldType = "shotgun"
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = true
@@ -45,8 +47,8 @@ SWEP.SpinAcceleration = 0.5
 SWEP.MaxSpinSpeed = 20
 SWEP.SpinAngle = Angle(0, 0, 0)
 SWEP.Primary.Sound = Sound("weapons/minigun_shoot.wav")
-SWEP.Primary.ClipSize = 200
-SWEP.Primary.DefaultClip = 200
+SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 9999
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "AR2"
 SWEP.Primary.Damage = 2.5
@@ -58,6 +60,7 @@ SWEP.Primary.Force = 1
 SWEP.Secondary.Sound = Sound("weapons/minigun_spin.wav")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 

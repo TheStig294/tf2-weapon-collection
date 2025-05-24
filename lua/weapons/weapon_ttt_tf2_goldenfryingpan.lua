@@ -24,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -47,6 +47,12 @@ SWEP.Primary.Damage = 48
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
 SWEP.Primary.Range = 128
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Deploy()
     local owner = self:GetOwner()

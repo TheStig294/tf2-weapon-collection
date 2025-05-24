@@ -59,6 +59,16 @@ hook.Add("PreRegisterSWEP", "TF2WeaponCollectionDroppableCrowbar", function(SWEP
     end
 end)
 
+if engine.ActiveGamemode() ~= "terrortown" then
+    local entmeta = FindMetaTable("Entity")
+
+    if not entmeta.IsSpec then
+        function entmeta:IsSpec()
+            return not self:Alive()
+        end
+    end
+end
+
 hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     TF2WC = TF2WC or {}
 
@@ -138,6 +148,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
     end)
 
     local function ShouldDoDeathCam(ply)
+        if engine.ActiveGamemode() ~= "terrortown" then return false end
         if not IsValid(ply) or ply:Alive() or not ply:IsSpec() then return false end
         if ply.TF2Class then return true end
         if (ply.IsREDMann and ply:IsREDMann()) or (ply.IsBLUMann and ply:IsBLUMann()) then return true end
@@ -260,7 +271,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                             return
                         end
 
-                        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, class.prompt, "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
                     end)
 
                     timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()

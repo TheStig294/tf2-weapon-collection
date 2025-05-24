@@ -20,7 +20,7 @@ SWEP.HoldType = "ar2"
 SWEP.FiresUnderwater = false
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_PISTOL
 SWEP.Slot = 1
 SWEP.AutoSpawnable = true
@@ -40,7 +40,7 @@ SWEP.Primary.Damage = 12
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 25
 SWEP.Primary.Ammo = "SMG1"
-SWEP.Primary.DefaultClip = 25
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 25 or 9999
 SWEP.Primary.Spread = 0.1
 SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Automatic = true
@@ -48,6 +48,12 @@ SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.1
 SWEP.Primary.Force = 1
 SWEP.ReloadAnimDelay = 0.5
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")

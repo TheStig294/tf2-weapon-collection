@@ -1,4 +1,8 @@
 SWEP.PrintName = "Your Eternal Reward"
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -20,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
 SWEP.Slot = 6
 SWEP.AutoSpawnable = false
@@ -51,6 +55,13 @@ SWEP.BackstabAngle = 30
 SWEP.BackstabRange = 64
 
 SWEP.Primary.Anims = {"eternal_stab_a", "eternal_stab_b", "eternal_stab_c"}
+
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Initialize()
 	self:SetWeaponHoldType(self.HoldType)

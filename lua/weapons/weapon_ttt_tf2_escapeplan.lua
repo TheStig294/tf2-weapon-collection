@@ -24,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -53,6 +53,12 @@ SWEP.Primary.Anims = {"s_swing_a", "s_swing_b", "s_swing_c"}
 SWEP.MaxSpeedBoost = 1.3
 SWEP.CurrentSpeedBoost = 1
 SWEP.SpeedBoostActive = false
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -203,7 +209,7 @@ end
 
 if CLIENT then
     function SWEP:DrawHUD()
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Health Speed: x" .. math.Round(self.CurrentSpeedBoost, 1), "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Health Speed: x" .. math.Round(self.CurrentSpeedBoost, 1), "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

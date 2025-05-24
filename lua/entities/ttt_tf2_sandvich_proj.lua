@@ -43,7 +43,7 @@ function ENT:ActivateSandvich(ply)
 
         hook.Add("HUDPaintBackground", "TF2SandvichHUDSeconds", function()
             if not client.TF2SandvichSeconds then return end
-            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
         end)
     end
 

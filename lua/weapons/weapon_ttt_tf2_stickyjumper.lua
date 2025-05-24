@@ -20,7 +20,7 @@ SWEP.UseHands = true
 SWEP.HoldType = "shotgun"
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
 SWEP.Slot = 6
 SWEP.AutoSpawnable = false
@@ -40,7 +40,7 @@ SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/sticky_jumper_shoot.wav")
 SWEP.Primary.Damage = 90
 SWEP.Primary.ClipSize = 8
-SWEP.Primary.DefaultClip = 32
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 32 or 9999
 SWEP.Primary.Spread = 0.05
 SWEP.Primary.NumberofShots = 0
 SWEP.Primary.Automatic = false

@@ -107,7 +107,7 @@ if CLIENT then
         end
 
         if not (client:IsActive() and (client:GetSubRole() == ROLE_REDMANN or client:GetSubRole() == ROLE_BLUMANN)) or client:GetNW2Bool("TF2ClassChanged") or not client:Alive() or client:IsSpec() then return end
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press comma [,] to switch class", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press comma [,] to switch class", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end)
 
     net.Receive("TTT2MannSyncClasses", function()

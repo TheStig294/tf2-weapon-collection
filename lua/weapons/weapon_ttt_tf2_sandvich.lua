@@ -1,3 +1,4 @@
+if engine.ActiveGamemode() ~= "terrortown" then return end
 SWEP.PrintName = "Sandvich"
 SWEP.ViewModelFOV = 60
 SWEP.ViewModel = "models/weapons/c_models/c_heavy_arms.mdl"
@@ -5,6 +6,7 @@ SWEP.WorldModel = "models/weapons/c_models/c_sandwich/c_sandwich.mdl"
 SWEP.ViewModelFlip = false
 SWEP.UseHands = true
 SWEP.Spawnable = true
+SWEP.Category = "Team Fortress 2"
 SWEP.Base = "weapon_tttbasegrenade"
 SWEP.AutoSpawnable = true
 
@@ -75,7 +77,7 @@ function SWEP:ActivateSandvich(ply)
 
         hook.Add("HUDPaintBackground", "TF2SandvichHUDSeconds", function()
             if not client.TF2SandvichSeconds then return end
-            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
         end)
     end
 
@@ -156,7 +158,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if not self.FullHealthPrompt then return end
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

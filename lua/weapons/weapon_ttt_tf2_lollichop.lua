@@ -3,6 +3,10 @@ SWEP.Author = ""
 SWEP.Contact = ""
 SWEP.Purpose = ""
 SWEP.Instructions = "Sends you to Pyroland..."
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -24,7 +28,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -52,6 +56,12 @@ SWEP.Primary.Anims = {"fa_swing_a", "fa_swing_b", "fa_swing_c"}
 
 SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetHooks()
     if self.HooksSet then return end

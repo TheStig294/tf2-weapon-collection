@@ -128,7 +128,7 @@ function TF2WC:AddSentryPlacerFunctions(SWEP)
     if CLIENT then
         function SWEP:DrawHUD()
             if self.TTTPAPSentryWrenchSpawned then return end
-            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Right-click to place sentry", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Right-click to place sentry", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
         end
     end
 end

@@ -46,7 +46,7 @@ if CLIENT then
         end
 
         if (not client:IsREDMann() and not client:IsBLUMann()) or client.TF2ClassChanged or not client:Alive() or client:IsSpec() then return end
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press comma [,] to switch class", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press comma [,] to switch class", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end)
 
     hook.Add("TTTTutorialRoleText", "REDMann_TTTTutorialRoleText", function(role, _)

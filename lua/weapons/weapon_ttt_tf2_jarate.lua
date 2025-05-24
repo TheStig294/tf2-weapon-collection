@@ -1,3 +1,4 @@
+if engine.ActiveGamemode() ~= "terrortown" then return end
 SWEP.PrintName = "Jarate"
 SWEP.ViewModelFOV = 60
 SWEP.ViewModel = "models/weapons/c_models/c_sniper_arms.mdl"
@@ -5,6 +6,7 @@ SWEP.WorldModel = "models/weapons/c_models/urinejar.mdl"
 SWEP.ViewModelFlip = false
 SWEP.UseHands = true
 SWEP.Spawnable = true
+SWEP.Category = "Team Fortress 2"
 SWEP.Base = "weapon_tttbasegrenade"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2

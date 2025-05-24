@@ -56,15 +56,15 @@ net.Receive("TF2RandomatRespawnTimer", function()
 
                 if TTT2 then
                     hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                        draw.WordBox(8, ScrW() / 2, ScrH() / 11, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) - 50, ScrH() / 8, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) + 50, ScrH() / 8, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, ScrW() / 2, ScrH() / 11, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) - 50, ScrH() / 8, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) + 50, ScrH() / 8, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     end)
                 else
                     hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                        draw.WordBox(8, ScrW() / 2, 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) - 50, 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) + 50, 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, ScrW() / 2, 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) - 50, 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) + 50, 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     end)
                 end
             end
@@ -90,7 +90,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
             alignment = TEXT_ALIGN_CENTER
         end
 
-        draw.WordBox(8, xPos, yPos, message, "TF2Font", COLOR_BLACK, COLOR_WHITE, alignment)
+        draw.WordBox(8, xPos, yPos, message, "TF2Font", color_black, color_white, alignment)
     end)
 
     if isEventBegin then

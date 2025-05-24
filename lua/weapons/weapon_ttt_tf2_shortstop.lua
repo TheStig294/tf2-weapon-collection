@@ -23,7 +23,7 @@ SWEP.HoldType = "revolver"
 SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_PISTOL
 SWEP.Slot = 1
 SWEP.AutoSpawnable = false
@@ -43,7 +43,7 @@ SWEP.Primary.ClipSize = 4
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.WeaponID = AMMO_SHOTGUN
-SWEP.Primary.DefaultClip = 4
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 4 or 9999
 SWEP.Primary.Spread = 0.3
 SWEP.Primary.NumberofShots = 8
 SWEP.Primary.Automatic = true

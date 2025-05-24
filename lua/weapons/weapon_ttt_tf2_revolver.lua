@@ -19,7 +19,7 @@ SWEP.UseHands = false
 SWEP.HoldType = "Revolver"
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_PISTOL
 SWEP.Slot = 1
 SWEP.AutoSpawnable = true
@@ -39,7 +39,7 @@ SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 6
 SWEP.Primary.Ammo = "AlyxGun"
 SWEP.AmmoEnt = "item_ammo_revolver_ttt"
-SWEP.Primary.DefaultClip = 6
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 6 or 9999
 SWEP.Primary.Spread = 0.2
 SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Automatic = true
@@ -47,6 +47,12 @@ SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.5
 SWEP.Primary.Force = 1
 SWEP.ReloadAnimDelay = 1
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")

@@ -1,4 +1,8 @@
 SWEP.PrintName = "TF2 Sniper"
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -19,7 +23,7 @@ SWEP.HoldType = "ar2"
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = true
@@ -38,8 +42,8 @@ SWEP.ScopedTimer = 0
 SWEP.Idle = false
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("weapons/sniper_shoot.wav")
-SWEP.Primary.ClipSize = 25
-SWEP.Primary.DefaultClip = 25
+SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 25 or 9999
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 25 or 9999
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "SniperRound"
 SWEP.Primary.Damage = 50
@@ -52,6 +56,7 @@ SWEP.Primary.Delay = 1.5
 SWEP.Primary.Force = 1
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 0.25
@@ -117,7 +122,7 @@ function SWEP:DrawHUD()
             text = "Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%"
         end
 
-        draw.SimpleText(text, "TF2Font", ScrW() / 2, self.ChargeHudOffset, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        draw.SimpleText(text, "TF2Font", ScrW() / 2, self.ChargeHudOffset, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     else
         return self.BaseClass.DrawHUD(self)
     end

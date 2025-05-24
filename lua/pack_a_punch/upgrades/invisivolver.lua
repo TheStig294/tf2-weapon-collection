@@ -88,7 +88,7 @@ function UPGRADE:Apply(SWEP)
 
         function SWEP:DrawHUD()
             if client.TF2InvisivolverTime then
-                draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Invis time: " .. client.TF2InvisivolverTime, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Invis time: " .. client.TF2InvisivolverTime, "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
             end
         end
     end

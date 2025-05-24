@@ -1,4 +1,8 @@
 SWEP.PrintName = "Invis Watch"
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -20,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP2
 SWEP.AmmoEnt = "item_ammo_pistol_ttt"
 SWEP.Slot = 7
@@ -52,6 +56,7 @@ SWEP.Primary.Delay = 1
 SWEP.Secondary.Sound = Sound("player/spy_uncloak.wav")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 2

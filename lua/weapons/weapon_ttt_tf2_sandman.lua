@@ -24,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -49,6 +49,7 @@ SWEP.Primary.Force = 2
 SWEP.Primary.Range = 64
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 10

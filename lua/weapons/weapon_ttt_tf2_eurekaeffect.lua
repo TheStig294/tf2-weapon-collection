@@ -22,7 +22,7 @@ SWEP.HoldType = "melee"
 SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -47,6 +47,13 @@ SWEP.Primary.Force = 2
 SWEP.Primary.Range = 128
 
 SWEP.Primary.Anims = {"spk_swing_a", "spk_swing_b", "spk_swing_c"}
+
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -94,7 +101,7 @@ function SWEP:Teleport()
 
     timer.Simple(1.9, function()
         if not IsValid(self) or not IsValid(owner) then return end
-        owner:ScreenFade(SCREENFADE.OUT, COLOR_WHITE, 0.25, 0.125)
+        owner:ScreenFade(SCREENFADE.OUT, color_white, 0.25, 0.125)
     end)
 
     timer.Simple(2, function()
@@ -102,8 +109,8 @@ function SWEP:Teleport()
         if not IsValid(self) then return end
         self.IsTeleporting = false
         if not IsValid(owner) then return end
-        owner:ScreenFade(SCREENFADE.PURGE, COLOR_WHITE, 0, 0)
-        owner:ScreenFade(SCREENFADE.IN, COLOR_WHITE, 0.25, 0.125)
+        owner:ScreenFade(SCREENFADE.PURGE, color_white, 0, 0)
+        owner:ScreenFade(SCREENFADE.IN, color_white, 0.25, 0.125)
 
         for _, ent in ents.Iterator() do
             if IsValid(ent) and ent:GetClass() == "info_player_start" then
@@ -209,7 +216,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if self.HasTeleported then return end
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press Reload to teleport", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press Reload to teleport", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

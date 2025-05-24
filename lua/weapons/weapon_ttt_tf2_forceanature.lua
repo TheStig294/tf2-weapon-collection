@@ -23,7 +23,7 @@ SWEP.HoldType = "shotgun"
 SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = false
@@ -43,13 +43,19 @@ SWEP.Primary.ClipSize = 2
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.WeaponID = AMMO_SHOTGUN
-SWEP.Primary.DefaultClip = 2
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 2 or 9999
 SWEP.Primary.Spread = 0.3
 SWEP.Primary.NumberofShots = 12
 SWEP.Primary.Automatic = true
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.3125
 SWEP.Primary.Force = 250
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Deploy()
     local owner = self:GetOwner()

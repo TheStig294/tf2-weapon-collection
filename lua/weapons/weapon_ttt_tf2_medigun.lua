@@ -1,4 +1,8 @@
 SWEP.PrintName = "Medi Gun"
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -20,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP2
 SWEP.Slot = 7
 SWEP.AutoSpawnable = false
@@ -58,6 +62,7 @@ SWEP.Primary.Overheal = 50
 SWEP.Secondary.Sound = Sound("WeaponMedigun.Charged")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.UsedUber = false
@@ -489,7 +494,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if self:UberChargeReady() then
-            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Right-Click for ÜberCharge", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Right-Click for ÜberCharge", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
         end
     end
 end

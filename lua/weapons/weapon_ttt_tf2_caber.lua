@@ -24,7 +24,7 @@ SWEP.FiresUnderwater = true
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = false
 SWEP.ReloadSound = ""
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_MELEE
 SWEP.Slot = 0
 SWEP.AutoSpawnable = true
@@ -54,6 +54,12 @@ SWEP.Primary.Anims = {"b_swing_a", "b_swing_b", "b_swing_c"}
 
 SWEP.SwitchedViewModel = false
 SWEP.SwitchedWorldModel = false
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Exploded")

@@ -1,4 +1,8 @@
 SWEP.PrintName = "Syringe Gun"
+SWEP.Author = ""
+SWEP.Contact = ""
+SWEP.Purpose = ""
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
@@ -19,7 +23,7 @@ SWEP.HoldType = "ar2"
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = true
@@ -40,7 +44,7 @@ SWEP.Idle = 0
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("Weapon_SyringeGun.Single")
 SWEP.Primary.ClipSize = 40
-SWEP.Primary.DefaultClip = 40
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 40 or 9999
 SWEP.Primary.Damage = 10
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "SMG1"
@@ -49,6 +53,12 @@ SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Delay = 0.1
 SWEP.Primary.Force = 1500
 SWEP.ReloadAnimDelay = 0.5
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")

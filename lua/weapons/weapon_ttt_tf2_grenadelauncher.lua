@@ -22,7 +22,7 @@ SWEP.UseHands = true
 SWEP.HoldType = "shotgun"
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = true
@@ -42,7 +42,7 @@ SWEP.Primary.Damage = 20
 SWEP.Primary.Radius = 140
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 4
-SWEP.Primary.DefaultClip = 8
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 8 or 9999
 SWEP.Primary.Spread = 0.05
 SWEP.Primary.NumberofShots = 0
 SWEP.Primary.Automatic = false
@@ -52,6 +52,12 @@ SWEP.Primary.Force = 5
 SWEP.ReloadAnimDelay = 1
 SWEP.ReserveAmmo = SWEP.Primary.DefaultClip - SWEP.Primary.ClipSize
 SWEP.ReloadHoldType = "revolver"
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:Equip()
 	local owner = self:GetOwner()

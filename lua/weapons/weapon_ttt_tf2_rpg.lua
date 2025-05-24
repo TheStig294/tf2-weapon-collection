@@ -19,7 +19,7 @@ SWEP.HoldType = "rpg"
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
 SWEP.ReloadSound = "sound/epicreload.wav"
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
 SWEP.Slot = 6
 SWEP.WeaponID = AMMO_SHOTGUN
@@ -42,7 +42,7 @@ SWEP.Primary.Damage = 40
 SWEP.Primary.TakeAmmo = 0
 SWEP.Primary.ClipSize = 4
 SWEP.Primary.Ammo = "Buckshot"
-SWEP.Primary.DefaultClip = 32
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 32 or 9999
 SWEP.Primary.Spread = 0.1
 SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Automatic = true
@@ -52,6 +52,7 @@ SWEP.Primary.Force = 562.5
 SWEP.Primary.Radius = 169
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Sound = Sound("weapons/rocket_shoot.wav")

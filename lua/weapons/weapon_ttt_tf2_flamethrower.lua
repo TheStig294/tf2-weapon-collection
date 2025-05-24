@@ -1,4 +1,6 @@
 SWEP.PrintName = "Flamethrower"
+SWEP.Author = ""
+SWEP.Contact = ""
 SWEP.Purpose = ""
 SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
@@ -23,7 +25,7 @@ SWEP.FiresUnderwater = false
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.AutoSpawnable = true
@@ -45,8 +47,8 @@ SWEP.ReloadingTimer = 0
 SWEP.Idle = true
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("weapons/flame_thrower_start.wav")
-SWEP.Primary.ClipSize = 200
-SWEP.Primary.DefaultClip = 200
+SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 10000
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 10000
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "AR2AltFire"
 SWEP.Primary.Damage = 3.5
@@ -58,6 +60,7 @@ SWEP.Primary.Range = 196
 SWEP.Secondary.Sound = Sound("weapons/flame_thrower_airblast.wav")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.TakeAmmo = 20

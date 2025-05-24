@@ -22,7 +22,7 @@ SWEP.UseHands = false
 SWEP.HoldType = "shotgun"
 SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
-SWEP.Base = "weapon_tttbase"
+SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
 SWEP.WeaponID = AMMO_SHOTGUN
@@ -43,7 +43,7 @@ SWEP.Primary.Damage = 6
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 6
 SWEP.Primary.Ammo = "Buckshot"
-SWEP.Primary.DefaultClip = 6
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 6 or 9999
 SWEP.Primary.Spread = 0.3
 SWEP.Primary.NumberofShots = 9
 SWEP.Primary.Automatic = true
@@ -51,6 +51,12 @@ SWEP.Primary.Recoil = 0.5
 SWEP.Primary.Delay = 0.625
 SWEP.Primary.Force = 1
 SWEP.ReloadAnimDelay = 1
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
+
+function SWEP:SecondaryAttack()
+end
 
 function SWEP:SetupDataTables()
 	self:NetworkVar("Bool", "Idle")
