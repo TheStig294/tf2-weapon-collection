@@ -45,6 +45,7 @@ SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 35
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
+SWEP.Primary.Range = 128
 SWEP.BleedDamage = 5
 SWEP.BleedDamageTicks = 6
 SWEP.BleedDamageDelay = 1
@@ -92,7 +93,7 @@ function SWEP:Think()
 
 		local tr = util.TraceLine({
 			start = owner:GetShootPos(),
-			endpos = owner:GetShootPos() + owner:GetAimVector() * 64,
+			endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
 			filter = owner,
 			mask = MASK_SHOT_HULL,
 		})
@@ -102,7 +103,7 @@ function SWEP:Think()
 		if not IsValid(ent) then
 			tr = util.TraceHull({
 				start = owner:GetShootPos(),
-				endpos = owner:GetShootPos() + owner:GetAimVector() * 64,
+				endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
 				filter = owner,
 				mins = Vector(-16, -16, 0),
 				maxs = Vector(16, 16, 0),

@@ -44,6 +44,7 @@ SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 30
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
+SWEP.Primary.Range = 128
 SWEP.HealAmount = 1
 SWEP.HealDelay = 1
 SWEP.Secondary.ClipSize = -1
@@ -106,7 +107,7 @@ function SWEP:Think()
 	if self.Attack == 1 and self.AttackTimer <= CurTime() then
 		local tr = util.TraceLine({
 			start = owner:GetShootPos(),
-			endpos = owner:GetShootPos() + owner:GetAimVector() * 64,
+			endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
 			filter = owner,
 			mask = MASK_SHOT_HULL,
 		})
@@ -114,7 +115,7 @@ function SWEP:Think()
 		if not IsValid(tr.Entity) then
 			tr = util.TraceHull({
 				start = owner:GetShootPos(),
-				endpos = owner:GetShootPos() + owner:GetAimVector() * 64,
+				endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
 				filter = owner,
 				mins = Vector(-16, -16, 0),
 				maxs = Vector(16, 16, 0),
