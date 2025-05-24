@@ -76,7 +76,7 @@ function SWEP:SetHooks()
         util.AddNetworkString("TF2RainblowerConfetti")
     else
         -- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
-        local confettiMat = Material("confetti.png")
+        local confettiMat = Material("effects/confetti.png")
         local sparkleMat = Material("effects/tp_sparkle2")
 
         local sparkleColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
@@ -332,7 +332,11 @@ function SWEP:OwnerChanged()
 end
 
 function SWEP:Holster()
-    local owner = self.LastOwner
+    local owner = self:GetOwner()
+
+    if not IsValid(owner) then
+        owner = self.LastOwner
+    end
 
     for _, ent in ents.Iterator() do
         if ent.TF2RainblowerParticle then

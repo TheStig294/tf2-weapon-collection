@@ -57,6 +57,9 @@ SWEP.StickyQueue = {}
 SWEP.MaxStickyCount = SWEP.Primary.ClipSize
 SWEP.ReloadAnimDelay = 1
 SWEP.ReloadHoldType = "revolver"
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 
 function SWEP:SetupDataTables()
 	self:NetworkVar("Bool", "Idle")

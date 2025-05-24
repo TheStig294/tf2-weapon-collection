@@ -100,6 +100,14 @@ function SWEP:PrimaryAttack()
     return self.BaseClass.PrimaryAttack(self)
 end
 
+if engine.ActiveGamemode() ~= "terrortown" then
+    function SWEP:PrimaryAttack()
+        self:ResetAnimations()
+
+        return TF2WC:PrimaryAttackSandbox(self)
+    end
+end
+
 function SWEP:Reload()
     self:ResetAnimations()
     self:SetReload(true)

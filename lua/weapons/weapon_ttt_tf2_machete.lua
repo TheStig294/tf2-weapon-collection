@@ -127,7 +127,7 @@ function SWEP:Think()
 			local timername = "TF2KukriBleedDamage" .. ent:EntIndex()
 
 			timer.Create(timername, self.BleedDamageDelay, self.BleedDamageTicks, function()
-				if not IsValid(ent) or not IsValid(self) or GetRoundState() == ROUND_PREP or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
+				if not IsValid(ent) or not IsValid(self) or (GetRoundState and GetRoundState() == ROUND_PREP) or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
 					timer.Remove(timername)
 
 					return

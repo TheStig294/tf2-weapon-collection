@@ -228,7 +228,11 @@ function SWEP:OwnerChanged()
 end
 
 function SWEP:Holster()
-    local owner = self.LastOwner
+    local owner = self:GetOwner()
+
+    if not IsValid(owner) then
+        owner = self.LastOwner
+    end
 
     for _, ent in ents.Iterator() do
         if ent.TF2LollichopParticle then

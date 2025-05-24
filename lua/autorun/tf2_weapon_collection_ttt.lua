@@ -265,7 +265,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
             if CLIENT and class.prompt then
                 timer.Create("TF2ClassChangeHUDPrompt", 2, 1, function()
                     hook.Add("HUDPaint", "TF2_ClassChangeHUDPrompt", function()
-                        if GetRoundState() ~= ROUND_ACTIVE then
+                        if GetRoundState and GetRoundState() ~= ROUND_ACTIVE then
                             hook.Remove("HUDPaint", "TF2_ClassChangeHUDPrompt")
 
                             return
@@ -327,5 +327,23 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         if SERVER then return 0 end
 
         return TTT2 and ScrW() / 5 or 265
+    end
+
+    function TF2WC:PrimaryAttackSandbox(SWEP)
+        SWEP:SetNextSecondaryFire(CurTime() + SWEP.Primary.Delay)
+        SWEP:SetNextPrimaryFire(CurTime() + SWEP.Primary.Delay)
+        if not SWEP:CanPrimaryAttack() then return end
+
+        if not worldsnd then
+            SWEP:EmitSound(SWEP.Primary.Sound, SWEP.Primary.SoundLevel)
+        elseif SERVER then
+            sound.Play(SWEP.Primary.Sound, SWEP:GetPos(), SWEP.Primary.SoundLevel)
+        end
+
+        SWEP:ShootBullet(SWEP.Primary.Damage, SWEP.Primary.Recoil, SWEP.Primary.NumShots, SWEP.Primary.Cone or 0.2)
+        SWEP:TakePrimaryAmmo(1)
+        local owner = SWEP:GetOwner()
+        if not IsValid(owner) or owner:IsNPC() or (not owner.ViewPunch) then return end
+        owner:ViewPunch(Angle(util.SharedRandom(SWEP:GetClass(), -0.2, -0.1, 0) * SWEP.Primary.Recoil, util.SharedRandom(SWEP:GetClass(), -0.1, 0.1, 1) * SWEP.Primary.Recoil, 0))
     end
 end)

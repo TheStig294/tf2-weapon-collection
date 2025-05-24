@@ -53,6 +53,9 @@ SWEP.StickyQueue = {}
 SWEP.MaxStickyCount = SWEP.Primary.ClipSize
 SWEP.ReloadAnimDelay = 1
 SWEP.ReloadHoldType = "revolver"
+SWEP.Secondary.ClipSize = -1
+SWEP.Secondary.DefaultClip = -1
+SWEP.Secondary.Ammo = "none"
 
 function SWEP:SetupDataTables()
     self:NetworkVar("Bool", "Idle")
@@ -75,7 +78,7 @@ function SWEP:Initialize()
     hook.Add("EntityTakeDamage", "TF2StickyJumperNoFallDamage", function(ply, dmg)
         if not dmg:IsFallDamage() or not IsValid(ply) or not ply:IsPlayer() then return end
         local wep = ply:GetActiveWeapon()
-        if IsValid(wep) and WEPS.GetClass(wep) == "weapon_ttt_tf2_stickyjumper" then return true end
+        if IsValid(wep) and wep:GetClass() == "weapon_ttt_tf2_stickyjumper" then return true end
     end)
 
     hook.Add("TTTPrepareRound", "TF2StickyJumperReset", function()
@@ -131,7 +134,11 @@ function SWEP:PrimaryAttack()
         ent.ExplodeSound = "weapons/sticky_jumper_explode1.wav"
         ent.DamageForce = self.Primary.Force
         ent:Spawn()
-        ent:SetPAPCamo()
+
+        if ent.SetPAPCamo then
+            ent:SetPAPCamo()
+        end
+
         local phys = ent:GetPhysicsObject()
 
         if not IsValid(phys) then

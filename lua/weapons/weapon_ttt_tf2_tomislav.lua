@@ -93,7 +93,12 @@ function SWEP:OwnerChanged()
 end
 
 function SWEP:Holster()
-    local owner = self.LastOwner
+    local owner = self:GetOwner()
+
+    if not IsValid(owner) then
+        owner = self.LastOwner
+    end
+
     self.Sound = 0
     self.Spin = 0
     self.SpinTimer = CurTime()

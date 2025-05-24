@@ -13,7 +13,7 @@ if CLIENT then
             local hookname = "TF2Spy_DisguisePrompt"
 
             hook.Add("HUDPaint", hookname, function()
-                if ply:GetNWBool("disguised") or GetRoundState() ~= ROUND_ACTIVE or not TF2WC:IsClass(ply, "spy") then
+                if ply:GetNWBool("disguised") or (GetRoundState and GetRoundState() ~= ROUND_ACTIVE) or not TF2WC:IsClass(ply, "spy") then
                     hook.Remove("HUDPaint", hookname)
 
                     return
