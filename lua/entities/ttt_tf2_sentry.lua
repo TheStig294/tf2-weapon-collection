@@ -139,6 +139,10 @@ function ENT:Think()
         end
     end
 
+    if IsValid(self.Barrel) then
+        self.Barrel:SetRenderMode(RENDERMODE_NONE)
+    end
+
     return true
 end
 
