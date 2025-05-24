@@ -209,7 +209,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if self.HasTeleported then return end
-        draw.WordBox(8, 265, ScrH() - 50, "Press Reload to teleport", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press Reload to teleport", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

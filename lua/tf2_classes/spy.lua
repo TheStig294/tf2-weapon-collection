@@ -1,7 +1,8 @@
 if SERVER then
     hook.Add("TF2ClassChanged", "TF2Spy_GiveDisguiser", function(ply, class)
         if class and class.name == "spy" then
-            ply:GiveEquipmentItem(EQUIP_DISGUISE)
+            local disguiser = TTT2 and "item_ttt_disguiser" or EQUIP_DISGUISE
+            ply:GiveEquipmentItem(disguiser)
         end
     end)
 end
@@ -18,7 +19,7 @@ if CLIENT then
                     return
                 end
 
-                draw.WordBox(8, 265, ScrH() - 50, "Press numpad enter to enable disguise", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Press numpad enter to enable disguise", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
             end)
         end
     end)

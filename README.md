@@ -10,8 +10,9 @@ Includes...
 - 4 Traitor weapons, that traitors can buy
 - 24 Weapon upgrades, one for each weapon, for the "Pack-a-Punch" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3043605644>
-- 2+ Roles using weapons and abilities from each of the TF2 classes (The "REDMann" and "BLUMann" roles), for the "Custom Roles for TTT" mod:\
+- 2 Roles using weapons and abilities from each of the TF2 classes, for "Custom Roles for TTT" mod, or "TTT2" mods!\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=2404251054>
+<https://steamcommunity.com/sharedfiles/filedetails/?id=1357204556>
 - 1 Randomat event using all of the TF2 weapons in the pack, where you play a round of Capture the Flag, for the "Randomat" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=2055805086>
 - (And also works with the randomat's many different versions:)\
@@ -24,7 +25,7 @@ Credit goes to [IRIS](https://steamcommunity.com/profiles/76561198145368675) and
 \
 Credit goes to [Malivil](https://steamcommunity.com/id/malivil) for creating the [Improved Double Jump!](https://steamcommunity.com/sharedfiles/filedetails/?id=2501234496) mod, which was used for the Scout's double/multi-jump ability.
 
-## Custom Roles
+## Roles
 
 ### The REDMann & BLUMann
 

@@ -54,11 +54,19 @@ net.Receive("TF2RandomatRespawnTimer", function()
                     end
                 end)
 
-                hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                    draw.WordBox(8, (ScrW() / 2) - 50, 50, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                    draw.WordBox(8, (ScrW() / 2) + 50, 50, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                    draw.WordBox(8, ScrW() / 2, 15, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                end)
+                if TTT2 then
+                    hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
+                        draw.WordBox(8, ScrW() / 2, ScrH() / 11, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) - 50, ScrH() / 8, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) + 50, ScrH() / 8, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    end)
+                else
+                    hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
+                        draw.WordBox(8, ScrW() / 2, 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) - 50, 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                        draw.WordBox(8, (ScrW() / 2) + 50, 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    end)
+                end
             end
         end
     end)
@@ -71,7 +79,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
         end
 
         local message = "Respawning in " .. respawnTime .. " seconds, press [,] to change class"
-        local xPos = 265
+        local xPos = TF2WC:GetXHUDOffset()
         local yPos = ScrH() - 50
         local alignment = TEXT_ALIGN_LEFT
 

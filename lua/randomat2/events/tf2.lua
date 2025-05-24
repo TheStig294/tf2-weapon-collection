@@ -78,9 +78,9 @@ function EVENT:Begin()
         -- Don't let the last intel capture announcement overlap with the victory/defeat round end sounds
         if REDIntelCaptures < capturesToWin:GetInt() and BLUIntelCaptures < capturesToWin:GetInt() then
             for _, p in player.Iterator() do
-                if (isBLU and Randomat:IsInnocentTeam(p)) or (not isBLU and Randomat:IsTraitorTeam(p)) then
+                if (isBLU and TF2WC:IsInnocentTeam(p)) or (not isBLU and TF2WC:IsTraitorTeam(p)) then
                     p:SendLua("surface.PlaySound(\"misc/intel_teamcaptured.wav\")")
-                elseif (isBLU and not Randomat:IsInnocentTeam(p)) or (not isBLU and not Randomat:IsTraitorTeam(p)) then
+                elseif (isBLU and not TF2WC:IsInnocentTeam(p)) or (not isBLU and not TF2WC:IsTraitorTeam(p)) then
                     p:SendLua("surface.PlaySound(\"misc/intel_enemycaptured.wav\")")
                 end
             end
@@ -120,7 +120,7 @@ function EVENT:Begin()
             if timer.RepsLeft(timername) > 0 then return end
             ply:SpawnForRound(true)
             -- Make the player face the enemy intel on respawning
-            local intel = Randomat:IsTraitorTeam(ply) and BLUIntel or REDIntel
+            local intel = TF2WC:IsTraitorTeam(ply) and BLUIntel or REDIntel
             local direction = intel:GetPos() - ply:GetPos()
             ply:SetEyeAngles(direction:Angle())
 
@@ -152,7 +152,7 @@ function EVENT:Begin()
             timer.Simple(0.1, function()
                 if wintype == WIN_TIMELIMIT then
                     ply:SendLua("surface.PlaySound(\"misc/your_team_stalemate.wav\")")
-                elseif (Randomat:IsTraitorTeam(ply) and wintype == WIN_TRAITOR) or (Randomat:IsInnocentTeam(ply) and wintype == WIN_INNOCENT) then
+                elseif (TF2WC:IsTraitorTeam(ply) and wintype == WIN_TRAITOR) or (TF2WC:IsInnocentTeam(ply) and wintype == WIN_INNOCENT) then
                     ply:SendLua("surface.PlaySound(\"misc/your_team_won.wav\")")
                 else
                     ply:SendLua("surface.PlaySound(\"misc/your_team_lost.wav\")")
@@ -195,6 +195,12 @@ function EVENT:Begin()
             else
                 Randomat:SetRole(ply, BLURole)
                 enemyIntel = REDIntel
+            end
+
+            if ply.SetProperty then
+                ply:SetProperty("TF2ClassChanged", true)
+            else
+                ply:SetNW2Bool("TF2ClassChanged", true)
             end
 
             local direction = enemyIntel:GetPos() - ply:GetPos()

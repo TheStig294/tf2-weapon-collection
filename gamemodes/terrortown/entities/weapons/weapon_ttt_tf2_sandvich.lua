@@ -75,7 +75,7 @@ function SWEP:ActivateSandvich(ply)
 
         hook.Add("HUDPaintBackground", "TF2SandvichHUDSeconds", function()
             if not client.TF2SandvichSeconds then return end
-            draw.WordBox(8, 265, ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Sandvich Time: " .. client.TF2SandvichSeconds, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
         end)
     end
 
@@ -156,7 +156,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if not self.FullHealthPrompt then return end
-        draw.WordBox(8, 265, ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

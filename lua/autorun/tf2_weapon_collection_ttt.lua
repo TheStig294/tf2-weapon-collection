@@ -137,10 +137,18 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end
     end)
 
+    local function ShouldDoDeathCam(ply)
+        if not IsValid(ply) or ply:Alive() or not ply:IsSpec() then return false end
+        if ply.TF2Class then return true end
+        if (ply.IsREDMann and ply:IsREDMann()) or (ply.IsBLUMann and ply:IsBLUMann()) then return true end
+        if TTT2 and ROLE_REDMANN and ply:IsActive() and (ply:GetSubRole() == ROLE_REDMANN or ply:GetSubRole() == ROLE_BLUMANN) then return true end
+
+        return false
+    end
+
     hook.Add("DoPlayerDeath", "TF2_PlayerDeathFreezeCam", function(ply, attacker, dmg)
         timer.Simple(1, function()
-            if not IsValid(ply) or ply:Alive() or not ply:IsSpec() then return end
-            if (not Randomat or not Randomat.IsEventActive or not Randomat:IsEventActive("tf2")) and not ply.TF2Class and not (ply.IsREDMann and ply:IsREDMann()) and not (ply.IsBLUMann and ply:IsBLUMann()) then return end
+            if not ShouldDoDeathCam(ply) then return end
 
             if not IsValid(attacker) and IsValid(dmg) then
                 attacker = dmg:GetInflictor()
@@ -235,6 +243,10 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                 TF2WC:StripAndGiveLoadout(ply, class)
                 ply:SetHealth(class.health)
                 ply:SetMaxHealth(class.health)
+
+                if not CR_VERSION then
+                    ply:SetLaggedMovementValue(class.speed or 1)
+                end
             else
                 TF2WC:DoSpawnSound(ply, class)
             end
@@ -248,7 +260,7 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
                             return
                         end
 
-                        draw.WordBox(8, 265, ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+                        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, class.prompt, "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
                     end)
 
                     timer.Create("TF2ClassChangeHUDPromptRemove", 10, 1, function()
@@ -290,5 +302,19 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
 
     function TF2WC:IsClass(ply, className)
         return ply.TF2Class and ply.TF2Class.name == className
+    end
+
+    function TF2WC:IsInnocentTeam(ply)
+        return ply:GetRole() == ROLE_DETECTIVE or ply:GetRole() == ROLE_INNOCENT or (ply.IsInnocentTeam and ply:IsInnocentTeam()) or (ply.GetTeam and ply:GetTeam() == TEAM_INNOCENT) or (Randomat and Randomat.IsInnocentTeam and Randomat:IsInnocentTeam(ply))
+    end
+
+    function TF2WC:IsTraitorTeam(ply)
+        return ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam() or (ply.GetTeam and ply:GetTeam() == TEAM_TRAITOR)) or (Randomat and Randomat.IsTraitorTeam and Randomat:IsTraitorTeam(ply))
+    end
+
+    function TF2WC:GetXHUDOffset()
+        if SERVER then return 0 end
+
+        return TTT2 and ScrW() / 5 or 265
     end
 end)

@@ -157,11 +157,11 @@ function ENT:GetBLU()
 end
 
 function ENT:IsPlayerInnocent(ply)
-    return ply:GetRole() == ROLE_DETECTIVE or ply:GetRole() == ROLE_INNOCENT or (ply.IsInnocentTeam and ply:IsInnocentTeam())
+    return TF2WC:IsInnocentTeam(ply)
 end
 
 function ENT:IsPlayerTraitor(ply)
-    return ply:GetRole() == ROLE_TRAITOR or (ply.IsTraitorTeam and ply:IsTraitorTeam())
+    return TF2WC:IsTraitorTeam(ply)
 end
 
 function ENT:CanPickupEnemyIntel(ply)

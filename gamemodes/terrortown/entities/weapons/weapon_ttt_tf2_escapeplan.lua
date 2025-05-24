@@ -203,7 +203,7 @@ end
 
 if CLIENT then
     function SWEP:DrawHUD()
-        draw.WordBox(8, 265, ScrH() - 50, "Health Speed: x" .. math.Round(self.CurrentSpeedBoost, 1), "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Health Speed: x" .. math.Round(self.CurrentSpeedBoost, 1), "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
     end
 
     function SWEP:ViewModelDrawn(vm)

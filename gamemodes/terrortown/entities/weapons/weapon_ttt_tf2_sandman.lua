@@ -136,6 +136,7 @@ function SWEP:Deploy()
     self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
+    self.Secondary.Delay = 10
 
     return true
 end
