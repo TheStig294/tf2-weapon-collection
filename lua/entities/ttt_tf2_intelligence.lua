@@ -7,6 +7,7 @@ ENT.Model = "models/flag/briefcase.mdl"
 ENT.SpinDelay = 0.01
 ENT.SpinAngles = Angle(0, 1, 0)
 ENT.DroppedOldIntel = NULL
+ENT.BlockCapture = false
 
 function ENT:Initialize()
     self:SetModel(self.Model)
@@ -165,6 +166,7 @@ function ENT:IsPlayerTraitor(ply)
 end
 
 function ENT:CanPickupEnemyIntel(ply)
+    if self.BlockCapture then return false end
     local droppedIntel = self:GetBLU() and GetGlobalEntity("TF2IntelligenceDroppedBLU") or GetGlobalEntity("TF2IntelligenceDroppedRED")
     local BLUCapturePlayer, REDCapturePlayer
 

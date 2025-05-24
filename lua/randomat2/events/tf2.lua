@@ -17,42 +17,10 @@ function EVENT:Begin()
     hasteModeCvar = hasteMode:GetBool()
     hasteMode:SetBool(false)
     local REDSpawn, BLUSpawn
-    local playerSpawns = ents.FindByClass("info_player_start")
-
-    if #playerSpawns >= 1 then
-        REDSpawn = playerSpawns[math.random(#playerSpawns)]:GetPos()
-    end
-
-    local weaponSpawns = {}
-
-    for _, ent in ents.Iterator() do
-        if ent.AutoSpawnable then
-            table.insert(weaponSpawns, ent:GetPos())
-        end
-    end
-
-    if not REDSpawn then
-        REDSpawn = weaponSpawns[math.random(#weaponSpawns)]
-    end
-
-    local maxDist = 0
-
-    for _, pos in ipairs(weaponSpawns) do
-        local dist = pos:DistToSqr(REDSpawn)
-
-        if dist > maxDist then
-            maxDist = dist
-            BLUSpawn = pos
-        end
-    end
-
     local REDIntel = ents.Create("ttt_tf2_intelligence")
-    REDIntel:SetPos(REDSpawn)
-    REDIntel:Spawn()
+    REDIntel.BlockCapture = true
     local BLUIntel = ents.Create("ttt_tf2_intelligence")
-    BLUIntel:SetPos(BLUSpawn)
-    BLUIntel:Spawn()
-    BLUIntel:SetBLU(true)
+    BLUIntel.BlockCapture = true
     local REDIntelCaptures = 0
     local BLUIntelCaptures = 0
     util.AddNetworkString("TF2RandomatIntelCaptured")
@@ -178,6 +146,38 @@ function EVENT:Begin()
     end)
 
     timer.Create("TF2RandomatEventStartCountdown", 7, 1, function()
+        local playerSpawns = ents.FindByClass("info_player_start")
+
+        if #playerSpawns >= 1 then
+            REDSpawn = playerSpawns[math.random(#playerSpawns)]:GetPos()
+        end
+
+        local players = player.GetAll()
+
+        if not REDSpawn then
+            local ply = players[math.random(#players)]
+            REDSpawn = ply:GetPos()
+            ply:SetPos(REDSpawn + Vector(0, 0, 20))
+        end
+
+        local maxDist = 0
+
+        for _, ply in ipairs(players) do
+            local pos = ply:GetPos()
+            local dist = pos:DistToSqr(REDSpawn)
+            ply:SetPos(pos + Vector(0, 0, 20))
+
+            if dist > maxDist then
+                maxDist = dist
+                BLUSpawn = pos
+            end
+        end
+
+        REDIntel:SetPos(REDSpawn)
+        REDIntel:Spawn()
+        BLUIntel:SetPos(BLUSpawn)
+        BLUIntel:Spawn()
+        BLUIntel:SetBLU(true)
         local halfPlayerCount = player.GetCount() / 2
         local REDRole = ROLE_REDMANN or ROLE_TRAITOR
         local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
@@ -216,6 +216,9 @@ function EVENT:Begin()
             for _, ply in player.Iterator() do
                 ply:Freeze(false)
             end
+
+            REDIntel.BlockCapture = false
+            BLUIntel.BlockCapture = false
         end)
 
         local roundTime = GetGlobalFloat("ttt_round_end") - CurTime()
