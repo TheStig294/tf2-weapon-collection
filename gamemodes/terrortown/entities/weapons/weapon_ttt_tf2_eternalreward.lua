@@ -76,8 +76,6 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster()
-	local owner = self:GetOwner()
-	if not IsValid(owner) then return end
 	self.Backstab = 0
 	self.Attack = 0
 	self.AttackTimer = CurTime()

@@ -323,15 +323,21 @@ function SWEP:SecondaryAttack()
     self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
+function SWEP:OwnerChanged()
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    self.LastOwner = owner
+end
+
 function SWEP:Holster()
+    local owner = self.LastOwner
+
     for _, ent in ents.Iterator() do
         if ent.TF2RainblowerParticle then
             ent:SetDieTime(0.1)
             ent:Remove()
         end
     end
-
-    local owner = self:GetOwner()
 
     if IsValid(owner) then
         owner.TF2RainblowerEffects = false

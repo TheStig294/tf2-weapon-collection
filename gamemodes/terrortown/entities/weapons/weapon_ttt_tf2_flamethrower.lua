@@ -89,8 +89,6 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster()
-	local owner = self:GetOwner()
-	if not IsValid(owner) then return end
 	self:StopSound("Weapon_FlameThrower.PilotLoop")
 
 	return self.BaseClass.Holster(self)

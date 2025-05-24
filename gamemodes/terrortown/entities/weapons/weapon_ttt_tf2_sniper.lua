@@ -129,6 +129,11 @@ end
 
 function SWEP:SetScope(doScope)
     local owner = self:GetOwner()
+
+    if not IsValid(owner) then
+        owner = self.LastOwner
+    end
+
     self.Scoped = doScope
 
     if doScope then
@@ -174,9 +179,13 @@ function SWEP:Deploy()
     return self.BaseClass.Deploy(self)
 end
 
-function SWEP:Holster()
+function SWEP:OwnerChanged()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    self.LastOwner = owner
+end
+
+function SWEP:Holster()
     self.Idle = false
     self.IdleTimer = CurTime()
     self.HasScoped = false

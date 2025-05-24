@@ -81,13 +81,19 @@ function SWEP:Deploy()
     return self.BaseClass.Deploy(self)
 end
 
+function SWEP:OwnerChanged()
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    self.LastOwner = owner
+end
+
 function SWEP:Holster()
+    local owner = self.LastOwner
     self.Sound = 0
     self.Spin = 0
     self.SpinTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime()
-    local owner = self:GetOwner()
     if not IsValid(owner) then return end
 
     if SERVER then
@@ -111,11 +117,9 @@ function SWEP:PreDrop()
 end
 
 function SWEP:OnRemove()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
     self:Holster()
 
-    return self.BaseClass.PreDrop(self)
+    return self.BaseClass.OnRemove(self)
 end
 
 function SWEP:PrimaryAttack()

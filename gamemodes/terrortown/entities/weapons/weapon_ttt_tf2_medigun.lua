@@ -136,9 +136,15 @@ function SWEP:SetInvulnerable(ply, makeInvulnerable)
     end
 end
 
-function SWEP:Holster()
-    self:StopSound(self.Primary.Sound)
+function SWEP:OwnerChanged()
     local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    self.LastOwner = owner
+end
+
+function SWEP:Holster()
+    local owner = self.LastOwner
+    self:StopSound(self.Primary.Sound)
     if not IsValid(owner) then return end
 
     if SERVER then
@@ -483,7 +489,7 @@ end
 if CLIENT then
     function SWEP:DrawHUD()
         if self:UberChargeReady() then
-            draw.WordBox(8, 265, ScrH() - 50, "Right-Click for ÜberCharge", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Right-Click for ÜberCharge", "TF2Font", COLOR_BLACK, COLOR_WHITE, TEXT_ALIGN_LEFT)
         end
     end
 end
