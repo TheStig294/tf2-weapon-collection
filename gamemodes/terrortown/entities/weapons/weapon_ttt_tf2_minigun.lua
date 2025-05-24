@@ -40,6 +40,10 @@ SWEP.Spin = 0
 SWEP.SpinTimer = 0
 SWEP.Idle = 0
 SWEP.IdleTimer = 0
+SWEP.SpinSpeed = 0
+SWEP.SpinAcceleration = 0.5
+SWEP.MaxSpinSpeed = 20
+SWEP.SpinAngle = Angle(0, 0, 0)
 SWEP.Primary.Sound = Sound("weapons/minigun_shoot.wav")
 SWEP.Primary.ClipSize = 200
 SWEP.Primary.DefaultClip = 200
@@ -258,5 +262,19 @@ function SWEP:Think()
         end
 
         self.Idle = 1
+    end
+
+    if CLIENT then
+        if self.Spin == 0 then
+            self.SpinSpeed = math.max(0, self.SpinSpeed - self.SpinAcceleration)
+        else
+            self.SpinSpeed = math.min(self.MaxSpinSpeed, self.SpinSpeed + self.SpinAcceleration)
+        end
+
+        self.SpinAngle.z = (self.SpinAngle.z + self.SpinSpeed) % 360
+
+        if self.SpinSpeed > 0 then
+            vm:ManipulateBoneAngles(2, self.SpinAngle)
+        end
     end
 end
