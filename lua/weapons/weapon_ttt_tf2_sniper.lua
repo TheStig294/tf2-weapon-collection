@@ -37,7 +37,6 @@ if CLIENT then
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_sniper.png"
 end
 
-SWEP.Scoped = false
 SWEP.ScopedTimer = 0
 SWEP.Idle = false
 SWEP.IdleTimer = 0
@@ -68,6 +67,10 @@ SWEP.ChargeHudOffset = 10
 SWEP.RedDotSprite = nil
 SWEP.AllowDrop = true
 
+function SWEP:SetupDataTables()
+    self:NetworkVar("Bool", 0, "Scoped")
+end
+
 function SWEP:Initialize()
     self.IdleTimer = CurTime() + 1
 
@@ -84,7 +87,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:DrawHUD()
-    if self.Scoped then
+    if self:GetScoped() then
         local x, y
         local owner = self:GetOwner()
         if not IsValid(owner) then return end
@@ -139,7 +142,7 @@ function SWEP:SetScope(doScope)
         owner = self.LastOwner
     end
 
-    self.Scoped = doScope
+    self:SetScoped(doScope)
 
     if doScope then
         self.ScopedTimer = CurTime() + 3
@@ -252,7 +255,7 @@ function SWEP:PrimaryAttack()
     self.Idle = false
     self.IdleTimer = CurTime() + shootAnimationLength
 
-    if self.Scoped then
+    if self:GetScoped() then
         self:SetScope(false)
 
         timer.Simple(shootAnimationLength, function()
@@ -271,7 +274,7 @@ function SWEP:SecondaryAttack()
     if not IsValid(owner) then return end
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.HasScoped = true
-    self:SetScope(not self.Scoped)
+    self:SetScope(not self:GetScoped())
 end
 
 function SWEP:OwnerIsSniper()
@@ -284,7 +287,7 @@ end
 function SWEP:Think()
     local owner = self:GetOwner()
 
-    if self.Scoped then
+    if self:GetScoped() then
         if self.ScopedTimer > CurTime() then
             self.Primary.Damage = (1.5 / (self.ScopedTimer - CurTime() + 1.5)) * self.Primary.FullChargeDamage
 
@@ -306,7 +309,7 @@ function SWEP:Think()
         self.Primary.Damage = self.Primary.DamageOG
     end
 
-    if SERVER and IsValid(self.RedDotSprite) and self.Scoped then
+    if SERVER and IsValid(self.RedDotSprite) and self:GetScoped() then
         self.RedDotSprite:SetPos(owner:GetEyeTrace().HitPos)
     end
 
