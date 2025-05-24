@@ -9,7 +9,14 @@ ENT.Range = 140
 function ENT:Initialize()
     self:SetModel("models/weapons/w_models/w_grenade_grenadelauncher.mdl")
     self:SetMoveType(MOVETYPE_VPHYSICS)
-    self:SetSolid(SOLID_VPHYSICS)
+    self:SetSolid(SOLID_NONE)
+
+    timer.Simple(0.5, function()
+        if IsValid(self) then
+            self:SetSolid(SOLID_VPHYSICS)
+        end
+    end)
+
     self:PhysicsInit(SOLID_VPHYSICS)
     self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
     self:DrawShadow(false)
@@ -29,7 +36,9 @@ function ENT:PhysicsCollide(data)
             self:EmitSound("physics/metal/metal_grenade_impact_hard1.wav")
         end
 
-        if data.HitEntity:IsNPC() or data.HitEntity:IsPlayer() then
+        local ent = data.HitEntity
+
+        if ent:IsNPC() or ent:IsPlayer() then
             self:SetMoveType(MOVETYPE_NONE)
             self:SetSolid(SOLID_NONE)
             self:SetCollisionGroup(COLLISION_GROUP_NONE)
