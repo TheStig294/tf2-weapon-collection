@@ -119,7 +119,7 @@ function SWEP:OnRemove()
     if not IsValid(owner) then return end
     self:Holster()
 
-    return self.BaseClass.PreDrop(self)
+    return self.BaseClass.OnRemove(self)
 end
 
 function SWEP:PrimaryAttack()
