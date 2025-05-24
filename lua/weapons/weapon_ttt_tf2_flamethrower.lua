@@ -71,6 +71,27 @@ function SWEP:SetupDataTables()
 	self:NetworkVar("Float", 0, "NextIdle")
 end
 
+function SWEP:Initialize()
+	if SERVER then
+		hook.Add("PostEntityTakeDamage", "TF2FlamethrowerIgnite", function(ent, dmg, tookDmg)
+			if not tookDmg then return end
+			local inflictor = dmg:GetInflictor()
+			if not IsValid(inflictor) then return end
+
+			if inflictor:GetClass() == "weapon_ttt_tf2_flamethrower" then
+				ent:Ignite(10)
+
+				ent.ignite_info = {
+					att = dmg:GetAttacker(),
+					infl = dmg:GetInflictor()
+				}
+			end
+		end)
+	end
+
+	return self.BaseClass.Initialize(self)
+end
+
 function SWEP:UpdateNextIdle()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
@@ -276,7 +297,6 @@ function SWEP:Think()
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
 			dmg:SetDamageType(DMG_BURN)
 			ent:TakeDamageInfo(dmg)
-			ent:Ignite(10)
 
 			timer.Simple(0.1, function()
 				if IsValid(ent) and ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then

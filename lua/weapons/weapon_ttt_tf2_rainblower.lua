@@ -74,6 +74,21 @@ function SWEP:SetHooks()
 
     if SERVER then
         util.AddNetworkString("TF2RainblowerConfetti")
+
+        hook.Add("PostEntityTakeDamage", "TF2RainblowerIgnite", function(ent, dmg, tookDmg)
+            if not tookDmg then return end
+            local inflictor = dmg:GetInflictor()
+            if not IsValid(inflictor) then return end
+
+            if inflictor:GetClass() == "weapon_ttt_tf2_rainblower" then
+                ent:Ignite(10)
+
+                ent.ignite_info = {
+                    att = dmg:GetAttacker(),
+                    infl = dmg:GetInflictor()
+                }
+            end
+        end)
     else
         -- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
         local confettiMat = Material("effects/confetti.png")
@@ -439,7 +454,6 @@ function SWEP:Think()
             dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
             dmg:SetDamageType(DMG_BURN)
             ent:TakeDamageInfo(dmg)
-            ent:Ignite(10)
             net.Start("TF2RainblowerConfetti")
             net.WriteEntity(ent)
             net.Send(owner)
