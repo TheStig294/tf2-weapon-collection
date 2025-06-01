@@ -6,7 +6,7 @@ Includes...
 
 - 8 Melee weapons, that spawn on the ground and can replace your crowbar!
 - 11 Floor weapons, that spawn on the ground
-- 3 Detective weapons, that detectives can buy
+- 4 Detective weapons, that detectives can buy
 - 4 Traitor weapons, that traitors can buy
 - 24 Weapon upgrades, one for each weapon, for the "Pack-a-Punch" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3043605644>
@@ -245,7 +245,7 @@ PaP Upgrade: Immune to fall & self-damage while held, launches players hilarious
 
 ### Stickybomb Launcher
 
-Traitor, shoots bombs that can be remotely detonated, max 8 at a time\
+Detective/Traitor, shoots bombs that can be remotely detonated, max 8 at a time\
 PaP Upgrade: No self-damage, more damage and push force, infinite ammo!\
 *ttt_pap_sticky_jumper* - Default: 1 - Whether this upgrade is enabled
 

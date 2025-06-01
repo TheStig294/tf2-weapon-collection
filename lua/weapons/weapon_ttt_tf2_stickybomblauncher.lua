@@ -37,7 +37,7 @@ if CLIENT then
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_stickybomblauncher.png"
 end
 
-SWEP.CanBuy = {ROLE_TRAITOR}
+SWEP.CanBuy = {ROLE_DETECTIVE, ROLE_TRAITOR}
 
 SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/stickybomblauncher_shoot.wav")
