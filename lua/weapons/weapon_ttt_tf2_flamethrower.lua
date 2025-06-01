@@ -241,6 +241,24 @@ function SWEP:RemoveFlame()
 	self.IsAttacking = false
 end
 
+function SWEP:Holster()
+	self:RemoveFlame()
+
+	return self.BaseClass.Holster(self)
+end
+
+function SWEP:PreDrop()
+	self:Holster()
+
+	return self.BaseClass.PreDrop(self)
+end
+
+function SWEP:OnRemove()
+	self:Holster()
+
+	return self.BaseClass.OnRemove(self)
+end
+
 function SWEP:Think()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end

@@ -340,6 +340,19 @@ function SWEP:SecondaryAttack()
     self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
+function SWEP:RemoveFlame()
+    self:StopSound(self.Primary.Sound)
+    self:StopSound("weapons/rainblower/rainblower_loop.wav")
+    self:EmitSound("weapons/rainblower/rainblower_end.wav")
+
+    if SERVER and IsValid(self.Flame) then
+        self.Flame:Remove()
+    end
+
+    self.DoLoopingSound = false
+    self.IsAttacking = false
+end
+
 function SWEP:OwnerChanged()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
@@ -365,6 +378,7 @@ function SWEP:Holster()
     end
 
     self:StopSound("weapons/rainblower/rainblower_pilot.wav")
+    self:RemoveFlame()
 
     return self.BaseClass.Holster(self)
 end
@@ -378,24 +392,7 @@ end
 function SWEP:OnRemove()
     self:Holster()
 
-    if SERVER and IsValid(self.Flame) then
-        self.Flame:Remove()
-    end
-
     return self.BaseClass.OnRemove(self)
-end
-
-function SWEP:RemoveFlame()
-    self:StopSound(self.Primary.Sound)
-    self:StopSound("weapons/rainblower/rainblower_loop.wav")
-    self:EmitSound("weapons/rainblower/rainblower_end.wav")
-
-    if SERVER and IsValid(self.Flame) then
-        self.Flame:Remove()
-    end
-
-    self.DoLoopingSound = false
-    self.IsAttacking = false
 end
 
 function SWEP:Think()
