@@ -50,8 +50,7 @@ function ENT:InitPhysics()
     barrel:SetModel("models/props_c17/oildrum001.mdl")
     barrel:SetPos(self:GetPos())
     barrel:SetMoveType(MOVETYPE_NONE)
-    -- We don't use nodraw here because we still want the barrel networked to clients for bullet impact effects when shooting the sentry
-    barrel:SetRenderMode(RENDERMODE_NONE)
+    barrel:SetNoDraw(true)
     barrel:Spawn()
     barrel:Activate()
     barrel.HP = self.HP
@@ -137,10 +136,6 @@ function ENT:Think()
         else
             self:Reset()
         end
-    end
-
-    if IsValid(self.Barrel) then
-        self.Barrel:SetRenderMode(RENDERMODE_NONE)
     end
 
     return true
