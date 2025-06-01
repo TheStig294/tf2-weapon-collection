@@ -31,7 +31,7 @@ SWEP.Slot = 7
 SWEP.AutoSpawnable = false
 SWEP.AllowDrop = false
 
-SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}
+SWEP.CanBuy = {ROLE_TRAITOR}
 
 if CLIENT then
     SWEP.EquipMenuData = {

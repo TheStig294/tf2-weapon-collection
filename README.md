@@ -6,7 +6,7 @@ Includes...
 
 - 8 Melee weapons, that spawn on the ground and can replace your crowbar!
 - 11 Floor weapons, that spawn on the ground
-- 4 Detective weapons, that detectives can buy
+- 3 Detective weapons, that detectives can buy
 - 4 Traitor weapons, that traitors can buy
 - 24 Weapon upgrades, one for each weapon, for the "Pack-a-Punch" mod:\
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3043605644>
@@ -221,7 +221,7 @@ PaP Upgrade: Heals 3 HP for every hit!\
 
 ### Invis Watch
 
-Detective/Traitor, temporarily makes you invisible, can be reloaded with pistol ammo\
+Traitor, temporarily makes you invisible, can be reloaded with pistol ammo\
 PaP Upgrade: Recharges while standing still and not attacking!\
 *ttt_pap_cloak_and_dagger* - Default: 1 - Whether this upgrade is enabled
 
