@@ -81,7 +81,7 @@ function SWEP:SetHooks()
             if not IsValid(inflictor) then return end
 
             if inflictor:GetClass() == "weapon_ttt_tf2_rainblower" then
-                ent:Ignite(10)
+                ent:Ignite(3)
 
                 ent.ignite_info = {
                     att = dmg:GetAttacker(),
