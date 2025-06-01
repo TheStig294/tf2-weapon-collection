@@ -38,7 +38,7 @@ end
 
 SWEP.Primary.Ammo = "Grenade"
 SWEP.Primary.Sound = Sound("weapons/grenade_launcher_shoot.wav")
-SWEP.Primary.Damage = 20
+SWEP.Primary.Damage = 40
 SWEP.Primary.Radius = 140
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 4

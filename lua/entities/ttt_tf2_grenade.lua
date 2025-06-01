@@ -3,7 +3,7 @@ ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.Spawnable = false
 ENT.PrintName = "TF2 Grenade"
-ENT.Damage = 20
+ENT.Damage = 40
 ENT.Range = 140
 
 function ENT:Initialize()
