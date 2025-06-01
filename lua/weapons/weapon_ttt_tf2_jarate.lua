@@ -8,8 +8,8 @@ SWEP.UseHands = true
 SWEP.Spawnable = true
 SWEP.Category = "Team Fortress 2"
 SWEP.Base = "weapon_tttbasegrenade"
-SWEP.Kind = WEAPON_HEAVY
-SWEP.Slot = 2
+SWEP.Kind = WEAPON_PISTOL
+SWEP.Slot = 1
 SWEP.AutoSpawnable = false
 
 if CLIENT then
