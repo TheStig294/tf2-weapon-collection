@@ -58,6 +58,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 0.5
+SWEP.Secondary.Sound = Sound("Default.Zoom")
 SWEP.ScopedLaserAlpha = 0
 SWEP.ScopedAlpha = 0
 SWEP.MouseSensitivity = 1
@@ -274,6 +275,10 @@ function SWEP:SecondaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.HasScoped = true
     self:SetScope(not self:GetScoped())
+
+    if CLIENT then
+        self:EmitSound(self.Secondary.Sound)
+    end
 end
 
 function SWEP:OwnerIsSniper()
