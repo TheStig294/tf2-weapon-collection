@@ -76,7 +76,7 @@ function SWEP:SetHooks()
         util.AddNetworkString("TF2RainblowerConfetti")
 
         hook.Add("PostEntityTakeDamage", "TF2RainblowerIgnite", function(ent, dmg, tookDmg)
-            if not tookDmg then return end
+            if not tookDmg or ent:IsOnFire() then return end
             local inflictor = dmg:GetInflictor()
             if not IsValid(inflictor) then return end
 
