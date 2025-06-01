@@ -88,11 +88,17 @@ if CLIENT then
     w_model:SetNoDraw(true)
     local offsetvec = Vector(8, -3, 0)
     local offsetang = Angle(180, 180, 0)
+    local client
 
     function SWEP:DrawWorldModel(flags)
-        local owner = self:GetOwner()
+        if not IsValid(client) then
+            client = LocalPlayer()
+        end
 
-        if not IsValid(owner) then
+        local owner = self:GetOwner()
+        local spectatedPlayer = client:GetObserverTarget()
+
+        if not IsValid(owner) or (IsValid(spectatedPlayer) and spectatedPlayer == owner) then
             self:DrawModel(flags)
 
             return
