@@ -18,6 +18,7 @@ PrecacheParticleSystem("peejar_impact")
 PrecacheParticleSystem("peejar_drips")
 PrecacheParticleSystem("peejar_trail_red")
 PrecacheParticleSystem("player_intel_papertrail")
+resource.AddWorkshop("3484716425")
 
 if SERVER then
     resource.AddSingleFile("resource/fonts/tf2build.ttf")
