@@ -214,7 +214,7 @@ PaP Upgrade: Full-charge headshots always kill!\
 ### Syringe Gun
 
 A very high-damage, low range and accuracy gun, syringes fired are affected by gravity\
-PaP Upgrade: Heals 3 HP for every hit!\
+PaP Upgrade: You heal 3 HP every time you hit a player!\
 *ttt_pap_blutsauger* - Default: 1 - Whether this upgrade is enabled
 
 ## Buyable Weapons

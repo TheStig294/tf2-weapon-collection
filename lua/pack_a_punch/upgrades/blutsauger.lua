@@ -2,7 +2,7 @@ local UPGRADE = {}
 UPGRADE.id = "blutsauger"
 UPGRADE.class = "weapon_ttt_tf2_syringegun"
 UPGRADE.name = "Blutsauger"
-UPGRADE.desc = "Heals 3 HP for every hit!"
+UPGRADE.desc = "You heal 3 HP every time you hit a player!"
 UPGRADE.noSound = true
 
 function UPGRADE:Apply(SWEP)
