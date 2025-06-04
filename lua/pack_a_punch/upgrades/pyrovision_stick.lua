@@ -29,7 +29,12 @@ function UPGRADE:Apply(SWEP)
             end)
         end
 
-        StartPyrovision()
+        local own = SWEP:GetOwner()
+
+        if IsValid(own) and IsValid(client) and client == own then
+            StartPyrovision()
+        end
+
         self:AddToHook(SWEP, "Deploy", StartPyrovision)
 
         self:AddToHook(SWEP, "Holster", function()
