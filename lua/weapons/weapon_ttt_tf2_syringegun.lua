@@ -45,7 +45,7 @@ SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("Weapon_SyringeGun.Single")
 SWEP.Primary.ClipSize = 40
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 40 or 9999
-SWEP.Primary.Damage = 10
+SWEP.Primary.Damage = 20
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "SMG1"
 SWEP.Primary.TakeAmmo = 1
