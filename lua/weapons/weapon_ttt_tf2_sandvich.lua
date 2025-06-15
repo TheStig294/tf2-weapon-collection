@@ -62,11 +62,13 @@ function SWEP:ActivateSandvich(ply)
             return
         end
 
-        if timer.RepsLeft(timername) == 0 then
-            if ply.TF2SandvichHealth > ply:Health() then return end
-            ply:SetHealth(ply.TF2SandvichHealth)
-            ply.TF2SandvichHealth = nil
+        if timer.RepsLeft(timername) <= 0 then
+            if ply.TF2SandvichHealth < ply:Health() then
+                ply:SetHealth(ply.TF2SandvichHealth)
+            end
+
             ply.TF2SandvichSeconds = nil
+            ply.TF2SandvichHealth = nil
         else
             ply.TF2SandvichSeconds = ply.TF2SandvichSeconds - 1
         end
