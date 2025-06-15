@@ -56,6 +56,15 @@ SWEP.Primary.Anims = {"fa_swing_a", "fa_swing_b", "fa_swing_c"}
 
 SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
+SWEP.ConfettiMat = Material("effects/confetti.png")
+SWEP.BalloonMat = Material("effects/balloon001")
+
+SWEP.BalloonColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
+
+SWEP.ConfettiCount = 10
+SWEP.BalloonCount = 3
+SWEP.ParticleGravityMax = 50
+SWEP.ParticleVelocityMax = 200
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
@@ -69,66 +78,6 @@ function SWEP:SetHooks()
     if SERVER then
         util.AddNetworkString("TF2LollichopConfetti")
     else
-        -- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
-        local confettiMat = Material("effects/confetti.png")
-        local balloonMat = Material("effects/balloon001")
-
-        local balloonColours = {Color(255, 0, 0), Color(0, 255, 0), Color(0, 0, 255), Color(255, 255, 0), Color(255, 0, 255), Color(0, 255, 255)}
-
-        local confettiCount = 10
-        local balloonCount = 3
-
-        -- Confetti and laughter effect on damaging a player
-        net.Receive("TF2LollichopConfetti", function()
-            local ent = net.ReadEntity()
-            if not IsValid(ent) then return end
-            ent:EmitSound("player/pyro/laugh" .. math.random(9) .. ".mp3")
-            local pos = ent:GetPos() + Vector(0, 0, ent:OBBMaxs().z)
-
-            if ent.GetShootPos then
-                pos = ent:GetShootPos()
-            end
-
-            local velMax = 200
-            local gravMax = 50
-            local gravity = Vector(math.random(-gravMax, gravMax), math.random(-gravMax, gravMax), math.random(-gravMax, 0))
-            -- Handles particles
-            local emitter = ParticleEmitter(pos, true)
-
-            for _ = 1, confettiCount do
-                local p = emitter:Add(confettiMat, pos)
-                p:SetStartSize(math.random(6, 10))
-                p:SetEndSize(0)
-                p:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
-                p:SetAngleVelocity(Angle(math.random(5, 50), math.random(5, 50), math.random(5, 50)))
-                p:SetVelocity(Vector(math.random(-velMax, velMax), math.random(-velMax, velMax), math.random(-velMax, velMax)))
-                p:SetColor(255, 255, 255)
-                p:SetDieTime(math.random(4, 7))
-                p:SetGravity(gravity)
-                p:SetAirResistance(125)
-                p.TF2LollichopParticle = true
-            end
-
-            gravity = -gravity
-
-            for _ = 1, balloonCount do
-                local p = emitter:Add(balloonMat, pos)
-                p:SetStartSize(math.random(16, 20))
-                p:SetEndSize(0)
-                p:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
-                p:SetAngleVelocity(Angle(math.random(5, 50), math.random(5, 50), math.random(5, 50)))
-                p:SetVelocity(Vector(math.random(-velMax, velMax), math.random(-velMax, velMax), math.random(-velMax, velMax)))
-                local randomColour = balloonColours[math.random(#balloonColours)]
-                p:SetColor(randomColour.r, randomColour.g, randomColour.b)
-                p:SetDieTime(math.random(4, 7))
-                p:SetGravity(gravity)
-                p:SetAirResistance(125)
-                p.TF2LollichopParticle = true
-            end
-
-            emitter:Finish()
-        end)
-
         local client = LocalPlayer()
 
         -- Make all sounds higher pitched!
@@ -171,6 +120,55 @@ function SWEP:SetHooks()
     self.HooksSet = true
 end
 
+-- Confetti and laughter effect on damaging a player
+-- Credit to Nick and Mal for making this function as part of the Custom Roles Jester confetti effect
+function SWEP:ConfettiEffect(ent)
+    if SERVER or not IsValid(ent) then return end
+    ent:EmitSound("player/pyro/laugh" .. math.random(9) .. ".mp3")
+    local pos = ent:GetPos() + Vector(0, 0, ent:OBBMaxs().z)
+
+    if ent.GetShootPos then
+        pos = ent:GetShootPos()
+    end
+
+    local gravity = Vector(math.random(-self.ParticleGravityMax, self.ParticleGravityMax), math.random(-self.ParticleGravityMax, self.ParticleGravityMax), math.random(-self.ParticleGravityMax, 0))
+    -- Handles particles
+    local emitter = ParticleEmitter(pos, true)
+
+    for _ = 1, self.ConfettiCount do
+        local p = emitter:Add(self.ConfettiMat, pos)
+        p:SetStartSize(math.random(6, 10))
+        p:SetEndSize(0)
+        p:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
+        p:SetAngleVelocity(Angle(math.random(5, 50), math.random(5, 50), math.random(5, 50)))
+        p:SetVelocity(Vector(math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax), math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax), math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax)))
+        p:SetColor(255, 255, 255)
+        p:SetDieTime(math.random(4, 7))
+        p:SetGravity(gravity)
+        p:SetAirResistance(125)
+        p.TF2LollichopParticle = true
+    end
+
+    gravity = -gravity
+
+    for _ = 1, self.BalloonCount do
+        local p = emitter:Add(self.BalloonMat, pos)
+        p:SetStartSize(math.random(16, 20))
+        p:SetEndSize(0)
+        p:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
+        p:SetAngleVelocity(Angle(math.random(5, 50), math.random(5, 50), math.random(5, 50)))
+        p:SetVelocity(Vector(math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax), math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax), math.random(-self.ParticleVelocityMax, self.ParticleVelocityMax)))
+        local randomColour = self.BalloonColours[math.random(#self.BalloonColours)]
+        p:SetColor(randomColour.r, randomColour.g, randomColour.b)
+        p:SetDieTime(math.random(4, 7))
+        p:SetGravity(gravity)
+        p:SetAirResistance(125)
+        p.TF2LollichopParticle = true
+    end
+
+    emitter:Finish()
+end
+
 function SWEP:Initialize()
     -- SWEP:Deploy() isn't called if the player spawns on and picks up this weapon, and they haven't been given the crowbar yet
     -- So we have to check for that case here
@@ -195,6 +193,8 @@ function SWEP:Deploy()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("fa_draw"))
     self:SetNextPrimaryFire(CurTime() + 0.5)
+    self.Attack = 0
+    self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
     owner.TF2LollichopEffects = true
@@ -205,77 +205,16 @@ end
 function SWEP:PrimaryAttack()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
-    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-
-    if owner.LagCompensation then
-        owner:LagCompensation(true)
-    end
-
-    local spos = owner:GetShootPos()
-    local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
-
-    local tr_main = util.TraceLine({
-        start = spos,
-        endpos = sdest,
-        filter = owner,
-        mask = MASK_SHOT_HULL
-    })
-
-    local hitEnt = tr_main.Entity
-    self:EmitSound(self.Primary.Sound)
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence(self.Primary.Anims[math.random(#self.Primary.Anims)]))
-
-    if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
-        local edata = EffectData()
-        edata:SetStart(spos)
-        edata:SetOrigin(tr_main.HitPos)
-        edata:SetNormal(tr_main.Normal)
-        edata:SetSurfaceProp(tr_main.SurfaceProps)
-        edata:SetHitBox(tr_main.HitBox)
-        edata:SetEntity(hitEnt)
-
-        if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
-            util.Effect("BloodImpact", edata)
-            owner:LagCompensation(false)
-
-            owner:FireBullets({
-                Num = 1,
-                Src = spos,
-                Dir = owner:GetAimVector(),
-                Spread = Vector(0, 0, 0),
-                Tracer = 0,
-                Force = 1,
-                Damage = 0
-            })
-        else
-            util.Effect("Impact", edata)
-        end
-    end
-
-    if SERVER then
-        owner:SetAnimation(PLAYER_ATTACK1)
-
-        if hitEnt and hitEnt:IsValid() then
-            local dmg = DamageInfo()
-            dmg:SetDamage(self.Primary.Damage)
-            dmg:SetAttacker(owner)
-            dmg:SetInflictor(self)
-            dmg:SetDamageForce(owner:GetAimVector() * 1500)
-            dmg:SetDamagePosition(owner:GetPos())
-            dmg:SetDamageType(DMG_CLUB)
-            hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
-            self:OnEntHit(hitEnt)
-        end
-    end
-
+    owner:SetAnimation(PLAYER_ATTACK1)
+    self:EmitSound(self.Primary.Sound)
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+    self.Attack = 1
+    self.AttackTimer = CurTime() + 0.2
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
-
-    if owner.LagCompensation then
-        owner:LagCompensation(false)
-    end
 end
 
 function SWEP:OnEntHit(ent)
@@ -284,9 +223,7 @@ function SWEP:OnEntHit(ent)
 
     if ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
         self:EmitSound("Weapon_FireAxe.HitFlesh")
-        net.Start("TF2LollichopConfetti")
-        net.WriteEntity(ent)
-        net.Send(owner)
+        self:ConfettiEffect(ent)
     elseif ent:GetClass() == "prop_ragdoll" then
         self:EmitSound("Weapon_FireAxe.HitFlesh")
     elseif not ent:IsPlayer() then
@@ -338,6 +275,74 @@ function SWEP:Think()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
+
+    if self.Attack == 1 and self.AttackTimer <= CurTime() then
+        if owner.LagCompensation then
+            owner:LagCompensation(true)
+        end
+
+        local spos = owner:GetShootPos()
+        local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
+
+        local tr_main = util.TraceLine({
+            start = spos,
+            endpos = sdest,
+            filter = owner,
+            mask = MASK_SHOT_HULL
+        })
+
+        local hitEnt = tr_main.Entity
+
+        if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+            local edata = EffectData()
+            edata:SetStart(spos)
+            edata:SetOrigin(tr_main.HitPos)
+            edata:SetNormal(tr_main.Normal)
+            edata:SetSurfaceProp(tr_main.SurfaceProps)
+            edata:SetHitBox(tr_main.HitBox)
+            edata:SetEntity(hitEnt)
+
+            if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
+                util.Effect("BloodImpact", edata)
+                owner:LagCompensation(false)
+
+                owner:FireBullets({
+                    Num = 1,
+                    Src = spos,
+                    Dir = owner:GetAimVector(),
+                    Spread = Vector(0, 0, 0),
+                    Tracer = 0,
+                    Force = 1,
+                    Damage = 0
+                })
+            else
+                util.Effect("Impact", edata)
+            end
+
+            self:OnEntHit(hitEnt)
+        end
+
+        if SERVER then
+            owner:SetAnimation(PLAYER_ATTACK1)
+
+            if hitEnt and hitEnt:IsValid() then
+                local dmg = DamageInfo()
+                dmg:SetDamage(self.Primary.Damage)
+                dmg:SetAttacker(owner)
+                dmg:SetInflictor(self)
+                dmg:SetDamageForce(owner:GetAimVector() * 1500)
+                dmg:SetDamagePosition(owner:GetPos())
+                dmg:SetDamageType(DMG_CLUB)
+                hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
+            end
+        end
+
+        if owner.LagCompensation then
+            owner:LagCompensation(false)
+        end
+
+        self.Attack = 0
+    end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() then
         if SERVER then

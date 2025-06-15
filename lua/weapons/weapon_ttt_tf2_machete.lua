@@ -65,6 +65,8 @@ function SWEP:Deploy()
 	self:SetWeaponHoldType(self.HoldType)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 0.5)
+	self.Attack = 0
+	self.AttackTimer = CurTime()
 	self.Idle = 0
 	self.IdleTimer = CurTime() + vm:SequenceDuration()
 
@@ -74,75 +76,16 @@ end
 function SWEP:PrimaryAttack()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
-	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-
-	if owner.LagCompensation then
-		owner:LagCompensation(true)
-	end
-
-	local spos = owner:GetShootPos()
-	local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
-
-	local tr_main = util.TraceLine({
-		start = spos,
-		endpos = sdest,
-		filter = owner,
-		mask = MASK_SHOT_HULL
-	})
-
-	local hitEnt = tr_main.Entity
-	self:EmitSound(self.Primary.Sound)
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	self:SendWeaponAnim(ACT_VM_HITCENTER)
-
-	if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
-		local edata = EffectData()
-		edata:SetStart(spos)
-		edata:SetOrigin(tr_main.HitPos)
-		edata:SetNormal(tr_main.Normal)
-		edata:SetSurfaceProp(tr_main.SurfaceProps)
-		edata:SetHitBox(tr_main.HitBox)
-		edata:SetEntity(hitEnt)
-
-		if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
-			util.Effect("BloodImpact", edata)
-			owner:LagCompensation(false)
-
-			owner:FireBullets({
-				Num = 1,
-				Src = spos,
-				Dir = owner:GetAimVector(),
-				Spread = Vector(0, 0, 0),
-				Tracer = 0,
-				Force = 1,
-				Damage = 0
-			})
-		else
-			util.Effect("Impact", edata)
-		end
-	end
-
-	if SERVER then
-		owner:SetAnimation(PLAYER_ATTACK1)
-
-		if hitEnt and hitEnt:IsValid() then
-			local dmg = DamageInfo()
-			dmg:SetDamage(self.Primary.Damage)
-			dmg:SetAttacker(owner)
-			dmg:SetInflictor(self)
-			dmg:SetDamageForce(owner:GetAimVector() * 1500)
-			dmg:SetDamagePosition(owner:GetPos())
-			dmg:SetDamageType(DMG_CLUB)
-			hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
-			self:OnEntHit(hitEnt)
-		end
-	end
-
+	owner:SetAnimation(PLAYER_ATTACK1)
+	self:EmitSound(self.Primary.Sound)
+	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+	self.Attack = 1
+	self.AttackTimer = CurTime() + 0.2
 	self.Idle = 0
-	self.IdleTimer = CurTime() + owner:GetViewModel():SequenceDuration()
-
-	if owner.LagCompensation then
-		owner:LagCompensation(false)
-	end
+	self.IdleTimer = CurTime() + vm:SequenceDuration()
 end
 
 function SWEP:OnEntHit(ent)
@@ -150,49 +93,122 @@ function SWEP:OnEntHit(ent)
 	if not IsValid(owner) then return end
 
 	if ent:IsNPC() or ent:IsPlayer() or ent:GetClass() == "prop_ragdoll" then
-		owner:EmitSound("Weapon_Club.HitFlesh")
+		self:EmitSound("Weapon_Club.HitFlesh")
 
 		timer.Simple(0, function()
-			if ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
+			if SERVER and ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
 				owner:EmitSound("player/sniper/kill" .. math.random(3) .. ".wav")
 			end
 		end)
 	else
-		owner:EmitSound("Weapon_Club.HitWorld")
+		self:EmitSound("Weapon_Club.HitWorld")
 	end
 
-	local dmg = DamageInfo()
-	local attacker = owner
-
-	if not IsValid(attacker) then
-		attacker = self
-	end
-
-	local timername = "TF2KukriBleedDamage" .. ent:EntIndex()
-
-	timer.Create(timername, self.BleedDamageDelay, self.BleedDamageTicks, function()
-		if not IsValid(ent) or not IsValid(self) or (GetRoundState and GetRoundState() == ROUND_PREP) or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
-			timer.Remove(timername)
-
-			return
-		end
-
-		dmg = DamageInfo()
-		attacker = owner
+	if SERVER then
+		local dmg = DamageInfo()
+		local attacker = owner
 
 		if not IsValid(attacker) then
 			attacker = self
 		end
 
-		dmg:SetAttacker(attacker)
-		dmg:SetInflictor(self)
-		dmg:SetDamage(self.BleedDamage)
-		dmg:SetDamageType(self.DamageType)
-		ent:TakeDamageInfo(dmg)
-	end)
+		local timername = "TF2KukriBleedDamage" .. ent:EntIndex()
+
+		timer.Create(timername, self.BleedDamageDelay, self.BleedDamageTicks, function()
+			if not IsValid(ent) or not IsValid(self) or (GetRoundState and GetRoundState() == ROUND_PREP) or (ent:IsPlayer() and (not ent:Alive() or ent:IsSpec())) then
+				timer.Remove(timername)
+
+				return
+			end
+
+			dmg = DamageInfo()
+			attacker = owner
+
+			if not IsValid(attacker) then
+				attacker = self
+			end
+
+			dmg:SetAttacker(attacker)
+			dmg:SetInflictor(self)
+			dmg:SetDamage(self.BleedDamage)
+			dmg:SetDamageType(self.DamageType)
+			ent:TakeDamageInfo(dmg)
+		end)
+	end
 end
 
 function SWEP:Think()
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+
+	if self.Attack == 1 and self.AttackTimer <= CurTime() then
+		if owner.LagCompensation then
+			owner:LagCompensation(true)
+		end
+
+		local spos = owner:GetShootPos()
+		local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
+
+		local tr_main = util.TraceLine({
+			start = spos,
+			endpos = sdest,
+			filter = owner,
+			mask = MASK_SHOT_HULL
+		})
+
+		local hitEnt = tr_main.Entity
+
+		if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+			local edata = EffectData()
+			edata:SetStart(spos)
+			edata:SetOrigin(tr_main.HitPos)
+			edata:SetNormal(tr_main.Normal)
+			edata:SetSurfaceProp(tr_main.SurfaceProps)
+			edata:SetHitBox(tr_main.HitBox)
+			edata:SetEntity(hitEnt)
+
+			if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
+				util.Effect("BloodImpact", edata)
+				owner:LagCompensation(false)
+
+				owner:FireBullets({
+					Num = 1,
+					Src = spos,
+					Dir = owner:GetAimVector(),
+					Spread = Vector(0, 0, 0),
+					Tracer = 0,
+					Force = 1,
+					Damage = 0
+				})
+			else
+				util.Effect("Impact", edata)
+			end
+
+			self:OnEntHit(hitEnt)
+		end
+
+		if SERVER then
+			owner:SetAnimation(PLAYER_ATTACK1)
+
+			if hitEnt and hitEnt:IsValid() then
+				local dmg = DamageInfo()
+				dmg:SetDamage(self.Primary.Damage)
+				dmg:SetAttacker(owner)
+				dmg:SetInflictor(self)
+				dmg:SetDamageForce(owner:GetAimVector() * 1500)
+				dmg:SetDamagePosition(owner:GetPos())
+				dmg:SetDamageType(DMG_CLUB)
+				hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
+			end
+		end
+
+		if owner.LagCompensation then
+			owner:LagCompensation(false)
+		end
+
+		self.Attack = 0
+	end
+
 	if self.Idle == 0 and self.IdleTimer <= CurTime() then
 		if SERVER then
 			self:SendWeaponAnim(ACT_VM_IDLE)
