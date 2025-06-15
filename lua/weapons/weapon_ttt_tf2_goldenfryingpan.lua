@@ -61,9 +61,6 @@ function SWEP:Deploy()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("melee_allclass_draw"))
     self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
-    self.Attack = 0
-    self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
 
@@ -73,29 +70,110 @@ end
 function SWEP:PrimaryAttack()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+
+    if owner.LagCompensation then
+        owner:LagCompensation(true)
+    end
+
+    local spos = owner:GetShootPos()
+    local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
+
+    local tr_main = util.TraceLine({
+        start = spos,
+        endpos = sdest,
+        filter = owner,
+        mask = MASK_SHOT_HULL
+    })
+
+    local hitEnt = tr_main.Entity
     self:EmitSound(self.Primary.Sound)
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("melee_allclass_swing"))
-    owner:SetAnimation(PLAYER_ATTACK1)
-    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
-    self.Attack = 1
-    self.AttackTimer = CurTime() + 0.2
+
+    if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+        local edata = EffectData()
+        edata:SetStart(spos)
+        edata:SetOrigin(tr_main.HitPos)
+        edata:SetNormal(tr_main.Normal)
+        edata:SetSurfaceProp(tr_main.SurfaceProps)
+        edata:SetHitBox(tr_main.HitBox)
+        edata:SetEntity(hitEnt)
+
+        if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
+            util.Effect("BloodImpact", edata)
+            owner:LagCompensation(false)
+
+            owner:FireBullets({
+                Num = 1,
+                Src = spos,
+                Dir = owner:GetAimVector(),
+                Spread = Vector(0, 0, 0),
+                Tracer = 0,
+                Force = 1,
+                Damage = 0
+            })
+        else
+            util.Effect("Impact", edata)
+        end
+    end
+
+    if SERVER then
+        owner:SetAnimation(PLAYER_ATTACK1)
+
+        if hitEnt and hitEnt:IsValid() then
+            local dmg = DamageInfo()
+            dmg:SetDamage(self.Primary.Damage)
+            dmg:SetAttacker(owner)
+            dmg:SetInflictor(self)
+            dmg:SetDamageForce(owner:GetAimVector() * 1500)
+            dmg:SetDamagePosition(owner:GetPos())
+            dmg:SetDamageType(DMG_CLUB)
+            hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
+            self:OnEntHit(hitEnt)
+        end
+    end
+
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
+
+    if owner.LagCompensation then
+        owner:LagCompensation(false)
+    end
+end
+
+function SWEP:OnEntHit(ent)
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+
+    if ent:IsNPC() or ent:IsPlayer() or ent:GetClass() == "prop_ragdoll" then
+        owner:EmitSound("FryingPan.HitFlesh")
+
+        timer.Simple(0, function()
+            if ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
+                local rag = ent.server_ragdoll or ent:GetRagdollEntity()
+                self:EntToGold(rag)
+            end
+        end)
+    elseif not ent:IsPlayer() then
+        owner:EmitSound("FryingPan.HitWorld")
+        self:EntToGold(ent)
+    end
 end
 
 local addedBodySearchHook = false
 
-function SWEP:EntToGold(rag)
-    if not IsValid(rag) then return end
-    rag:EmitSound("weapons/pan/pan_turn_to_gold.wav", 80, 100, 1, CHAN_WEAPON)
-    rag:SetMaterial("models/player/shared/gold_player")
+function SWEP:EntToGold(ent)
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    if not IsValid(ent) or ent:GetMaterial() == "models/player/shared/gold_player" then return end
+    owner:EmitSound("weapons/pan/pan_turn_to_gold.wav", 80, 100, 0.75)
+    ent:SetMaterial("models/player/shared/gold_player")
 
-    for i = 0, rag:GetPhysicsObjectCount() - 1 do
-        rag:ManipulateBoneJiggle(i, 2)
-        local phys = rag:GetPhysicsObjectNum(i)
+    for i = 0, ent:GetPhysicsObjectCount() - 1 do
+        ent:ManipulateBoneJiggle(i, 2)
+        local phys = ent:GetPhysicsObjectNum(i)
 
         if IsValid(phys) then
             phys:EnableMotion(false)
@@ -150,62 +228,6 @@ function SWEP:Think()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
-
-    if self.Attack == 1 and self.AttackTimer <= CurTime() then
-        local tr = util.TraceLine({
-            start = owner:GetShootPos(),
-            endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-            filter = owner,
-            mask = MASK_SHOT_HULL,
-        })
-
-        local ent = tr.Entity
-
-        if not IsValid(ent) then
-            tr = util.TraceHull({
-                start = owner:GetShootPos(),
-                endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-                filter = owner,
-                mins = Vector(-16, -16, 0),
-                maxs = Vector(16, 16, 0),
-                mask = MASK_SHOT_HULL,
-            })
-        end
-
-        if IsValid(ent) then
-            if ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
-                self:EmitSound("FryingPan.HitFlesh")
-
-                timer.Simple(0, function()
-                    if not ent:Alive() or ent:IsSpec() then
-                        local rag = ent.server_ragdoll or ent:GetRagdollEntity()
-                        self:EntToGold(rag)
-                    end
-                end)
-            elseif not ent:IsPlayer() then
-                self:EmitSound("FryingPan.HitWorld")
-                self:EntToGold(ent)
-            end
-
-            if SERVER then
-                local attacker = owner
-
-                if not IsValid(attacker) then
-                    attacker = self
-                end
-
-                local dmg = DamageInfo()
-                dmg:SetAttacker(attacker)
-                dmg:SetInflictor(self)
-                dmg:SetDamage(self.Primary.Damage)
-                dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-                dmg:SetDamageType(DMG_CLUB)
-                ent:TakeDamageInfo(dmg)
-            end
-        end
-
-        self.Attack = 0
-    end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() then
         if SERVER then

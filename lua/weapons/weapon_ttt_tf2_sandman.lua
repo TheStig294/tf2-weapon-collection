@@ -133,8 +133,6 @@ function SWEP:Deploy()
     self:SetWeaponHoldType(self.HoldType)
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)
-    self.Attack = 0
-    self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
     self.Secondary.Delay = 10
@@ -145,6 +143,24 @@ end
 function SWEP:PrimaryAttack()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
+
+    if owner.LagCompensation then
+        owner:LagCompensation(true)
+    end
+
+    local spos = owner:GetShootPos()
+    local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
+
+    local tr_main = util.TraceLine({
+        start = spos,
+        endpos = sdest,
+        filter = owner,
+        mask = MASK_SHOT_HULL
+    })
+
+    local hitEnt = tr_main.Entity
     self:EmitSound(self.Primary.Sound)
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
@@ -155,13 +171,63 @@ function SWEP:PrimaryAttack()
         vm:SendViewModelMatchingSequence(vm:LookupSequence("wb_swing_a"))
     end
 
-    owner:SetAnimation(PLAYER_ATTACK1)
-    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
-    self.Attack = 1
-    self.AttackTimer = CurTime() + 0.2
+    if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+        local edata = EffectData()
+        edata:SetStart(spos)
+        edata:SetOrigin(tr_main.HitPos)
+        edata:SetNormal(tr_main.Normal)
+        edata:SetSurfaceProp(tr_main.SurfaceProps)
+        edata:SetHitBox(tr_main.HitBox)
+        edata:SetEntity(hitEnt)
+
+        if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
+            util.Effect("BloodImpact", edata)
+            owner:LagCompensation(false)
+
+            owner:FireBullets({
+                Num = 1,
+                Src = spos,
+                Dir = owner:GetAimVector(),
+                Spread = Vector(0, 0, 0),
+                Tracer = 0,
+                Force = 1,
+                Damage = 0
+            })
+        else
+            util.Effect("Impact", edata)
+        end
+    end
+
+    if SERVER then
+        owner:SetAnimation(PLAYER_ATTACK1)
+
+        if hitEnt and hitEnt:IsValid() then
+            local dmg = DamageInfo()
+            dmg:SetDamage(self.Primary.Damage)
+            dmg:SetAttacker(owner)
+            dmg:SetInflictor(self)
+            dmg:SetDamageForce(owner:GetAimVector() * 1500)
+            dmg:SetDamagePosition(owner:GetPos())
+            dmg:SetDamageType(DMG_CLUB)
+            hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
+            self:OnEntHit(hitEnt)
+        end
+    end
+
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
+
+    if owner.LagCompensation then
+        owner:LagCompensation(false)
+    end
+end
+
+function SWEP:OnEntHit(ent)
+    if ent:IsNPC() or ent:IsPlayer() or ent:GetClass() == "prop_ragdoll" then
+        self:EmitSound("Weapon_BaseballBat.HitFlesh")
+    else
+        self:EmitSound("Weapon_BaseballBat.HitWorld")
+    end
 end
 
 function SWEP:SecondaryAttack()
@@ -173,7 +239,7 @@ function SWEP:SecondaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     owner:SetAnimation(PLAYER_ATTACK1)
     vm:SetSequence(vm:LookupSequence("wb_fire"))
-    vm:SetPlaybackRate(1.0) -- Fix for the stupid sped up weapons thing
+    vm:SetPlaybackRate(1.0)
     self:EmitSound("Weapon_BaseballBat.HitBall")
 
     if SERVER then
@@ -203,7 +269,7 @@ function SWEP:SecondaryAttack()
 
         local velocity = owner:GetAimVector()
         velocity = velocity * 10000
-        velocity = velocity + (VectorRand() * 10) -- a random element
+        velocity = velocity + (VectorRand() * 10)
         phys:ApplyForceCenter(velocity)
     end
 
@@ -216,54 +282,6 @@ function SWEP:Think()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
-
-    if self.Attack == 1 and self.AttackTimer <= CurTime() then
-        local tr = util.TraceLine({
-            start = owner:GetShootPos(),
-            endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-            filter = owner,
-            mask = MASK_SHOT_HULL,
-        })
-
-        if not IsValid(tr.Entity) then
-            tr = util.TraceHull({
-                start = owner:GetShootPos(),
-                endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-                filter = owner,
-                mins = Vector(-16, -16, 0),
-                maxs = Vector(16, 16, 0),
-                mask = MASK_SHOT_HULL,
-            })
-        end
-
-        if SERVER and IsValid(tr.Entity) then
-            local dmg = DamageInfo()
-            local attacker = owner
-
-            if not IsValid(attacker) then
-                attacker = self
-            end
-
-            dmg:SetAttacker(attacker)
-            dmg:SetInflictor(self)
-            dmg:SetDamage(self.Primary.Damage)
-            dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-            dmg:SetDamageType(DMG_CLUB)
-            tr.Entity:TakeDamageInfo(dmg)
-        end
-
-        if SERVER and tr.Hit then
-            if tr.Entity:IsNPC() or tr.Entity:IsPlayer() then
-                owner:EmitSound("Weapon_BaseballBat.HitFlesh")
-            end
-
-            if not (tr.Entity:IsNPC() or tr.Entity:IsPlayer()) then
-                owner:EmitSound("Weapon_BaseballBat.HitWorld")
-            end
-        end
-
-        self.Attack = 0
-    end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() and self:Clip1() > 0 then
         if SERVER then

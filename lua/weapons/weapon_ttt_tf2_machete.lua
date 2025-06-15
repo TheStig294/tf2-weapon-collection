@@ -45,7 +45,7 @@ SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 35
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2
-SWEP.Primary.Range = 120
+SWEP.Primary.Range = 100
 SWEP.BleedDamage = 5
 SWEP.BleedDamageTicks = 6
 SWEP.BleedDamageDelay = 1
@@ -65,7 +65,6 @@ function SWEP:Deploy()
 	self:SetWeaponHoldType(self.HoldType)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 0.5)
-	self:SetNextSecondaryFire(CurTime() + 0.5)
 	self.Idle = 0
 	self.IdleTimer = CurTime() + vm:SequenceDuration()
 
@@ -134,10 +133,7 @@ function SWEP:PrimaryAttack()
 			dmg:SetDamagePosition(owner:GetPos())
 			dmg:SetDamageType(DMG_CLUB)
 			hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
-
-			if self.OnEntHit then
-				self:OnEntHit(hitEnt)
-			end
+			self:OnEntHit(hitEnt)
 		end
 	end
 
@@ -152,6 +148,19 @@ end
 function SWEP:OnEntHit(ent)
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+
+	if ent:IsNPC() or ent:IsPlayer() or ent:GetClass() == "prop_ragdoll" then
+		owner:EmitSound("Weapon_Club.HitFlesh")
+
+		timer.Simple(0, function()
+			if ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
+				owner:EmitSound("player/sniper/kill" .. math.random(3) .. ".wav")
+			end
+		end)
+	else
+		owner:EmitSound("Weapon_Club.HitWorld")
+	end
+
 	local dmg = DamageInfo()
 	local attacker = owner
 
@@ -181,20 +190,6 @@ function SWEP:OnEntHit(ent)
 		dmg:SetDamageType(self.DamageType)
 		ent:TakeDamageInfo(dmg)
 	end)
-
-	if ent:IsNPC() or ent:IsPlayer() then
-		owner:EmitSound("Weapon_Club.HitFlesh")
-
-		timer.Simple(0, function()
-			if not ent:Alive() or ent:IsSpec() then
-				owner:EmitSound("player/sniper/kill" .. math.random(3) .. ".wav")
-			end
-		end)
-	end
-
-	if not (ent:IsNPC() or ent:IsPlayer()) then
-		owner:EmitSound("Weapon_Club.HitWorld")
-	end
 end
 
 function SWEP:Think()

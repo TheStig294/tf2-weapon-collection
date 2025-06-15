@@ -84,9 +84,6 @@ function SWEP:Deploy()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("b_draw"))
     self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
-    self.Attack = 0
-    self.AttackTimer = CurTime()
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
 
@@ -96,17 +93,88 @@ end
 function SWEP:PrimaryAttack()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+
+    if owner.LagCompensation then
+        owner:LagCompensation(true)
+    end
+
+    local spos = owner:GetShootPos()
+    local sdest = spos + (owner:GetAimVector() * self.Primary.Range)
+
+    local tr_main = util.TraceLine({
+        start = spos,
+        endpos = sdest,
+        filter = owner,
+        mask = MASK_SHOT_HULL
+    })
+
+    local hitEnt = tr_main.Entity
     self:EmitSound(self.Primary.Sound)
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence(self.Primary.Anims[math.random(#self.Primary.Anims)]))
-    owner:SetAnimation(PLAYER_ATTACK1)
-    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
-    self.Attack = 1
-    self.AttackTimer = CurTime() + 0.2
+
+    if IsValid(hitEnt) or tr_main.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+        local edata = EffectData()
+        edata:SetStart(spos)
+        edata:SetOrigin(tr_main.HitPos)
+        edata:SetNormal(tr_main.Normal)
+        edata:SetSurfaceProp(tr_main.SurfaceProps)
+        edata:SetHitBox(tr_main.HitBox)
+        edata:SetEntity(hitEnt)
+
+        if hitEnt:IsPlayer() or hitEnt:GetClass() == "prop_ragdoll" then
+            util.Effect("BloodImpact", edata)
+            owner:LagCompensation(false)
+
+            owner:FireBullets({
+                Num = 1,
+                Src = spos,
+                Dir = owner:GetAimVector(),
+                Spread = Vector(0, 0, 0),
+                Tracer = 0,
+                Force = 1,
+                Damage = 0
+            })
+        else
+            util.Effect("Impact", edata)
+        end
+    end
+
+    if SERVER then
+        owner:SetAnimation(PLAYER_ATTACK1)
+
+        if hitEnt and hitEnt:IsValid() then
+            local dmg = DamageInfo()
+            dmg:SetDamage(self.Primary.Damage)
+            dmg:SetAttacker(owner)
+            dmg:SetInflictor(self)
+            dmg:SetDamageForce(owner:GetAimVector() * 1500)
+            dmg:SetDamagePosition(owner:GetPos())
+            dmg:SetDamageType(DMG_CLUB)
+            hitEnt:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
+            self:OnEntHit(hitEnt)
+        end
+    end
+
     self.Idle = 0
     self.IdleTimer = CurTime() + vm:SequenceDuration()
+
+    if owner.LagCompensation then
+        owner:LagCompensation(false)
+    end
+end
+
+function SWEP:OnEntHit(ent)
+    if ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
+        self:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
+        self:Explode()
+    elseif ent:GetClass() == "prop_ragdoll" then
+        self:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
+    elseif not ent:IsPlayer() then
+        self:EmitSound("weapons/bottle_hit" .. math.random(3) .. ".wav")
+    end
 end
 
 function SWEP:Explode()
@@ -152,53 +220,6 @@ function SWEP:Think()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
-
-    if self.Attack == 1 and self.AttackTimer <= CurTime() then
-        local tr = util.TraceLine({
-            start = owner:GetShootPos(),
-            endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-            filter = owner,
-            mask = MASK_SHOT_HULL,
-        })
-
-        local victim = tr.Entity
-
-        if not IsValid(victim) then
-            tr = util.TraceHull({
-                start = owner:GetShootPos(),
-                endpos = owner:GetShootPos() + owner:GetAimVector() * self.Primary.Range,
-                filter = owner,
-                mins = Vector(-16, -16, 0),
-                maxs = Vector(16, 16, 0),
-                mask = MASK_SHOT_HULL,
-            })
-        end
-
-        if SERVER and IsValid(victim) then
-            if victim:IsPlayer() and victim:Alive() and not victim:IsSpec() then
-                owner:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
-                self:Explode()
-            elseif not victim:IsPlayer() then
-                owner:EmitSound("weapons/bottle_hit" .. math.random(3) .. ".wav")
-            end
-
-            local dmg = DamageInfo()
-            local attacker = owner
-
-            if not IsValid(attacker) then
-                attacker = self
-            end
-
-            dmg:SetAttacker(attacker)
-            dmg:SetInflictor(self)
-            dmg:SetDamage(self.Primary.Damage)
-            dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
-            dmg:SetDamageType(DMG_CLUB)
-            victim:TakeDamageInfo(dmg)
-        end
-
-        self.Attack = 0
-    end
 
     if self.Idle == 0 and self.IdleTimer <= CurTime() then
         if SERVER then
