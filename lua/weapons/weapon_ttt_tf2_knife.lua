@@ -54,7 +54,7 @@ SWEP.Primary.Damage = 40
 SWEP.Primary.Delay = 0.8
 SWEP.Primary.Force = 2000
 SWEP.BackstabAngle = 30
-SWEP.BackstabRange = 64
+SWEP.BackstabRange = 100
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
@@ -101,18 +101,25 @@ function SWEP:PrimaryAttack()
 	local vm = owner:GetViewModel()
 	if not IsValid(vm) then return end
 
+	if owner.LagCompensation then
+		owner:LagCompensation(true)
+	end
+
 	if self.Backstab == 1 then
+		local spos = owner:GetShootPos()
+		local sdest = spos + owner:GetAimVector() * self.BackstabRange
+
 		local tr = util.TraceLine({
-			start = owner:GetShootPos(),
-			endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+			start = spos,
+			endpos = sdest,
 			filter = owner,
 			mask = MASK_SHOT_HULL,
 		})
 
 		if not IsValid(tr.Entity) then
 			tr = util.TraceHull({
-				start = owner:GetShootPos(),
-				endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+				start = spos,
+				endpos = sdest,
 				filter = owner,
 				mins = Vector(-16, -16, 0),
 				maxs = Vector(16, 16, 0),
@@ -180,6 +187,10 @@ function SWEP:PrimaryAttack()
 
 	self.Idle = 0
 	self.IdleTimer = CurTime() + vm:SequenceDuration()
+
+	if owner.LagCompensation then
+		owner:LagCompensation(false)
+	end
 end
 
 function SWEP:Think()
@@ -188,17 +199,24 @@ function SWEP:Think()
 	local vm = owner:GetViewModel()
 	if not IsValid(vm) then return end
 
+	if owner.LagCompensation then
+		owner:LagCompensation(true)
+	end
+
+	local spos = owner:GetShootPos()
+	local sdest = spos + owner:GetAimVector() * self.BackstabRange
+
 	local tr = util.TraceLine({
-		start = owner:GetShootPos(),
-		endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+		start = spos,
+		endpos = sdest,
 		filter = owner,
 		mask = MASK_SHOT_HULL,
 	})
 
 	if not IsValid(tr.Entity) then
 		tr = util.TraceHull({
-			start = owner:GetShootPos(),
-			endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+			start = spos,
+			endpos = sdest,
 			filter = owner,
 			mins = Vector(-16, -16, 0),
 			maxs = Vector(16, 16, 0),
@@ -244,21 +262,54 @@ function SWEP:Think()
 
 	if self.Attack == 1 and self.AttackTimer <= CurTime() then
 		local tr2 = util.TraceLine({
-			start = owner:GetShootPos(),
-			endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+			start = spos,
+			endpos = sdest,
 			filter = owner,
 			mask = MASK_SHOT_HULL,
 		})
 
-		if not IsValid(tr2.Entity) then
+		if not IsValid(hitEnt) then
 			tr2 = util.TraceHull({
-				start = owner:GetShootPos(),
-				endpos = owner:GetShootPos() + owner:GetAimVector() * self.BackstabRange,
+				start = spos,
+				endpos = sdest,
 				filter = owner,
 				mins = Vector(-16, -16, 0),
 				maxs = Vector(16, 16, 0),
 				mask = MASK_SHOT_HULL,
 			})
+		end
+
+		if IsValid(tr2.Entity) or tr2.HitWorld and not (CLIENT and (not IsFirstTimePredicted())) then
+			local edata = EffectData()
+			edata:SetStart(spos)
+			edata:SetOrigin(tr2.HitPos)
+			edata:SetNormal(tr2.Normal)
+			edata:SetSurfaceProp(tr2.SurfaceProps)
+			edata:SetHitBox(tr2.HitBox)
+			edata:SetEntity(tr2.Entity)
+
+			if tr2.Entity:IsPlayer() or tr2.Entity:GetClass() == "prop_ragdoll" then
+				util.Effect("BloodImpact", edata)
+				owner:LagCompensation(false)
+
+				owner:FireBullets({
+					Num = 1,
+					Src = spos,
+					Dir = owner:GetAimVector(),
+					Spread = Vector(0, 0, 0),
+					Tracer = 0,
+					Force = 1,
+					Damage = 0
+				})
+			else
+				util.Effect("Impact", edata)
+			end
+
+			if tr2.Entity:IsNPC() or tr2.Entity:IsPlayer() or tr2.Entity:GetClass() == "prop_ragdoll" then
+				self:EmitSound("Weapon_Knife.HitFlesh")
+			else
+				self:EmitSound("Weapon_Knife.HitWorld")
+			end
 		end
 
 		if SERVER and IsValid(tr2.Entity) then
@@ -274,17 +325,7 @@ function SWEP:Think()
 			dmg:SetDamage(self.Primary.Damage)
 			dmg:SetDamageForce(owner:GetForward() * self.Primary.Force)
 			dmg:SetDamageType(DMG_SLASH)
-			tr2.Entity:TakeDamageInfo(dmg)
-		end
-
-		if SERVER and tr2.Hit then
-			if tr2.Entity:IsNPC() or tr2.Entity:IsPlayer() then
-				owner:EmitSound("Weapon_Knife.HitFlesh")
-			end
-
-			if not (tr2.Entity:IsNPC() or tr2.Entity:IsPlayer()) then
-				owner:EmitSound("Weapon_Knife.HitWorld")
-			end
+			tr2.Entity:DispatchTraceAttack(dmg, spos + (owner:GetAimVector() * 3), sdest)
 		end
 
 		self.Attack = 0
@@ -302,5 +343,9 @@ function SWEP:Think()
 		end
 
 		self.Idle = 1
+	end
+
+	if owner.LagCompensation then
+		owner:LagCompensation(false)
 	end
 end
