@@ -50,6 +50,7 @@ SWEP.ReloadAnimDelay = 1
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
+SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:SecondaryAttack()
 end
@@ -126,7 +127,7 @@ function SWEP:Think()
         self:SetIdle(true)
     end
 
-    if not self:GetReload() and self:GetReloadTimer() <= CurTime() and self:Clip1() < self:GetMaxClip1() then
+    if not self:GetReload() and self:GetReloadTimer() <= CurTime() and self:Clip1() < self:GetMaxClip1() and self.AutoReloadCvar:GetBool() then
         self:Reload()
     end
 end

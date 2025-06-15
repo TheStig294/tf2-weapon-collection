@@ -51,6 +51,7 @@ SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.3125
 SWEP.Secondary.Force = 1000
 SWEP.ReloadDelay = 1
+SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Deploy()
     local owner = self:GetOwner()
@@ -172,7 +173,7 @@ function SWEP:Think()
         end
     end
 
-    if self.Reloading == 0 and self.ReloadingTimer <= CurTime() and self:Clip1() < self:GetMaxClip1() then
+    if self.Reloading == 0 and self.ReloadingTimer <= CurTime() and self:Clip1() < self:GetMaxClip1() and self.AutoReloadCvar:GetBool() then
         self:Reload()
     end
 end
