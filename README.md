@@ -249,6 +249,10 @@ Detective/Traitor, shoots bombs that can be remotely detonated, max 8 at a time\
 PaP Upgrade: No self-damage, more damage and push force, infinite ammo!\
 *ttt_pap_sticky_jumper* - Default: 1 - Whether this upgrade is enabled
 
+## Settings/Convars
+*tf2_weapon_collection_auto_reload* 1\
+Whether all TF2 weapons should auto-reload after not shooting for a while
+
 ## Steam Workshop Link
 
 <https://steamcommunity.com/sharedfiles/filedetails/?id=3484716425>
