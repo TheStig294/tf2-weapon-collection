@@ -152,17 +152,17 @@ function EVENT:Begin()
             REDSpawn = playerSpawns[math.random(#playerSpawns)]:GetPos()
         end
 
-        local players = player.GetAll()
+        local alivePlys = self:GetAlivePlayers()
 
         if not REDSpawn then
-            local ply = players[math.random(#players)]
+            local ply = alivePlys[math.random(#alivePlys)]
             REDSpawn = ply:GetPos()
             ply:SetPos(REDSpawn + Vector(0, 0, 20))
         end
 
         local maxDist = 0
 
-        for _, ply in ipairs(players) do
+        for _, ply in ipairs(alivePlys) do
             local pos = ply:GetPos()
             local dist = pos:DistToSqr(REDSpawn)
             ply:SetPos(pos + Vector(0, 0, 20))
@@ -178,15 +178,11 @@ function EVENT:Begin()
         BLUIntel:SetPos(BLUSpawn)
         BLUIntel:Spawn()
         BLUIntel:SetBLU(true)
-        local halfPlayerCount = player.GetCount() / 2
+        local halfPlayerCount = #alivePlys / 2
         local REDRole = ROLE_REDMANN or ROLE_TRAITOR
         local BLURole = ROLE_BLUMANN or ROLE_DETECTIVE
 
-        for i, ply in player.Iterator() do
-            if not ply:Alive() or ply:IsSpec() then
-                ply:SpawnForRound(true)
-            end
-
+        for i, ply in ipairs(alivePlys) do
             local enemyIntel
 
             if i <= halfPlayerCount then
@@ -236,7 +232,7 @@ function EVENT:Begin()
         end)
 
         net.Start("TF2ClassChangerScreen")
-        net.Broadcast()
+        net.Send(alivePlys)
 
         -- The initial class selection is a fixed amount of seconds to allow for the randomat's intro sequence to play properly
         -- (The "Meet the randomat" splash screen, etc.)
