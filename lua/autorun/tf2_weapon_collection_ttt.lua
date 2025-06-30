@@ -208,17 +208,31 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         end
     end
 
-    function TF2WC:StripAndGiveLoadout(ply, class)
-        local stripWepKinds = {}
-
-        for _, classname in ipairs(class.loadout) do
-            local SWEP = weapons.Get(classname)
-            stripWepKinds[SWEP.Kind] = true
+    -- Compatibility with the randomat, if an event doesn't want its weapons to be removed,
+    -- then skip trying to remove a player's weapons before giving them their new class's weapons
+    local function ShouldStripWeapons()
+        if EVENT_TYPE_WEAPON_OVERRIDE and Randomat and Randomat.ActiveEvents then
+            for _, event in pairs(Randomat.ActiveEvents) do
+                if event.Type and event.Type == EVENT_TYPE_WEAPON_OVERRIDE or istable(event.Type) and table.HasValue(event.Type, EVENT_TYPE_WEAPON_OVERRIDE) then return false end
+            end
         end
 
-        for _, SWEP in ipairs(ply:GetWeapons()) do
-            if stripWepKinds[SWEP.Kind] then
-                SWEP:Remove()
+        return true
+    end
+
+    function TF2WC:StripAndGiveLoadout(ply, class)
+        if ShouldStripWeapons() then
+            local stripWepKinds = {}
+
+            for _, classname in ipairs(class.loadout) do
+                local SWEP = weapons.Get(classname)
+                stripWepKinds[SWEP.Kind] = true
+            end
+
+            for _, SWEP in ipairs(ply:GetWeapons()) do
+                if stripWepKinds[SWEP.Kind] then
+                    SWEP:Remove()
+                end
             end
         end
 
