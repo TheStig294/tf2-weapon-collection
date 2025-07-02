@@ -16,7 +16,6 @@ SWEP.SwayScale = 0
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
 SWEP.Weight = 4
-SWEP.Slot = 2
 SWEP.SlotPos = 0
 SWEP.UseHands = false
 SWEP.HoldType = "ar2"

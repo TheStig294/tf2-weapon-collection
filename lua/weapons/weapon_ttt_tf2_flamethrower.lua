@@ -17,7 +17,6 @@ SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = false
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
-SWEP.Slot = 2
 SWEP.SlotPos = 0
 SWEP.UseHands = false
 SWEP.HoldType = "crossbow"

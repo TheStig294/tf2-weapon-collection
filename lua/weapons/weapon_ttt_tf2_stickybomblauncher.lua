@@ -15,7 +15,6 @@ SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = false
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
-SWEP.Slot = 4
 SWEP.SlotPos = 1
 SWEP.UseHands = true
 SWEP.HoldType = "shotgun"
@@ -23,7 +22,7 @@ SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = 6
+SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
 SWEP.AutoSpawnable = false
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"

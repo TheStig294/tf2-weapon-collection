@@ -15,7 +15,6 @@ SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = false
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
-SWEP.Slot = 0
 SWEP.SlotPos = 0
 SWEP.UseHands = true
 SWEP.HoldType = "melee"

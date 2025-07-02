@@ -16,7 +16,6 @@ SWEP.SwayScale = 0
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
 SWEP.Weight = 3
-SWEP.Slot = 1
 SWEP.SlotPos = 0
 SWEP.UseHands = false
 SWEP.HoldType = "shotgun"
@@ -26,7 +25,7 @@ SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP2
-SWEP.Slot = 7
+SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 7 or 5
 SWEP.AutoSpawnable = false
 SWEP.LimitedStock = true
 

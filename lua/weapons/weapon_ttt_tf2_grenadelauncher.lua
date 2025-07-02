@@ -16,7 +16,6 @@ SWEP.ShowWorldModel = false
 SWEP.ViewModelBoneMods = {}
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
-SWEP.Slot = 4
 SWEP.SlotPos = 1
 SWEP.UseHands = true
 SWEP.HoldType = "shotgun"

@@ -16,7 +16,6 @@ SWEP.SwayScale = 0
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
 SWEP.Weight = 2
-SWEP.Slot = 0
 SWEP.SlotPos = 0
 SWEP.UseHands = false
 SWEP.HoldType = "knife"
@@ -26,7 +25,7 @@ SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = 6
+SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
 SWEP.AutoSpawnable = false
 
 SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}

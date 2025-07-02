@@ -21,7 +21,7 @@ SWEP.DrawAmmo = true
 SWEP.ReloadSound = "sound/epicreload.wav"
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = 6
+SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
 SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.AutoSpawnable = false

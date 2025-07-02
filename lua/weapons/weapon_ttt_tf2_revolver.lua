@@ -13,7 +13,6 @@ SWEP.WorldModel = "models/weapons/w_models/w_revolver.mdl"
 SWEP.ViewModelFlip = false
 SWEP.AutoSwitchTo = true
 SWEP.AutoSwitchFrom = false
-SWEP.Slot = 1
 SWEP.SlotPos = 1
 SWEP.UseHands = false
 SWEP.HoldType = "Revolver"
