@@ -84,7 +84,7 @@ function SWEP:Deploy()
 
     hook.Add("Think", hookname, function()
         if not IsValid(owner) or not IsValid(self) or not IsValid(vm) then
-            hook.Remove(hookname)
+            hook.Remove("Think", hookname)
 
             return
         end

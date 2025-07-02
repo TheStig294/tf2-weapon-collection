@@ -105,7 +105,7 @@ function SWEP:Teleport()
     end)
 
     timer.Simple(2, function()
-        hook.Remove(thirdPersonHookName)
+        hook.Remove("CalcView", thirdPersonHookName)
         if not IsValid(self) then return end
         self.IsTeleporting = false
         if not IsValid(owner) then return end

@@ -91,7 +91,7 @@ function ENT:Initialize()
 
         hook.Add("PreDrawHalos", hookname, function()
             if not IsValid(self) then
-                hook.Remove(hookname)
+                hook.Remove("PreDrawHalos", hookname)
 
                 return
             end
