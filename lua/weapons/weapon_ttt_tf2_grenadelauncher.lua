@@ -24,6 +24,8 @@ SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
+SWEP.WeaponID = AMMO_SHOTGUN
+SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.AutoSpawnable = true
 
 if CLIENT then
@@ -37,11 +39,12 @@ end
 
 SWEP.Primary.Ammo = "Grenade"
 SWEP.Primary.Sound = Sound("weapons/grenade_launcher_shoot.wav")
-SWEP.Primary.Damage = 25
+SWEP.Primary.Damage = 50
 SWEP.Primary.Radius = 140
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 4
-SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 8 or 9999
+SWEP.Primary.Ammo = "Buckshot"
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 4 or 9999
 SWEP.Primary.Spread = 0.05
 SWEP.Primary.NumberofShots = 0
 SWEP.Primary.Automatic = false
@@ -49,7 +52,6 @@ SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.6
 SWEP.Primary.Force = 5
 SWEP.ReloadAnimDelay = 1
-SWEP.ReserveAmmo = SWEP.Primary.DefaultClip - SWEP.Primary.ClipSize
 SWEP.ReloadHoldType = "revolver"
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
@@ -57,12 +59,6 @@ SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:SecondaryAttack()
-end
-
-function SWEP:Equip()
-	local owner = self:GetOwner()
-	if not IsValid(owner) then return end
-	owner:SetAmmo(self.ReserveAmmo, self.Primary.Ammo)
 end
 
 function SWEP:SetupDataTables()
@@ -191,7 +187,6 @@ function SWEP:Think()
 			self:SetReloadingTimer(CurTime() + 0.6)
 			self:SetIdleTimer(CurTime() + 0.6)
 			owner:RemoveAmmo(1, self.Primary.Ammo, false)
-			self.ReserveAmmo = self.ReserveAmmo - 1
 			self:SetClip1(self:Clip1() + 1)
 		end
 	else
