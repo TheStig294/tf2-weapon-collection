@@ -50,12 +50,12 @@ SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 10000
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 10000
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "AR2AltFire"
-SWEP.Primary.Damage = 3.5
+SWEP.Primary.Damage = 6
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.Delay = 0.08
 SWEP.Primary.Force = 100
 SWEP.Primary.AmmoLossRate = 0.1
-SWEP.Primary.Range = 196
+SWEP.Primary.Range = 400
 SWEP.Secondary.Sound = Sound("weapons/flame_thrower_airblast.wav")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
