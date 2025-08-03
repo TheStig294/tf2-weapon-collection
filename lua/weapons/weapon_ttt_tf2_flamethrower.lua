@@ -66,11 +66,11 @@ SWEP.Secondary.TakeAmmo = 20
 SWEP.Secondary.Delay = 0.75
 SWEP.Secondary.Force = 2500
 
-function SWEP:SetupDataTables()
-	self:NetworkVar("Float", 0, "NextIdle")
-end
-
 function SWEP:Initialize()
+	timer.Simple(0, function()
+		self:SetHoldType(self.HoldType)
+	end)
+
 	if SERVER then
 		hook.Add("PostEntityTakeDamage", "TF2FlamethrowerIgnite", function(ent, dmg, tookDmg)
 			if not tookDmg or ent:IsOnFire() then return end
@@ -89,6 +89,10 @@ function SWEP:Initialize()
 	end
 
 	return self.BaseClass.Initialize(self)
+end
+
+function SWEP:SetupDataTables()
+	self:NetworkVar("Float", 0, "NextIdle")
 end
 
 function SWEP:UpdateNextIdle()

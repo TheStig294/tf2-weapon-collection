@@ -52,6 +52,14 @@ SWEP.Secondary.Force = 1000
 SWEP.ReloadDelay = 1
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end

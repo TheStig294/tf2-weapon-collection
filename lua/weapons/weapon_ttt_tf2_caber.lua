@@ -57,14 +57,11 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
-function SWEP:SecondaryAttack()
-end
-
-function SWEP:SetupDataTables()
-    self:NetworkVar("Bool", "Exploded")
-end
-
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     self:SetExploded(false)
 
     -- Mute the explosion ringing sound
@@ -74,6 +71,13 @@ function SWEP:Initialize()
     end)
 
     return self.BaseClass.Initialize(self)
+end
+
+function SWEP:SecondaryAttack()
+end
+
+function SWEP:SetupDataTables()
+    self:NetworkVar("Bool", "Exploded")
 end
 
 function SWEP:Deploy()

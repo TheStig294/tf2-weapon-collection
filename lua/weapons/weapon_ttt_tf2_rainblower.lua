@@ -68,6 +68,21 @@ SWEP.Secondary.Force = 2500
 SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    local owner = self:GetOwner()
+
+    if IsValid(owner) then
+        owner.TF2RainblowerEffects = true
+        self:SetHooks()
+    end
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SetHooks()
     if self.HooksSet then return end
 
@@ -198,17 +213,6 @@ function SWEP:UpdateNextIdle()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     self:SetNextIdle(CurTime() + vm:SequenceDuration())
-end
-
-function SWEP:Initialize()
-    local owner = self:GetOwner()
-
-    if IsValid(owner) then
-        owner.TF2RainblowerEffects = true
-        self:SetHooks()
-    end
-
-    return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()

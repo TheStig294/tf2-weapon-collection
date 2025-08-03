@@ -78,6 +78,10 @@ end
 local setHooks = false
 
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     if not setHooks then
         if CR_VERSION then
             hook.Add("TTTSpeedMultiplier", "TF2WCMinigunMovementSpeed", function(ply, mults)

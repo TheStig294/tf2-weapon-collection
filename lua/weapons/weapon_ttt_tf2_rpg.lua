@@ -60,6 +60,23 @@ SWEP.ReloadAnimDelay = 1
 SWEP.ReloadHoldType = "revolver"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
+function SWEP:Initialize()
+	timer.Simple(0, function()
+		self:SetHoldType(self.HoldType)
+	end)
+
+	self:ResetAnimations()
+
+	hook.Add("OnDamagedByExplosion", "TF2RPGNoExplosionRinging", function(_, dmg)
+		local inflictor = dmg:GetInflictor()
+		if not IsValid(inflictor) then return end
+		local class = inflictor:GetClass()
+		if class == "ttt_tf2_rocket" or class == "weapon_ttt_tf2_rpg" then return true end
+	end)
+
+	return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SetupDataTables()
 	self:NetworkVar("Bool", "Idle")
 	self:NetworkVar("Float", "IdleTimer")
@@ -79,19 +96,6 @@ function SWEP:ResetAnimations()
 	local animDelay = vm:SequenceDuration()
 	self:SetIdleTimer(CurTime() + animDelay)
 	self:SetReloadTimer(CurTime() + self.ReloadAnimDelay)
-end
-
-function SWEP:Initialize()
-	self:ResetAnimations()
-
-	hook.Add("OnDamagedByExplosion", "TF2RPGNoExplosionRinging", function(_, dmg)
-		local inflictor = dmg:GetInflictor()
-		if not IsValid(inflictor) then return end
-		local class = inflictor:GetClass()
-		if class == "ttt_tf2_rocket" or class == "weapon_ttt_tf2_rpg" then return true end
-	end)
-
-	return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()

@@ -68,6 +68,26 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    -- SWEP:Deploy() isn't called if the player spawns on and picks up this weapon, and they haven't been given the crowbar yet
+    -- So we have to check for that case here
+    timer.Simple(1, function()
+        if not IsValid(self) then return end
+        local owner = self:GetOwner()
+        if not IsValid(owner) then return end
+        local wep = owner:GetActiveWeapon()
+        if not IsValid(wep) or wep ~= self then return end
+        owner.TF2LollichopEffects = true
+        self:SetHooks()
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SecondaryAttack()
 end
 
@@ -166,22 +186,6 @@ function SWEP:ConfettiEffect(ent)
     end
 
     emitter:Finish()
-end
-
-function SWEP:Initialize()
-    -- SWEP:Deploy() isn't called if the player spawns on and picks up this weapon, and they haven't been given the crowbar yet
-    -- So we have to check for that case here
-    timer.Simple(1, function()
-        if not IsValid(self) then return end
-        local owner = self:GetOwner()
-        if not IsValid(owner) then return end
-        local wep = owner:GetActiveWeapon()
-        if not IsValid(wep) or wep ~= self then return end
-        owner.TF2LollichopEffects = true
-        self:SetHooks()
-    end)
-
-    return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()

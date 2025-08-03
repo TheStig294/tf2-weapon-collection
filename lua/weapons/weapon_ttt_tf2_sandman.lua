@@ -58,7 +58,9 @@ SWEP.SlowMultiplier = 0.33
 SWEP.SlowDuration = 7
 
 function SWEP:Initialize()
-    self:SetWeaponHoldType(self.HoldType)
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
 
     hook.Add("DoPlayerDeath", "TF2SandmanBonkKillSound", function(_, attacker, dmg)
         if not IsValid(attacker) then return end
@@ -129,7 +131,6 @@ function SWEP:Deploy()
         vm:SendViewModelMatchingSequence(vm:LookupSequence("wb_draw"))
     end
 
-    self:SetWeaponHoldType(self.HoldType)
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)
     self.Attack = 0

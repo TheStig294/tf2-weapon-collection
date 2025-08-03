@@ -53,6 +53,14 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
+function SWEP:Initialize()
+	timer.Simple(0, function()
+		self:SetHoldType(self.HoldType)
+	end)
+
+	return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SecondaryAttack()
 end
 
@@ -61,7 +69,6 @@ function SWEP:Deploy()
 	if not IsValid(owner) then return end
 	local vm = owner:GetViewModel()
 	if not IsValid(vm) then return end
-	self:SetWeaponHoldType(self.HoldType)
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self:SetNextPrimaryFire(CurTime() + 0.5)
 	self.Attack = 0

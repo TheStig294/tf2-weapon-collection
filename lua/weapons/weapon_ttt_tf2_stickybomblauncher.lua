@@ -49,7 +49,7 @@ SWEP.Primary.NumberofShots = 0
 SWEP.Primary.Automatic = false
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.6
-SWEP.Primary.Force = 5
+SWEP.Primary.Force = 750
 SWEP.ReloadTimer = 0
 SWEP.Reloading = false
 SWEP.StickyQueue = {}
@@ -60,6 +60,16 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
+
+function SWEP:Initialize()
+	timer.Simple(0, function()
+		self:SetHoldType(self.HoldType)
+	end)
+
+	self:ResetAnimations()
+
+	return self.BaseClass.Initialize(self)
+end
 
 function SWEP:SetupDataTables()
 	self:NetworkVar("Bool", "Idle")
@@ -80,12 +90,6 @@ function SWEP:ResetAnimations()
 	local animDelay = vm:SequenceDuration()
 	self:SetIdleTimer(CurTime() + animDelay)
 	self:SetReloadTimer(CurTime() + self.ReloadAnimDelay)
-end
-
-function SWEP:Initialize()
-	self:ResetAnimations()
-
-	return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()
@@ -148,6 +152,7 @@ function SWEP:ShootStickyBomb()
 		ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 16))
 		ent:SetAngles(owner:EyeAngles())
 		ent.Damage = self.Primary.Damage
+		ent.DamageForce = self.Primary.Force
 		ent:Spawn()
 		local phys = ent:GetPhysicsObject()
 

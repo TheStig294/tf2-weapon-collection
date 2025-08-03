@@ -66,11 +66,11 @@ SWEP.ChargeHudOffset = 10
 SWEP.RedDotSprite = nil
 SWEP.AllowDrop = true
 
-function SWEP:SetupDataTables()
-    self:NetworkVar("Bool", 0, "Scoped")
-end
-
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     self.IdleTimer = CurTime() + 1
 
     if SERVER then
@@ -83,6 +83,10 @@ function SWEP:Initialize()
     end
 
     return self.BaseClass.Initialize(self)
+end
+
+function SWEP:SetupDataTables()
+    self:NetworkVar("Bool", 0, "Scoped")
 end
 
 function SWEP:DrawHUD()
@@ -175,7 +179,6 @@ function SWEP:Deploy()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
-    self:SetWeaponHoldType(self.HoldType)
     self:SendWeaponAnim(ACT_VM_DRAW)
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)

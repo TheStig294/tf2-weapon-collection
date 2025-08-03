@@ -57,22 +57,11 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
-function SWEP:SetupDataTables()
-    self:NetworkVar("Bool", "Idle")
-    self:NetworkVar("Float", "IdleTimer")
-end
-
-function SWEP:ResetAnimations()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
-    self:SetIdle(false)
-    local vm = owner:GetViewModel()
-    if not IsValid(vm) then return end
-    local animDelay = vm:SequenceDuration()
-    self:SetIdleTimer(CurTime() + animDelay)
-end
-
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     self:ResetAnimations()
 
     hook.Add("EntityTakeDamage", "TF2StickyJumperNoFallDamage", function(ply, dmg)
@@ -87,6 +76,21 @@ function SWEP:Initialize()
     end)
 
     return self.BaseClass.Initialize(self)
+end
+
+function SWEP:SetupDataTables()
+    self:NetworkVar("Bool", "Idle")
+    self:NetworkVar("Float", "IdleTimer")
+end
+
+function SWEP:ResetAnimations()
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    self:SetIdle(false)
+    local vm = owner:GetViewModel()
+    if not IsValid(vm) then return end
+    local animDelay = vm:SequenceDuration()
+    self:SetIdleTimer(CurTime() + animDelay)
 end
 
 function SWEP:Deploy()

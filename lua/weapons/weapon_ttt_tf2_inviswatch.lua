@@ -60,6 +60,14 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 2
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end

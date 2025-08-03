@@ -71,6 +71,10 @@ SWEP.ShowUberTargetEffects = false
 SWEP.TargetPositionForgiveness = 100
 
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     self.IdleTimer = CurTime() + 1
 
     return self.BaseClass.Initialize(self)
@@ -100,7 +104,6 @@ end
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
-    self:SetWeaponHoldType(self.HoldType)
     self:SendWeaponAnim(ACT_VM_DRAW)
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)

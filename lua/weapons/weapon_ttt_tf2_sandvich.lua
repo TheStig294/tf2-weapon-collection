@@ -26,6 +26,14 @@ SWEP.HoldType = "grenade"
 SWEP.Duration = 15
 SWEP.FullHealthPrompt = false
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:GetGrenadeName()
     return "ttt_tf2_sandvich_proj"
 end

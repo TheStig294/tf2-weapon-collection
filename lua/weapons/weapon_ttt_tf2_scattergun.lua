@@ -56,6 +56,16 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
+function SWEP:Initialize()
+	timer.Simple(0, function()
+		self:SetHoldType(self.HoldType)
+	end)
+
+	self:ResetAnimations()
+
+	return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SecondaryAttack()
 end
 
@@ -78,12 +88,6 @@ function SWEP:ResetAnimations()
 	local animDelay = vm:SequenceDuration()
 	self:SetIdleTimer(CurTime() + animDelay)
 	self:SetReloadTimer(CurTime() + self.ReloadAnimDelay)
-end
-
-function SWEP:Initialize()
-	self:ResetAnimations()
-
-	return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()

@@ -57,6 +57,10 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     if IsValid(self:GetOwner()) then
         self.SpeedBoostActive = true
     end

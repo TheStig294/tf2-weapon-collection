@@ -63,18 +63,13 @@ SWEP.Secondary.Ammo = "none"
 local SPIN_OFF = 0
 local SPIN_UP = 1
 local SPIN_SHOOT = 2
-
-function SWEP:SetupDataTables()
-    self:NetworkVar("Bool", "ShootSound")
-    self:NetworkVar("Int", "Spin")
-    self:NetworkVar("Float", "SpinTimer")
-    self:NetworkVar("Bool", "Idle")
-    self:NetworkVar("Float", "IdleTimer")
-end
-
 local setHooks = false
 
 function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
     if not setHooks then
         if CR_VERSION then
             hook.Add("TTTSpeedMultiplier", "TF2WCTomislavMovementSpeed", function(ply, mults)
@@ -94,6 +89,14 @@ function SWEP:Initialize()
     end
 
     return self.BaseClass.Initialize(self)
+end
+
+function SWEP:SetupDataTables()
+    self:NetworkVar("Bool", "ShootSound")
+    self:NetworkVar("Int", "Spin")
+    self:NetworkVar("Float", "SpinTimer")
+    self:NetworkVar("Bool", "Idle")
+    self:NetworkVar("Float", "IdleTimer")
 end
 
 function SWEP:Deploy()

@@ -56,6 +56,32 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    self:ResetAnimations()
+
+    -- Sound effect for hitting a player at the same time as the cannonball exploding!
+    hook.Add("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound", function(ent, dmg)
+        if not IsValid(ent) or not ent:IsPlayer() or not dmg:IsExplosionDamage() then return end
+        local inflictor = dmg:GetInflictor()
+        if not IsValid(inflictor) then return end
+
+        if inflictor:GetClass() == "weapon_ttt_tf2_loosecannon" and inflictor.ImpactDamageTime and CurTime() - inflictor.ImpactDamageTime < 0.5 then
+            inflictor:EmitSound("player/doubledonk.wav")
+        end
+    end)
+
+    hook.Add("TTTPrepareRound", "TF2LooseCannonReset", function()
+        hook.Remove("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound")
+        hook.Remove("TTTPrepareRound", "TF2LooseCannonReset")
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SecondaryAttack()
 end
 
@@ -82,28 +108,6 @@ function SWEP:ResetAnimations()
     self:SetIdleTimer(CurTime() + animDelay)
     self:SetReloadTimer(CurTime() + self.ReloadAnimDelay)
     self:SetAttackingTimer(CurTime() + self.Primary.ChargeTime)
-end
-
-function SWEP:Initialize()
-    self:ResetAnimations()
-
-    -- Sound effect for hitting a player at the same time as the cannonball exploding!
-    hook.Add("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound", function(ent, dmg)
-        if not IsValid(ent) or not ent:IsPlayer() or not dmg:IsExplosionDamage() then return end
-        local inflictor = dmg:GetInflictor()
-        if not IsValid(inflictor) then return end
-
-        if inflictor:GetClass() == "weapon_ttt_tf2_loosecannon" and inflictor.ImpactDamageTime and CurTime() - inflictor.ImpactDamageTime < 0.5 then
-            inflictor:EmitSound("player/doubledonk.wav")
-        end
-    end)
-
-    hook.Add("TTTPrepareRound", "TF2LooseCannonReset", function()
-        hook.Remove("EntityTakeDamage", "TF2LooseCannonDoubleDonkSound")
-        hook.Remove("TTTPrepareRound", "TF2LooseCannonReset")
-    end)
-
-    return self.BaseClass.Initialize(self)
 end
 
 function SWEP:Deploy()

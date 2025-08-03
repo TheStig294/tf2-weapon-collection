@@ -50,6 +50,14 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
+function SWEP:Initialize()
+    timer.Simple(0, function()
+        self:SetHoldType(self.HoldType)
+    end)
+
+    return self.BaseClass.Initialize(self)
+end
+
 function SWEP:SecondaryAttack()
 end
 
