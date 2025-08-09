@@ -137,6 +137,7 @@ end
 
 function SWEP:SecondaryAttack()
     if self.IsEating then return end
+    self.IsEating = true
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
@@ -144,6 +145,7 @@ function SWEP:SecondaryAttack()
     self:EmitSound("weapons/jar_single.wav")
 
     timer.Simple(self.Secondary.Delay, function()
+        if not IsValid(self) or not IsValid(owner) then return end
         self.BaseClass.PrimaryAttack(self)
     end)
 end
