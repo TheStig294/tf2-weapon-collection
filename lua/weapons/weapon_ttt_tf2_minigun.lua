@@ -106,6 +106,7 @@ end
 function SWEP:Deploy()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
+    self.LastOwner = owner
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
     self:SetNextPrimaryFire(CurTime() + 0.5)
@@ -159,25 +160,12 @@ function SWEP:Holster()
 end
 
 function SWEP:PreDrop()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
-
-    if SERVER and not CR_VERSION then
-        owner:SetLaggedMovementValue(1)
-    end
-
-    local vm = owner:GetViewModel()
-
-    if IsValid(vm) then
-        vm:ManipulateBoneAngles(2, Angle(0, 0, 0))
-    end
+    self:Holster()
 
     return self.BaseClass.PreDrop(self)
 end
 
 function SWEP:OnRemove()
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
     self:Holster()
 
     return self.BaseClass.OnRemove(self)
