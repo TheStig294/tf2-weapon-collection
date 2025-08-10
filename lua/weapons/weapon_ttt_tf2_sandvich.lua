@@ -13,7 +13,7 @@ SWEP.AutoSpawnable = true
 if CLIENT then
     SWEP.EquipMenuData = {
         type = "item_weapon",
-        desc = "Eat to temporarily fully heal!\nRight-click to throw at someone else!"
+        desc = "Right-click to eat and temporarily fully heal!\nLeft-click to throw at someone else!"
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_sandvich.png"
@@ -25,6 +25,8 @@ SWEP.Secondary.Delay = 0.2
 SWEP.HoldType = "grenade"
 SWEP.Duration = 15
 SWEP.FullHealthPrompt = false
+SWEP.ControlsPrompt = false
+SWEP.ShownControlsPrompt = false
 
 function SWEP:Initialize()
     TF2WC:SetHoldType(self)
@@ -44,6 +46,17 @@ function SWEP:Deploy()
     vm:SendViewModelMatchingSequence(vm:LookupSequence("sw_draw"))
     self:SetNextPrimaryFire(CurTime() + vm:SequenceDuration())
     self:EmitSound("weapons/draw_machete_sniper.wav")
+
+    if not self.ShownControlsPrompt then
+        self.ShownControlsPrompt = true
+        self.ControlsPrompt = true
+
+        timer.Simple(5, function()
+            if IsValid(self) then
+                self.ControlsPrompt = false
+            end
+        end)
+    end
 
     return self.BaseClass.Deploy(self)
 end
@@ -102,6 +115,21 @@ end
 
 function SWEP:PrimaryAttack()
     if self.IsEating then return end
+    self.IsEating = true
+    local owner = self:GetOwner()
+    if not IsValid(owner) then return end
+    local vm = owner:GetViewModel()
+    vm:SendViewModelMatchingSequence(vm:LookupSequence("throw_fire"))
+    self:EmitSound("weapons/jar_single.wav")
+
+    timer.Simple(self.Secondary.Delay, function()
+        if not IsValid(self) or not IsValid(owner) then return end
+        self.BaseClass.PrimaryAttack(self)
+    end)
+end
+
+function SWEP:SecondaryAttack()
+    if self.IsEating then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
 
@@ -133,21 +161,6 @@ function SWEP:PrimaryAttack()
     end)
 end
 
-function SWEP:SecondaryAttack()
-    if self.IsEating then return end
-    self.IsEating = true
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
-    local vm = owner:GetViewModel()
-    vm:SendViewModelMatchingSequence(vm:LookupSequence("throw_fire"))
-    self:EmitSound("weapons/jar_single.wav")
-
-    timer.Simple(self.Secondary.Delay, function()
-        if not IsValid(self) or not IsValid(owner) then return end
-        self.BaseClass.PrimaryAttack(self)
-    end)
-end
-
 function SWEP:Think()
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
@@ -167,8 +180,11 @@ end
 
 if CLIENT then
     function SWEP:DrawHUD()
-        if not self.FullHealthPrompt then return end
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+        if self.FullHealthPrompt then
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Full health, no need for Sandvich!", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+        elseif self.ControlsPrompt then
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Left-click: Throw, Right-click: Eat", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+        end
     end
 
     function SWEP:ViewModelDrawn(vm)
