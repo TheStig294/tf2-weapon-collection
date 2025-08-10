@@ -72,7 +72,6 @@ function SWEP:SetupDataTables()
     self:NetworkVar("Float", "SpinTimer")
     self:NetworkVar("Bool", "Idle")
     self:NetworkVar("Float", "IdleTimer")
-    self:NetworkVar("Float", "SpinSoundTimer")
 end
 
 local setHooks = false
@@ -116,7 +115,6 @@ function SWEP:Deploy()
     self:SetSpinTimer(CurTime() + 0.5)
     self:SetIdle(false)
     self:SetIdleTimer(CurTime() + vm:SequenceDuration())
-    self:SetSpinSoundTimer(CurTime())
 
     return self.BaseClass.Deploy(self)
 end
@@ -139,7 +137,6 @@ function SWEP:Holster()
     self:SetSpinTimer(CurTime())
     self:SetIdle(false)
     self:SetIdleTimer(CurTime())
-    self:SetSpinSoundTimer(CurTime())
     if not IsValid(owner) then return end
 
     if SERVER then
@@ -203,7 +200,6 @@ function SWEP:PrimaryAttack()
         self:SetSpinTimer(CurTime() + 0.9)
         self:SetIdle(false)
         self:SetIdleTimer(CurTime() + vm:SequenceDuration())
-        self:SetSpinSoundTimer(CurTime())
     end
 
     if self:GetSpin() ~= SPIN_SHOOT then return end
@@ -218,6 +214,7 @@ function SWEP:PrimaryAttack()
     bullet.AmmoType = self.Primary.Ammo
     bullet.Inflictor = self
     owner:FireBullets(bullet)
+    owner:EmitSound(self.Primary.Sound)
 
     if not self:GetShootSound() then
         if SERVER then
@@ -253,10 +250,10 @@ function SWEP:SecondaryAttack()
         self:SetSpinTimer(CurTime() + 0.9)
         self:SetIdle(false)
         self:SetIdleTimer(CurTime() + vm:SequenceDuration())
-        self:SetSpinSoundTimer(CurTime())
     end
 
     if self:GetSpin() == SPIN_SHOOT then
+        self:EmitSound(self.Secondary.Sound)
         self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
         self:SetIdle(true)
     end
@@ -294,15 +291,13 @@ function SWEP:Think()
         if SERVER then
             owner:StopSound(self.Primary.Sound)
             owner:StopSound("Weapon_Minigun.ClipEmpty")
-
-            if owner:KeyDown(IN_ATTACK2) and self:GetSpin() == SPIN_SHOOT and self:GetSpinSoundTimer() <= CurTime() then
-                owner:StopSound(self.Secondary.Sound)
-                owner:EmitSound(self.Secondary.Sound)
-                self:SetSpinSoundTimer(CurTime() + 0.6)
-            end
         end
 
         self:SetShootSound(false)
+    end
+
+    if SERVER and not owner:KeyDown(IN_ATTACK2) then
+        owner:StopSound(self.Secondary.Sound)
     end
 
     if self:GetSpin() == SPIN_SHOOT and ((not owner:KeyDown(IN_ATTACK) and not owner:KeyDown(IN_ATTACK2)) or self:Clip1() <= 0) then
@@ -318,7 +313,6 @@ function SWEP:Think()
         self:SetSpinTimer(CurTime() + 0.9)
         self:SetIdle(false)
         self:SetIdleTimer(CurTime() + vm:SequenceDuration())
-        self:SetSpinSoundTimer(CurTime())
     end
 
     if not self:GetIdle() and self:GetIdleTimer() <= CurTime() then
