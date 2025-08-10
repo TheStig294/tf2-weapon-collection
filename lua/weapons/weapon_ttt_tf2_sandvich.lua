@@ -27,9 +27,7 @@ SWEP.Duration = 15
 SWEP.FullHealthPrompt = false
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     return self.BaseClass.Initialize(self)
 end

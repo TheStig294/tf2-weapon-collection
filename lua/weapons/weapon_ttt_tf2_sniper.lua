@@ -67,10 +67,7 @@ SWEP.RedDotSprite = nil
 SWEP.AllowDrop = true
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
-
+    TF2WC:SetHoldType(self)
     self.IdleTimer = CurTime() + 1
 
     if SERVER then

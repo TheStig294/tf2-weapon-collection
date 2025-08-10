@@ -66,9 +66,7 @@ local SPIN_SHOOT = 2
 local setHooks = false
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     if not setHooks then
         if CR_VERSION then

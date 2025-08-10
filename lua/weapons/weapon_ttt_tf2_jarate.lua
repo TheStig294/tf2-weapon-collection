@@ -25,9 +25,7 @@ SWEP.Primary.Sound = Sound("weapons/jar_single.wav")
 SWEP.HoldType = "grenade"
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     return self.BaseClass.Initialize(self)
 end

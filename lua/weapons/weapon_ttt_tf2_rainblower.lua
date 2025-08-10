@@ -69,10 +69,7 @@ SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
-
+    TF2WC:SetHoldType(self)
     local owner = self:GetOwner()
 
     if IsValid(owner) then

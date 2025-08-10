@@ -55,9 +55,7 @@ SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     return self.BaseClass.Initialize(self)
 end

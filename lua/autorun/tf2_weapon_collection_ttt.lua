@@ -365,4 +365,12 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         if not IsValid(owner) or owner:IsNPC() or (not owner.ViewPunch) then return end
         owner:ViewPunch(Angle(util.SharedRandom(SWEP:GetClass(), -0.2, -0.1, 0) * SWEP.Primary.Recoil, util.SharedRandom(SWEP:GetClass(), -0.1, 0.1, 1) * SWEP.Primary.Recoil, 0))
     end
+
+    function TF2WC:SetHoldType(wep)
+        timer.Simple(0, function()
+            if IsValid(wep) then
+                wep:SetHoldType(wep.HoldType)
+            end
+        end)
+    end
 end)

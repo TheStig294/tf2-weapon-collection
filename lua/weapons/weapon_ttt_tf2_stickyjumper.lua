@@ -58,10 +58,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
-
+    TF2WC:SetHoldType(self)
     self:ResetAnimations()
 
     hook.Add("EntityTakeDamage", "TF2StickyJumperNoFallDamage", function(ply, dmg)

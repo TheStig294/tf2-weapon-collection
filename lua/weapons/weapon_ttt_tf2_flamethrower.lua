@@ -67,9 +67,7 @@ SWEP.Secondary.Delay = 0.75
 SWEP.Secondary.Force = 2500
 
 function SWEP:Initialize()
-	timer.Simple(0, function()
-		self:SetHoldType(self.HoldType)
-	end)
+	TF2WC:SetHoldType(self)
 
 	if SERVER then
 		hook.Add("PostEntityTakeDamage", "TF2FlamethrowerIgnite", function(ent, dmg, tookDmg)

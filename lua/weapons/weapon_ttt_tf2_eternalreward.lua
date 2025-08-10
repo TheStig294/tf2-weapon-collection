@@ -60,10 +60,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
-	timer.Simple(0, function()
-		self:SetHoldType(self.HoldType)
-	end)
-
+	TF2WC:SetHoldType(self)
 	self.Idle = 0
 	self.IdleTimer = CurTime() + 1
 

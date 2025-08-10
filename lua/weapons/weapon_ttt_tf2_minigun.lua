@@ -78,16 +78,14 @@ end
 local setHooks = false
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     if not setHooks then
         if CR_VERSION then
             hook.Add("TTTSpeedMultiplier", "TF2WCMinigunMovementSpeed", function(ply, mults)
                 if not IsValid(ply) then return end
                 local wep = ply:GetActiveWeapon()
-                if not IsValid(wep) or WEPS.GetClass(wep) ~= "weapon_ttt_tf2_minigun" then return end
+                if not IsValid(wep) or WEPS.GetClass(wep) ~= "weapon_ttt_tf2_minigun" or not wep.GetSpin then return end
 
                 if wep:GetSpin() == SPIN_UP then
                     table.insert(mults, 0.75)

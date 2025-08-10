@@ -58,9 +58,7 @@ SWEP.SlowMultiplier = 0.33
 SWEP.SlowDuration = 7
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
+    TF2WC:SetHoldType(self)
 
     hook.Add("DoPlayerDeath", "TF2SandmanBonkKillSound", function(_, attacker, dmg)
         if not IsValid(attacker) then return end

@@ -71,10 +71,7 @@ SWEP.ShowUberTargetEffects = false
 SWEP.TargetPositionForgiveness = 100
 
 function SWEP:Initialize()
-    timer.Simple(0, function()
-        self:SetHoldType(self.HoldType)
-    end)
-
+    TF2WC:SetHoldType(self)
     self.IdleTimer = CurTime() + 1
 
     return self.BaseClass.Initialize(self)
