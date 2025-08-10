@@ -214,7 +214,6 @@ function SWEP:PrimaryAttack()
     bullet.AmmoType = self.Primary.Ammo
     bullet.Inflictor = self
     owner:FireBullets(bullet)
-    owner:EmitSound(self.Primary.Sound)
 
     if not self:GetShootSound() then
         if SERVER then
