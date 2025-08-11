@@ -55,6 +55,8 @@ SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
+SWEP.StartReload = false
+SWEP.LastFireTime = CurTime()
 
 function SWEP:Initialize()
     TF2WC:SetHoldType(self)
@@ -266,8 +268,10 @@ function SWEP:Think()
 end
 
 if CLIENT then
-    function SWEP:DrawHUD()
-        draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+    if not game.SinglePlayer() then
+        function SWEP:DrawHUD()
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+        end
     end
 
     function SWEP:ViewModelDrawn(vm)
