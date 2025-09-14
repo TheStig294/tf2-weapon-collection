@@ -50,7 +50,7 @@ SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "AR2"
-SWEP.Primary.Damage = 2.5
+SWEP.Primary.Damage = 4
 SWEP.Primary.Spread = 0.03
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.NumberofShots = 4
