@@ -18,7 +18,6 @@ PrecacheParticleSystem("peejar_impact")
 PrecacheParticleSystem("peejar_drips")
 PrecacheParticleSystem("peejar_trail_red")
 PrecacheParticleSystem("player_intel_papertrail")
-CreateConVar("tf2_weapon_collection_auto_reload", 1, FCVAR_REPLICATED, "Whether weapons from the TF2 Weapon Collection should auto-reload", 0, 1)
 
 if SERVER then
     resource.AddWorkshop("3484716425")

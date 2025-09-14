@@ -250,8 +250,22 @@ PaP Upgrade: No self-damage, more damage and push force, infinite ammo!\
 *ttt_pap_sticky_jumper* - Default: 1 - Whether this upgrade is enabled
 
 ## Settings/Convars
-*tf2_weapon_collection_auto_reload* 1\
-Whether all TF2 weapons should auto-reload after not shooting for a while
+
+Whether all TF2 weapons should auto-reload after not shooting for a while\
+*tf2_weapon_collection_auto_reload* 1
+
+**For the below convars, your options are:**\
+bonesaw,caber,escapeplan,eternalreward,eurekaeffect,flamethrower,forceanature,goldenfryingpan,grenadelauncher,inviswatch,jarate,knife,lollichop,loosecannon,machete,medigun,minigun,pistol,rainblower,revolver,rpg,sandman,sandvich,scattergun,shortstop,shotgun,smg,sniper,stickybomblauncher,stickyjumper,syringegun,tomislav
+
+TF2 weapons a detective can buy\
+*tf2_weapon_collection_detective* knife,medigun,rpg,stickybomblauncher
+
+TF2 weapons a traitor can buy\
+*tf2_weapon_collection_traitor* knife,inviswatch,rpg,stickybomblauncher
+
+TF2 weapons that spawn on the ground\
+*tf2_weapon_collection_spawns_on_floor*\
+bonesaw,caber,escapeplan,eurekaeffect,flamethrower,goldenfryingpan,grenadelauncher,lollichop,machete,minigun,pistol,revolver,sandman,sandvich,scattergun,shotgun,smg,sniper,syringegun
 
 ## Steam Workshop Link
 
