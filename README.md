@@ -257,13 +257,13 @@ Whether all TF2 weapons should auto-reload after not shooting for a while\
 **For the below convars, your options are:**\
 bonesaw,caber,escapeplan,eternalreward,eurekaeffect,flamethrower,forceanature,goldenfryingpan,grenadelauncher,inviswatch,jarate,knife,lollichop,loosecannon,machete,medigun,minigun,pistol,rainblower,revolver,rpg,sandman,sandvich,scattergun,shortstop,shotgun,smg,sniper,stickybomblauncher,stickyjumper,syringegun,tomislav
 
-TF2 weapons a detective can buy\
+TF2 weapons a detective can buy (Requires map change to take effect)\
 *tf2_weapon_collection_detective* knife,medigun,rpg,stickybomblauncher
 
-TF2 weapons a traitor can buy\
+TF2 weapons a traitor can buy (Requires map change to take effect)\
 *tf2_weapon_collection_traitor* knife,inviswatch,rpg,stickybomblauncher
 
-TF2 weapons that spawn on the ground\
+TF2 weapons that spawn on the ground (Requires map change to take effect)\
 *tf2_weapon_collection_spawns_on_floor*\
 bonesaw,caber,escapeplan,eurekaeffect,flamethrower,goldenfryingpan,grenadelauncher,lollichop,machete,minigun,pistol,revolver,sandman,sandvich,scattergun,shotgun,smg,sniper,syringegun
 

@@ -1,9 +1,9 @@
 CreateConVar("tf2_weapon_collection_auto_reload", 1, FCVAR_REPLICATED, "Whether weapons from the TF2 Weapon Collection should auto-reload", 0, 1)
-local detectiveCvar = CreateConVar("tf2_weapon_collection_detective_buyable", "knife,medigun,rpg,stickybomblauncher", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons a detective can buy")
+local detectiveCvar = CreateConVar("tf2_weapon_collection_detective_buyable", "knife,medigun,rpg,stickybomblauncher", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons a detective can buy (Requires map change to take effect)")
 local detectiveWeapons = string.Explode(",", detectiveCvar:GetString())
-local traitorCvar = CreateConVar("tf2_weapon_collection_traitor_buyable", "knife,inviswatch,rpg,stickybomblauncher", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons a traitor can buy")
+local traitorCvar = CreateConVar("tf2_weapon_collection_traitor_buyable", "knife,inviswatch,rpg,stickybomblauncher", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons a traitor can buy (Requires map change to take effect)")
 local traitorWeapons = string.Explode(",", traitorCvar:GetString())
-local floorCvar = CreateConVar("tf2_weapon_collection_spawns_on_floor", "bonesaw,caber,escapeplan,eurekaeffect,flamethrower,goldenfryingpan,grenadelauncher,lollichop,machete,minigun,pistol,revolver,sandman,sandvich,scattergun,shotgun,smg,sniper,syringegun", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons that spawn on the ground")
+local floorCvar = CreateConVar("tf2_weapon_collection_spawns_on_floor", "bonesaw,caber,escapeplan,eurekaeffect,flamethrower,goldenfryingpan,grenadelauncher,lollichop,machete,minigun,pistol,revolver,sandman,sandvich,scattergun,shotgun,smg,sniper,syringegun", FCVAR_ARCHIVE + FCVAR_REPLICATED, "TF2 weapons that spawn on the ground (Requires map change to take effect)")
 local floorWeapons = string.Explode(",", floorCvar:GetString())
 
 local function ToDictionary(tab)
