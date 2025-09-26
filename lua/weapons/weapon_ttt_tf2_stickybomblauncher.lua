@@ -22,7 +22,8 @@ SWEP.DrawCrosshair = true
 SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
+SWEP.Slot = 6
+SWEP.SandboxSlot = 4
 SWEP.AutoSpawnable = false
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
@@ -34,6 +35,7 @@ if CLIENT then
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_stickybomblauncher.png"
+	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.CanBuy = {ROLE_DETECTIVE, ROLE_TRAITOR}
@@ -62,7 +64,7 @@ SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Initialize()
-	TF2WC:SetHoldType(self)
+	TF2WC:SandboxSetup(self)
 	self:ResetAnimations()
 
 	return self.BaseClass.Initialize(self)

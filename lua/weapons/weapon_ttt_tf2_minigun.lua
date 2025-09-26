@@ -34,6 +34,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_minigun.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Sound = 0
@@ -77,7 +78,7 @@ end
 local setHooks = false
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
 
     if not setHooks then
         if CR_VERSION then

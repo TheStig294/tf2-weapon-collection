@@ -25,7 +25,8 @@ SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
+SWEP.Slot = 6
+SWEP.SandboxSlot = 4
 SWEP.AutoSpawnable = false
 
 SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}
@@ -37,6 +38,7 @@ if CLIENT then
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_knife.png"
+	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Backstab = 0
@@ -59,7 +61,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
-	TF2WC:SetHoldType(self)
+	TF2WC:SandboxSetup(self)
 	self.Idle = 0
 	self.IdleTimer = CurTime() + 1
 

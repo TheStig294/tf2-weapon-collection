@@ -35,6 +35,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_sandman.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("Weapon_Bat.Miss")
@@ -58,7 +59,7 @@ SWEP.SlowMultiplier = 0.33
 SWEP.SlowDuration = 7
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
 
     hook.Add("DoPlayerDeath", "TF2SandmanBonkKillSound", function(_, attacker, dmg)
         if not IsValid(attacker) then return end

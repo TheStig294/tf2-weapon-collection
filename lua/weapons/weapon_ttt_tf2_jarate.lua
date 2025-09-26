@@ -19,13 +19,14 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_smg.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("weapons/jar_single.wav")
 SWEP.HoldType = "grenade"
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
 
     return self.BaseClass.Initialize(self)
 end

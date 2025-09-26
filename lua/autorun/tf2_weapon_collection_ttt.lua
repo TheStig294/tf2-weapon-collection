@@ -365,7 +365,11 @@ hook.Add("PostGamemodeLoaded", "TF2RoleGlobals", function()
         owner:ViewPunch(Angle(util.SharedRandom(SWEP:GetClass(), -0.2, -0.1, 0) * SWEP.Primary.Recoil, util.SharedRandom(SWEP:GetClass(), -0.1, 0.1, 1) * SWEP.Primary.Recoil, 0))
     end
 
-    function TF2WC:SetHoldType(wep)
+    function TF2WC:SandboxSetup(wep)
+        if wep.SandboxSlot and engine.ActiveGamemode() ~= "terrortown" then
+            wep.Slot = wep.SandboxSlot
+        end
+
         timer.Simple(0, function()
             if IsValid(wep) then
                 wep:SetHoldType(wep.HoldType)

@@ -31,6 +31,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_smg.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.AmmoEnt = "item_ammo_smg1_ttt"
@@ -53,7 +54,7 @@ SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     self:ResetAnimations()
 
     return self.BaseClass.Initialize(self)

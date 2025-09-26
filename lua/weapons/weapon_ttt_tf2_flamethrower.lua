@@ -36,6 +36,7 @@ if CLIENT then
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_flamethrower.png"
+	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.DoLoopingSound = false
@@ -67,7 +68,7 @@ SWEP.Secondary.Delay = 0.75
 SWEP.Secondary.Force = 2500
 
 function SWEP:Initialize()
-	TF2WC:SetHoldType(self)
+	TF2WC:SandboxSetup(self)
 
 	if SERVER then
 		hook.Add("PostEntityTakeDamage", "TF2FlamethrowerIgnite", function(ent, dmg, tookDmg)

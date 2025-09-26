@@ -35,6 +35,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_flamethrower.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.DoLoopingSound = false
@@ -69,7 +70,7 @@ SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     local owner = self:GetOwner()
 
     if IsValid(owner) then

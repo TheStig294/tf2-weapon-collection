@@ -34,6 +34,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_sniper.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.ScopedTimer = 0
@@ -67,7 +68,7 @@ SWEP.RedDotSprite = nil
 SWEP.AllowDrop = true
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     self.IdleTimer = CurTime() + 1
 
     if SERVER then

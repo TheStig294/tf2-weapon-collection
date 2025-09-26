@@ -21,7 +21,8 @@ SWEP.DrawAmmo = true
 SWEP.ReloadSound = "sound/epicreload.wav"
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP
-SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 6 or 5
+SWEP.Slot = 6
+SWEP.SandboxSlot = 4
 SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.AutoSpawnable = false
@@ -33,6 +34,7 @@ if CLIENT then
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_rpg.png"
+	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.CanBuy = {ROLE_TRAITOR, ROLE_DETECTIVE}
@@ -61,7 +63,7 @@ SWEP.ReloadHoldType = "revolver"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Initialize()
-	TF2WC:SetHoldType(self)
+	TF2WC:SandboxSetup(self)
 	self:ResetAnimations()
 
 	hook.Add("OnDamagedByExplosion", "TF2RPGNoExplosionRinging", function(_, dmg)

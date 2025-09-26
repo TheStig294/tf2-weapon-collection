@@ -35,6 +35,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_caber.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("Weapon_FireAxe.Miss")
@@ -58,7 +59,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     self:SetExploded(false)
 
     -- Mute the explosion ringing sound

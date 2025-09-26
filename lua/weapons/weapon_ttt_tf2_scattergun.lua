@@ -34,6 +34,7 @@ if CLIENT then
 	}
 
 	SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_scattergun.png"
+	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("weapons/scatter_gun_shoot.wav")
@@ -57,7 +58,7 @@ SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
 
 function SWEP:Initialize()
-	TF2WC:SetHoldType(self)
+	TF2WC:SandboxSetup(self)
 	self:ResetAnimations()
 
 	return self.BaseClass.Initialize(self)

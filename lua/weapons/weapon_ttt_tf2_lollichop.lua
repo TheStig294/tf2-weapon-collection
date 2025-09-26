@@ -39,6 +39,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_fireaxe.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("Weapon_FireAxe.Miss")
@@ -69,7 +70,7 @@ SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
 
     -- SWEP:Deploy() isn't called if the player spawns on and picks up this weapon, and they haven't been given the crowbar yet
     -- So we have to check for that case here

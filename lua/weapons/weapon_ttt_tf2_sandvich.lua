@@ -17,6 +17,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_sandvich.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("player/heavy/sandvich_eat.wav")
@@ -29,7 +30,7 @@ SWEP.ControlsPrompt = false
 SWEP.ShownControlsPrompt = false
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
 
     return self.BaseClass.Initialize(self)
 end

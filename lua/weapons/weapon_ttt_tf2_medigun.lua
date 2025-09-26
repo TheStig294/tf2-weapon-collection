@@ -25,7 +25,8 @@ SWEP.DrawAmmo = true
 SWEP.CSMuzzleFlashes = 1
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_EQUIP2
-SWEP.Slot = engine.ActiveGamemode() == "terrortown" and 7 or 5
+SWEP.Slot = 7
+SWEP.SandboxSlot = 4
 SWEP.AutoSpawnable = false
 SWEP.LimitedStock = true
 
@@ -38,6 +39,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_medigun.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Uber = false
@@ -71,7 +73,7 @@ SWEP.ShowUberTargetEffects = false
 SWEP.TargetPositionForgiveness = 100
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     self.IdleTimer = CurTime() + 1
 
     return self.BaseClass.Initialize(self)

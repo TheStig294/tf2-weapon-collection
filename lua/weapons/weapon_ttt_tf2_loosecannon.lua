@@ -34,6 +34,7 @@ if CLIENT then
     }
 
     SWEP.Icon = "vgui/ttt/weapon_ttt_tf2_grenadelauncher.png"
+    SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
 SWEP.Primary.Sound = Sound("weapons/loose_cannon_shoot.wav")
@@ -59,7 +60,7 @@ SWEP.StartReload = false
 SWEP.LastFireTime = CurTime()
 
 function SWEP:Initialize()
-    TF2WC:SetHoldType(self)
+    TF2WC:SandboxSetup(self)
     self:ResetAnimations()
 
     -- Sound effect for hitting a player at the same time as the cannonball exploding!
