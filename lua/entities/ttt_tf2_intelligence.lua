@@ -244,12 +244,23 @@ function ENT:OnNearAlivePlayer(ply)
             end
         end
 
+        self.DroppedOldIntel:SetNoDraw(false)
+
+        if IsValid(self.DroppedOldIntel.BaseEnt) then
+            self.DroppedOldIntel.BaseEnt:OnIntelligenceReturned()
+        end
+
         self:Remove()
     elseif IsValid(intelEnt) and ((intelEnt:GetBLU() and not self:GetBLU()) or (not intelEnt:GetBLU() and self:GetBLU())) then
         -- Returning enemy intel
         ply:SetNWEntity("TF2Intelligence", NULL)
         ply:StopParticles()
         hook.Run("TF2IntelligenceCaptured", ply, self:GetBLU())
+        intelEnt:SetNoDraw(false)
+
+        if IsValid(intelEnt.BaseEnt) then
+            intelEnt.BaseEnt:OnIntelligenceReturned()
+        end
     elseif self:CanPickupEnemyIntel(ply) then
         -- Picking up the enemy intel
         ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 5)
@@ -269,6 +280,12 @@ function ENT:OnNearAlivePlayer(ply)
             self:Remove()
         else
             ply:SetNWEntity("TF2Intelligence", self)
+        end
+
+        self:SetNoDraw(true)
+
+        if IsValid(self.BaseEnt) then
+            self.BaseEnt:OnIntelligenceStolen()
         end
     end
 end

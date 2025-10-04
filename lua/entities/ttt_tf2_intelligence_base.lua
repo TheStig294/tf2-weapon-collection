@@ -40,7 +40,7 @@ function ENT:Initialize()
     end
 
     timer.Simple(0, function()
-        self:OnIntelligenceAtBase()
+        self:OnIntelligenceReturned()
     end)
 end
 
@@ -57,8 +57,14 @@ function ENT:GetBLU()
     return self:GetNWBool("IsBLU")
 end
 
-function ENT:OnIntelligenceAtBase()
+function ENT:OnIntelligenceReturned()
     if SERVER then
         self.WorldText:SetKeyValue("message", self.TeamName .. " Team Base")
+    end
+end
+
+function ENT:OnIntelligenceStolen()
+    if SERVER then
+        self.WorldText:SetKeyValue("message", self.TeamName .. " Team Base... Intel Stolen!")
     end
 end
