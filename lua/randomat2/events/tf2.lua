@@ -31,20 +31,9 @@ function EVENT:Begin()
     BLUIntel.BlockCapture = true
     local REDIntelCaptures = 0
     local BLUIntelCaptures = 0
-    util.AddNetworkString("TF2RandomatIntelCaptured")
+    util.AddNetworkString("TF2RandomatIntelStatusChanged")
 
-    self:AddHook("TF2IntelligenceCaptured", function(ply, isBLU)
-        local str = ply:Nick() .. " has captured the enemy intelligence for the"
-
-        if isBLU then
-            str = str .. " BLU team!"
-        else
-            str = str .. " RED team!"
-        end
-
-        PrintMessage(HUD_PRINTCENTER, str)
-        PrintMessage(HUD_PRINTTALK, str)
-
+    self:AddHook("TF2IntelligenceCaptured", function(isBLU)
         if isBLU then
             BLUIntelCaptures = BLUIntelCaptures + 1
         else
@@ -61,10 +50,6 @@ function EVENT:Begin()
                 end
             end
         end
-
-        net.Start("TF2RandomatIntelCaptured")
-        net.WriteBool(isBLU)
-        net.Broadcast()
     end)
 
     -- Only allow for a win through getting enough captures, or the round time running out
@@ -118,6 +103,24 @@ function EVENT:Begin()
         end
     end)
 
+    -- Makes disguised players un-disguise on taking damage, like the Spy does in TF2
+    -- Also blocks teammates from damaging each other
+    self:AddHook("EntityTakeDamage", function(victim, dmg)
+        if not IsValid(victim) or not victim:IsPlayer() then return end
+        local attacker = dmg:GetAttacker()
+        if IsValid(attacker) and victim:GetNWString("TF2RandomatTeam", "") == attacker:GetNWString("TF2RandomatTeam", "") then return true end
+
+        if victim:GetNWBool("disguised") then
+            victim:ConCommand("ttt_set_disguise 0")
+        end
+    end)
+
+    self:AddHook("DoPlayerDeath", function(ply, _, _)
+        if IsValid(ply) then
+            ply:StripWeapons()
+        end
+    end)
+
     self:DisableRoundEndSounds()
 
     -- TTTEndRound doesn't pass the win type to clients, so we have to check on the server
@@ -136,6 +139,12 @@ function EVENT:Begin()
             end)
         end
     end)
+
+    for _, wep in ents.Iterator() do
+        if IsValid(wep) and wep:IsWeapon() and wep.Kind and wep.Kind ~= WEAPON_UNARMED and wep.Kind ~= WEAPON_CARRY and wep.Kind ~= WEAPON_MELEE then
+            wep:Remove()
+        end
+    end
 
     if playMusic:GetBool() then
         SetGlobal2Bool("TF2ClassChangerDisableMusic", true)
@@ -194,9 +203,11 @@ function EVENT:Begin()
             if i <= halfPlayerCount then
                 Randomat:SetRole(ply, REDRole)
                 enemyIntel = BLUIntel
+                ply:SetNWString("TF2RandomatTeam", "RED")
             else
                 Randomat:SetRole(ply, BLURole)
                 enemyIntel = REDIntel
+                ply:SetNWString("TF2RandomatTeam", "BLU")
             end
 
             if ply.SetProperty then
@@ -268,6 +279,7 @@ function EVENT:End()
 
     for _, ply in player.Iterator() do
         timer.Remove("TF2RandomatRespawnTimer" .. ply:SteamID64())
+        ply:SetNWString("TF2RandomatTeam", "")
     end
 
     timer.Remove("TF2RandomatRoundBeginUnfreeze")

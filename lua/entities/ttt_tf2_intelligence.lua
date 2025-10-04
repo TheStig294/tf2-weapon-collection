@@ -3,6 +3,7 @@ ENT.Type = "anim"
 ENT.Base = "base_anim"
 ENT.Spawnable = false
 ENT.PrintName = "Intelligence Briefcase"
+ENT.NextSpin = 0
 ENT.Model = "models/flag/briefcase.mdl"
 ENT.SpinDelay = 0.01
 ENT.SpinAngles = Angle(0, 1, 0)
@@ -31,6 +32,7 @@ function ENT:Initialize()
     self:SetSolid(SOLID_NONE)
 
     if SERVER then
+        util.AddNetworkString("TF2RandomatIntelStatusChanged")
         self:SetTrigger(true)
         local hookname = "TF2IntelligenceBypassPVS" .. self:EntIndex()
 
@@ -70,6 +72,11 @@ function ENT:Initialize()
                         p:SendLua("surface.PlaySound(\"misc/intel_enemydropped.wav\")")
                     end
                 end
+
+                net.Start("TF2RandomatIntelStatusChanged")
+                net.WriteBool(droppedIntel:GetBLU())
+                net.WriteString("DROPPED, go find it!")
+                net.Broadcast()
             end
 
             ply:SetNWEntity("TF2Intelligence", NULL)
@@ -108,6 +115,7 @@ function ENT:Initialize()
     if CLIENT then
         local BLUColour = Color(0, 255, 255)
         local REDColour = Color(255, 0, 0)
+        local client = LocalPlayer()
         local hookname = "TF2IntelligenceOutline" .. self:EntIndex()
         local colour
 
@@ -139,6 +147,16 @@ function ENT:Initialize()
             end
 
             halo.Add(haloEnts, colour, 1, 1, 3, true, true)
+            local intelHaloEnts = {}
+
+            -- Highlight all enemy team members with the intelligence through walls!
+            for _, ply in player.Iterator() do
+                if client:GetNWString("TF2RandomatTeam", "") ~= ply:GetNWString("TF2RandomatTeam", "") and IsValid(ply:GetNWEntity("TF2Intelligence")) then
+                    table.insert(intelHaloEnts, ply)
+                end
+            end
+
+            halo.Add(intelHaloEnts, COLOR_WHITE, 1, 1, 3, true, true)
         end)
     end
 end
@@ -158,27 +176,9 @@ function ENT:SetBLU(setBLU)
 end
 
 function ENT:Think()
-    if CLIENT then
-        if CurTime() > self.NextSpin then
-            self.NextSpin = CurTime() + self.SpinDelay
-            self:SetAngles(self:GetAngles() + self.SpinAngles)
-        end
-
-        for _, ply in player.Iterator() do
-            local intelEnt = ply:GetNWEntity("TF2Intelligence")
-            local clientEnt = ply.ClientTF2IntelEnt
-
-            if IsValid(intelEnt) and not IsValid(clientEnt) then
-                clientEnt = ClientsideModel(intelEnt:GetModel(), RENDERGROUP_BOTH)
-                clientEnt:SetPos(Vector(0, 0, 40))
-                clientEnt:SetMoveParent(clientEnt)
-                clientEnt:Spawn()
-                clientEnt:SetRenderMode(RENDERMODE_TRANSCOLOR)
-                clientEnt:SetColor(Color(255, 255, 255, 100))
-            elseif IsValid(clientEnt) and not IsValid(intelEnt) then
-                clientEnt:Remove()
-            end
-        end
+    if CLIENT and CurTime() > self.NextSpin then
+        self.NextSpin = CurTime() + self.SpinDelay
+        self:SetAngles(self:GetAngles() + self.SpinAngles)
     end
 
     if SERVER and CurTime() > self.NextNearPlayerCheck then
@@ -253,22 +253,41 @@ function ENT:OnNearAlivePlayer(ply)
             self.DroppedOldIntel.BaseEnt:OnIntelligenceReturned()
         end
 
+        net.Start("TF2RandomatIntelStatusChanged")
+        net.WriteBool(self:GetBLU())
+        net.WriteString("AT BASE")
+        net.Broadcast()
         self:Remove()
     elseif IsValid(intelEnt) and ((intelEnt:GetBLU() and not self:GetBLU()) or (not intelEnt:GetBLU() and self:GetBLU())) then
         -- Returning enemy intel
+        local str = ply:Nick() .. " has captured the enemy intelligence for the"
+
+        if self:GetBLU() then
+            str = str .. " BLU team!"
+        else
+            str = str .. " RED team!"
+        end
+
+        PrintMessage(HUD_PRINTCENTER, str)
+        PrintMessage(HUD_PRINTTALK, str)
         ply:SetNWEntity("TF2Intelligence", NULL)
         ply:StopParticles()
-        hook.Run("TF2IntelligenceCaptured", ply, self:GetBLU())
         intelEnt:SetNoDraw(false)
 
         if IsValid(intelEnt.BaseEnt) then
             intelEnt.BaseEnt:OnIntelligenceReturned()
         end
+
+        net.Start("TF2RandomatIntelStatusChanged")
+        net.WriteBool(intelEnt:GetBLU())
+        net.WriteString("CAPTURED")
+        net.Broadcast()
+        hook.Run("TF2IntelligenceCaptured", self:GetBLU())
     elseif self:CanPickupEnemyIntel(ply) then
         -- Picking up the enemy intel
         ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 5)
-        ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
-        ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
+        ply:PrintMessage(HUD_PRINTCENTER, "Picked up the intelligence, bring it back to your base!")
+        ply:PrintMessage(HUD_PRINTTALK, "Picked up the intelligence, bring it back to your base!")
 
         for _, p in player.Iterator() do
             if (self:GetBLU() and self:IsPlayerInnocent(p)) or (not self:GetBLU() and self:IsPlayerTraitor(p)) then
@@ -290,5 +309,10 @@ function ENT:OnNearAlivePlayer(ply)
         if IsValid(self.BaseEnt) then
             self.BaseEnt:OnIntelligenceStolen()
         end
+
+        net.Start("TF2RandomatIntelStatusChanged")
+        net.WriteBool(self:GetBLU())
+        net.WriteString("STOLEN BY " .. ply:Nick() .. "!")
+        net.Broadcast()
     end
 end

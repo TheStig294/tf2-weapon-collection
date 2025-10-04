@@ -35,7 +35,7 @@ function ENT:Initialize()
                 return
             end
 
-            halo.Add(selfTable, self:GetBLU() and BLUColour or REDColour, 1, 1, 5, true, true)
+            halo.Add(selfTable, self:GetBLU() and BLUColour or REDColour, 1, 1, 3, true, true)
         end)
     end
 

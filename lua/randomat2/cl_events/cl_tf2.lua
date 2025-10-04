@@ -43,30 +43,37 @@ net.Receive("TF2RandomatRespawnTimer", function()
             elseif respawnTime == 0 then
                 local REDIntelCaptures = 0
                 local BLUIntelCaptures = 0
+                local REDIntelStatus = "AT BASE"
+                local BLUIntelStatus = "AT BASE"
 
-                net.Receive("TF2RandomatIntelCaptured", function()
-                    local isBLUCapture = net.ReadBool()
+                net.Receive("TF2RandomatIntelStatusChanged", function()
+                    local isBLUIntel = net.ReadBool()
+                    local status = net.ReadString()
 
-                    if isBLUCapture then
-                        BLUIntelCaptures = BLUIntelCaptures + 1
+                    if status == "CAPTURED" then
+                        status = "AT BASE"
+
+                        if isBLUIntel then
+                            BLUIntelCaptures = BLUIntelCaptures + 1
+                        else
+                            REDIntelCaptures = REDIntelCaptures + 1
+                        end
+                    end
+
+                    if isBLUIntel then
+                        BLUIntelStatus = status
                     else
-                        REDIntelCaptures = REDIntelCaptures + 1
+                        REDIntelStatus = status
                     end
                 end)
 
-                if TTT2 then
-                    hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                        draw.WordBox(8, ScrW() / 2, ScrH() / 11, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) - 50, ScrH() / 8, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) + 50, ScrH() / 8, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                    end)
-                else
-                    hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                        draw.WordBox(8, ScrW() / 2, 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) - 50, 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                        draw.WordBox(8, (ScrW() / 2) + 50, 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-                    end)
-                end
+                hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
+                    draw.WordBox(8, ScrW() / 2, TTT2 and (ScrH() / 11) or 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) - 50, TTT2 and (ScrH() / 8) or 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) - 350, TTT2 and (ScrH() / 8) or 105, "RED intel is: " .. REDIntelStatus, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) + 50, TTT2 and (ScrH() / 8) or 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, (ScrW() / 2) + 350, TTT2 and (ScrH() / 8) or 105, "BLU intel is: " .. BLUIntelStatus, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                end)
 
                 local clientTeam = client:GetNWString("TF2RandomatTeam", "")
                 local BLUColour = Color(0, 255, 255)
@@ -76,12 +83,14 @@ net.Receive("TF2RandomatRespawnTimer", function()
                     local teamPlayers = {}
 
                     for _, ply in player.Iterator() do
-                        if ply:GetNWString("TF2RandomatTeam", "") == clientTeam then
+                        if not ply:Alive() or ply:IsSpec() then continue end
+
+                        if ply:GetNWString("TF2RandomatTeam", "") == clientTeam or ply:GetNWBool("disguised") then
                             table.insert(teamPlayers, ply)
                         end
                     end
 
-                    halo.Add(teamPlayers, clientTeam == "RED" and REDColour or BLUColour, 1, 1, 1, true, true)
+                    halo.Add(teamPlayers, clientTeam == "RED" and REDColour or BLUColour, 1, 1, 3, true, true)
                 end)
             end
         end
@@ -133,6 +142,9 @@ net.Receive("TF2RandomatRespawnTimer", function()
 
                 return newTitle
             end)
+
+            -- Block the overhead icons so that disguised spies on the enemy team don't have the wrong icon above their head!
+            hook.Add("TTTTargetIDPlayerBlockIcon", "TF2RandomatBlockOverheadIcons", function(_, _) return true end)
         end
 
         -- Adds a near-black-and-white filter to the screen
