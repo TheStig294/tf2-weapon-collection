@@ -8,12 +8,27 @@ ENT.SpinDelay = 0.01
 ENT.SpinAngles = Angle(0, 1, 0)
 ENT.DroppedOldIntel = NULL
 ENT.BlockCapture = false
+ENT.BaseEnt = NULL
+ENT.BasePosOffset = Vector(0, 0, 40)
+ENT.NextNearPlayerCheck = 0
+ENT.NearPlayerCheckDelay = 1
+ENT.NearPlayerCheckDistance = 100
+ENT.NearPlayerCheckDistanceSquared = ENT.NearPlayerCheckDistance * ENT.NearPlayerCheckDistance
+
+if SERVER then
+    concommand.Add("ttt_tf2_intel_test", function(ply, cmd, args, argStr)
+        local intelEnt = ents.Create("ttt_tf2_intelligence")
+        intelEnt:SetPos(ply:GetPos() + Vector(600, 600, 0))
+        intelEnt:Spawn()
+        intelEnt:SetBLU(true)
+    end)
+end
 
 function ENT:Initialize()
     self:SetModel(self.Model)
     self.NextSpin = CurTime()
-    self:SetMoveType(MOVETYPE_VPHYSICS)
-    self:SetSolid(SOLID_VPHYSICS)
+    self:SetMoveType(MOVETYPE_NONE)
+    self:SetSolid(SOLID_NONE)
 
     if SERVER then
         self:SetTrigger(true)
@@ -81,6 +96,13 @@ function ENT:Initialize()
 
             hook.Remove("TTTPrepareRound", "TF2IntelligenceReset")
         end)
+
+        if not IsValid(self.DroppedOldIntel) then
+            self.BaseEnt = ents.Create("ttt_tf2_intelligence_base")
+            self.BaseEnt:SetPos(self:GetPos())
+            self.BaseEnt:Spawn()
+            self:SetPos(self:GetPos() + self.BasePosOffset)
+        end
     end
 
     if CLIENT then
@@ -139,6 +161,10 @@ end
 function ENT:SetBLU(setBLU)
     self:SetNWBool("IsBLU", setBLU)
 
+    if IsValid(self.BaseEnt) then
+        self.BaseEnt:SetBLU(setBLU)
+    end
+
     if setBLU then
         self:SetMaterial("models/flag/briefcase_blue")
     else
@@ -150,6 +176,18 @@ function ENT:Think()
     if CLIENT and CurTime() > self.NextSpin then
         self.NextSpin = CurTime() + self.SpinDelay
         self:SetAngles(self:GetAngles() + self.SpinAngles)
+    end
+
+    if SERVER and CurTime() > self.NextNearPlayerCheck then
+        self.NextNearPlayerCheck = CurTime() + self.NearPlayerCheckDelay
+
+        for _, ply in player.Iterator() do
+            if not ply:Alive() or ply:IsSpec() then continue end
+
+            if ply:GetPos():DistToSqr(self:GetPos()) < self.NearPlayerCheckDistanceSquared then
+                self:OnNearAlivePlayer(ply)
+            end
+        end
     end
 end
 
@@ -187,10 +225,9 @@ function ENT:CanPickupEnemyIntel(ply)
     end
 end
 
-function ENT:StartTouch(ply)
+function ENT:OnNearAlivePlayer(ply)
     local intelEnt = ply:GetNWEntity("TF2Intelligence")
     if IsValid(intelEnt) and intelEnt == self then return end
-    if not ply:IsPlayer() or not ply:Alive() or ply:IsSpec() then return end
 
     if IsValid(self.DroppedOldIntel) and ((self:IsPlayerTraitor(ply) and not self:GetBLU()) or (self:IsPlayerInnocent(ply) and self:GetBLU())) then
         -- Returning friendly intel
@@ -215,7 +252,7 @@ function ENT:StartTouch(ply)
         hook.Run("TF2IntelligenceCaptured", ply, self:GetBLU())
     elseif self:CanPickupEnemyIntel(ply) then
         -- Picking up the enemy intel
-        ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 1)
+        ParticleEffectAttach("player_intel_papertrail", PATTACH_POINT_FOLLOW, ply, 5)
         ply:PrintMessage(HUD_PRINTCENTER, "You picked up the enemy intelligence!")
         ply:PrintMessage(HUD_PRINTTALK, "You picked up the enemy intelligence!")
 

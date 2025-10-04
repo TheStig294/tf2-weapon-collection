@@ -157,7 +157,6 @@ function EVENT:Begin()
         if not REDSpawn then
             local ply = alivePlys[math.random(#alivePlys)]
             REDSpawn = ply:GetPos()
-            ply:SetPos(REDSpawn + Vector(0, 0, 20))
         end
 
         local maxDist = 0
@@ -165,7 +164,6 @@ function EVENT:Begin()
         for _, ply in ipairs(alivePlys) do
             local pos = ply:GetPos()
             local dist = pos:DistToSqr(REDSpawn)
-            ply:SetPos(pos + Vector(0, 0, 20))
 
             if dist > maxDist then
                 maxDist = dist
