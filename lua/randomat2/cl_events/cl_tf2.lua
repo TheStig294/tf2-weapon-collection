@@ -224,6 +224,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
             timer.Remove("TF2RandomatIntroFadeInBegin")
             timer.Remove("TF2RandomatIntroFadeIn")
             hook.Remove("PlayerButtonDown", "TF2RandomatMusicMuteButton")
+            hook.Remove("TTTTargetIDPlayerBlockIcon", "TF2RandomatBlockOverheadIcons")
             hook.Remove("TTTPrepareRound", "TF2RandomatReset")
         end)
     end
