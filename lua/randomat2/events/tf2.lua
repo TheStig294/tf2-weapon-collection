@@ -11,11 +11,19 @@ local capturesToWin = CreateConVar("randomat_tf2_captures_to_win", 2, FCVAR_NONE
 local respawnSecs = CreateConVar("randomat_tf2_respawn_seconds", 15, FCVAR_NONE, "Seconds to wait until respawning", 1, 60)
 local playMusic = CreateConVar("randomat_tf2_play_music", 1, FCVAR_NONE, "Play music during the event", 0, 1)
 local hasteModeCvar
+local traitorOutlineCvar
+local detectiveOutlineCvar
 
 function EVENT:Begin()
     local hasteMode = GetConVar("ttt_haste")
     hasteModeCvar = hasteMode:GetBool()
     hasteMode:SetBool(false)
+    local traitorOutlines = GetConVar("ttt_traitors_vision_enabled")
+    traitorOutlineCvar = traitorOutlines:GetBool()
+    traitorOutlines:SetBool(false)
+    local detectiveOutlines = GetConVar("ttt_detectives_glow_enabled")
+    detectiveOutlineCvar = detectiveOutlines:GetBool()
+    detectiveOutlines:SetBool(false)
     local REDSpawn, BLUSpawn
     local REDIntel = ents.Create("ttt_tf2_intelligence")
     REDIntel.BlockCapture = true
@@ -248,6 +256,14 @@ end
 function EVENT:End()
     if hasteModeCvar then
         GetConVar("ttt_haste"):SetBool(hasteModeCvar)
+    end
+
+    if traitorOutlineCvar then
+        GetConVar("ttt_traitors_vision_enabled"):SetBool(traitorOutlineCvar)
+    end
+
+    if detectiveOutlineCvar then
+        GetConVar("ttt_detectives_glow_enabled"):SetBool(detectiveOutlineCvar)
     end
 
     for _, ply in player.Iterator() do

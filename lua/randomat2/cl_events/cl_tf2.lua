@@ -67,6 +67,22 @@ net.Receive("TF2RandomatRespawnTimer", function()
                         draw.WordBox(8, (ScrW() / 2) + 50, 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     end)
                 end
+
+                local clientTeam = client:GetNWString("TF2RandomatTeam", "")
+                local BLUColour = Color(0, 255, 255)
+                local REDColour = Color(255, 0, 0)
+
+                hook.Add("PreDrawHalos", "TF2RandomatTeamOutlines", function()
+                    local teamPlayers = {}
+
+                    for _, ply in player.Iterator() do
+                        if ply:GetNWString("TF2RandomatTeam", "") == clientTeam then
+                            table.insert(teamPlayers, ply)
+                        end
+                    end
+
+                    halo.Add(teamPlayers, clientTeam == "RED" and REDColour or BLUColour, 1, 1, 1, true, true)
+                end)
             end
         end
     end)

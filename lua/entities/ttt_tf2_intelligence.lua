@@ -11,7 +11,7 @@ ENT.BlockCapture = false
 ENT.BaseEnt = NULL
 ENT.BasePosOffset = Vector(0, 0, 40)
 ENT.NextNearPlayerCheck = 0
-ENT.NearPlayerCheckDelay = 1
+ENT.NearPlayerCheckDelay = 0.1
 ENT.NearPlayerCheckDistance = 100
 ENT.NearPlayerCheckDistanceSquared = ENT.NearPlayerCheckDistance * ENT.NearPlayerCheckDistance
 
@@ -127,30 +127,15 @@ function ENT:Initialize()
                 colour = BLUColour
             end
 
-            local heldPlayer
-
-            for _, ply in player.Iterator() do
-                local intelEnt = ply:GetNWEntity("TF2Intelligence")
-
-                if IsValid(intelEnt) and intelEnt == self then
-                    heldPlayer = ply
-                    break
-                end
-            end
-
             local droppedBLUIntel = GetGlobalEntity("TF2IntelligenceDroppedBLU")
             local droppedREDIntel = GetGlobalEntity("TF2IntelligenceDroppedRED")
-
-            if IsValid(droppedREDIntel) then
-                table.insert(haloEnts, droppedREDIntel)
-            end
 
             if IsValid(droppedBLUIntel) then
                 table.insert(haloEnts, droppedBLUIntel)
             end
 
-            if IsValid(heldPlayer) then
-                table.insert(haloEnts, heldPlayer)
+            if IsValid(droppedREDIntel) then
+                table.insert(haloEnts, droppedREDIntel)
             end
 
             halo.Add(haloEnts, colour, 1, 1, 3, true, true)
@@ -173,9 +158,27 @@ function ENT:SetBLU(setBLU)
 end
 
 function ENT:Think()
-    if CLIENT and CurTime() > self.NextSpin then
-        self.NextSpin = CurTime() + self.SpinDelay
-        self:SetAngles(self:GetAngles() + self.SpinAngles)
+    if CLIENT then
+        if CurTime() > self.NextSpin then
+            self.NextSpin = CurTime() + self.SpinDelay
+            self:SetAngles(self:GetAngles() + self.SpinAngles)
+        end
+
+        for _, ply in player.Iterator() do
+            local intelEnt = ply:GetNWEntity("TF2Intelligence")
+            local clientEnt = ply.ClientTF2IntelEnt
+
+            if IsValid(intelEnt) and not IsValid(clientEnt) then
+                clientEnt = ClientsideModel(intelEnt:GetModel(), RENDERGROUP_BOTH)
+                clientEnt:SetPos(Vector(0, 0, 40))
+                clientEnt:SetMoveParent(clientEnt)
+                clientEnt:Spawn()
+                clientEnt:SetRenderMode(RENDERMODE_TRANSCOLOR)
+                clientEnt:SetColor(Color(255, 255, 255, 100))
+            elseif IsValid(clientEnt) and not IsValid(intelEnt) then
+                clientEnt:Remove()
+            end
+        end
     end
 
     if SERVER and CurTime() > self.NextNearPlayerCheck then
