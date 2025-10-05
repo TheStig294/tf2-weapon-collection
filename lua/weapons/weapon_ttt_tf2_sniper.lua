@@ -63,7 +63,6 @@ SWEP.ScopedLaserAlpha = 0
 SWEP.ScopedAlpha = 0
 SWEP.MouseSensitivity = 1
 SWEP.HasScoped = false
-SWEP.ChargeHudOffset = 10
 SWEP.RedDotSprite = nil
 SWEP.AllowDrop = true
 
@@ -126,7 +125,7 @@ function SWEP:DrawHUD()
             text = "Damage: " .. math.Round((self.Primary.Damage / self.Primary.FullChargeDamage) * 100) .. "%"
         end
 
-        draw.SimpleText(text, "TF2Font", ScrW() / 2, self.ChargeHudOffset, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        draw.WordBox(8, ScrW() / 2, ScrH() / 12, text, "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
     else
         return self.BaseClass.DrawHUD(self)
     end
