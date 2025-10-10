@@ -54,9 +54,9 @@ net.Receive("TF2RandomatRespawnTimer", function()
                         status = "AT BASE"
 
                         if isBLUIntel then
-                            BLUIntelCaptures = BLUIntelCaptures + 1
-                        else
                             REDIntelCaptures = REDIntelCaptures + 1
+                        else
+                            BLUIntelCaptures = BLUIntelCaptures + 1
                         end
                     end
 
@@ -68,7 +68,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
                 end)
 
                 hook.Add("HUDPaint", "TF2RandomatScoreHUD", function()
-                    draw.WordBox(8, ScrW() / 2, TTT2 and (ScrH() / 11) or 65, "Capture the flag " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.WordBox(8, ScrW() / 2, TTT2 and (ScrH() / 11) or 65, "Bring the enemy intel briefcase to your base " .. capturesToWin .. " times to win", "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     draw.WordBox(8, (ScrW() / 2) - 50, TTT2 and (ScrH() / 8) or 105, "RED: " .. REDIntelCaptures, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     draw.WordBox(8, (ScrW() / 2) - 350, TTT2 and (ScrH() / 8) or 105, "RED intel is: " .. REDIntelStatus, "TF2Font", COLOR_RED, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                     draw.WordBox(8, (ScrW() / 2) + 50, TTT2 and (ScrH() / 8) or 105, "BLU: " .. BLUIntelCaptures, "TF2Font", COLOR_BLUE, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -109,7 +109,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
         local alignment = TEXT_ALIGN_LEFT
 
         if isEventBegin then
-            message = "Capture The Flag begins in " .. respawnTime .. " seconds..."
+            message = "Steal the briefcase from the enemy team's base, and return it to your base!"
             xPos = ScrW() / 2
             yPos = 50
             alignment = TEXT_ALIGN_CENTER
