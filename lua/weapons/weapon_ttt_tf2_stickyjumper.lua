@@ -40,7 +40,7 @@ end
 
 SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/sticky_jumper_shoot.wav")
-SWEP.Primary.Damage = 90
+SWEP.Primary.Damage = engine.ActiveGamemode() == "terrortown" and 90 or 0
 SWEP.Primary.ClipSize = 8
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 32 or 9999
 SWEP.Primary.Spread = 0.05
@@ -136,6 +136,7 @@ function SWEP:PrimaryAttack()
         ent.SelfDamage = false
         ent.ExplodeSound = "weapons/sticky_jumper_explode1.wav"
         ent.DamageForce = self.Primary.Force
+        ent:SetStickyJumper(true)
         ent:Spawn()
 
         if ent.SetPAPCamo then

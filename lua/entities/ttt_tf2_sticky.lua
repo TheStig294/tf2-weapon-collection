@@ -8,12 +8,17 @@ ENT.SelfDamage = true
 ENT.ExplodeSound = "weapons/rocket_explosion.wav"
 ENT.DamageForce = 1
 
-function ENT:Draw()
-    self:DrawModel()
+function ENT:SetupDataTables()
+    self:NetworkVar("Bool", "StickyJumper")
 end
 
 function ENT:Initialize()
-    self:SetModel("models/weapons/w_models/w_stickybomb.mdl")
+    if self:GetStickyJumper() then
+        self:SetModel("models/weapons/w_models/w_stickybomb2.mdl")
+    else
+        self:SetModel("models/weapons/w_models/w_stickybomb.mdl")
+    end
+
     self:SetMoveType(MOVETYPE_VPHYSICS)
     self:SetSolid(SOLID_VPHYSICS)
     self:PhysicsInit(SOLID_VPHYSICS)

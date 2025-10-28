@@ -152,6 +152,7 @@ function SWEP:ShootStickyBomb()
 		ent:SetAngles(owner:EyeAngles())
 		ent.Damage = self.Primary.Damage
 		ent.DamageForce = self.Primary.Force
+		ent:SetStickyJumper(false)
 		ent:Spawn()
 		local phys = ent:GetPhysicsObject()
 
