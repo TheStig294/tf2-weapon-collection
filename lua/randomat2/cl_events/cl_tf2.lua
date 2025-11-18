@@ -81,16 +81,20 @@ net.Receive("TF2RandomatRespawnTimer", function()
 
                 hook.Add("PreDrawHalos", "TF2RandomatTeamOutlines", function()
                     local teamPlayers = {}
+                    local enemyPlayers = {}
 
                     for _, ply in player.Iterator() do
                         if not ply:Alive() or ply:IsSpec() then continue end
 
                         if ply:GetNWString("TF2RandomatTeam", "") == clientTeam or ply:GetNWBool("disguised") then
                             table.insert(teamPlayers, ply)
+                        else
+                            table.insert(enemyPlayers, ply)
                         end
                     end
 
                     halo.Add(teamPlayers, clientTeam == "RED" and REDColour or BLUColour, 1, 1, 3, true, true)
+                    halo.Add(enemyPlayers, clientTeam == "RED" and BLUColour or REDColour, 1, 1, 3, true, true)
                 end)
             end
         end
@@ -217,6 +221,7 @@ net.Receive("TF2RandomatRespawnTimer", function()
         hook.Add("TTTPrepareRound", "TF2RandomatReset", function()
             timer.Remove("TF2RandomatRespawnTimer")
             hook.Remove("HUDPaint", "TF2RandomatScoreHUD")
+            hook.Remove("PreDrawHalos", "TF2RandomatTeamOutlines")
             hook.Remove("PostDrawHUD", "TF2RandomatRespawnTimerHUD")
             hook.Remove("TTTScoringWinTitleOverride", "TF2RandomatWinTitle")
             hook.Remove("RenderScreenspaceEffects", "TF2RandomatIntroGreyscale")
