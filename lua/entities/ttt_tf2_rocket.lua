@@ -31,7 +31,7 @@ end
 
 function ENT:Explode()
     self.StopExp = true
-    self:EmitSound("weapons/rocket_explosion.wav", 100, math.random(75, 125))
+    self:EmitSound("weapons/rocket_explosion.wav", 75, math.random(75, 125))
     -- Create explosion effect
     local effect = EffectData()
     effect:SetOrigin(self:GetPos())

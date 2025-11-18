@@ -13,12 +13,7 @@ function UPGRADE:Apply(SWEP)
         local inflictor = dmg:GetInflictor()
         if not self:IsValidUpgrade(inflictor) or inflictor.Primary.Damage < inflictor.Primary.FullChargeDamage then return end
         dmg:SetDamage(10000)
-        local attacker = dmg:GetAttacker()
-
-        if IsValid(attacker) then
-            attacker:EmitSound("player/crit_hit.wav")
-        end
-
+        inflictor:EmitSound("player/crit_hit.wav")
         if CLIENT then return end
 
         timer.Simple(0.1, function()

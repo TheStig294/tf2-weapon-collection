@@ -51,7 +51,7 @@ function ENT:OnRemove()
     local effect = EffectData()
     effect:SetOrigin(self:GetPos())
     util.Effect("HelicopterMegaBomb", effect, true, true)
-    self:EmitSound("weapons/rocket_explosion.wav", 100, math.random(75, 125))
+    self:EmitSound("weapons/rocket_explosion.wav", 75, math.random(75, 125))
 
     if SERVER then
         local inflictor = self.Weapon

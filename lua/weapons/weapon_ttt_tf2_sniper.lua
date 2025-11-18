@@ -255,10 +255,7 @@ function SWEP:PrimaryAttack()
     bullet.AmmoType = self.Primary.Ammo
     bullet.Inflictor = self
     owner:FireBullets(bullet)
-
-    if SERVER then
-        owner:EmitSound(self.Primary.Sound, 94, 100, 1, CHAN_WEAPON)
-    end
+    self:EmitSound(self.Primary.Sound)
 
     if (game.SinglePlayer() and SERVER) or ((not game.SinglePlayer()) and CLIENT and IsFirstTimePredicted()) then
         local recoil = self:GetScoped() and (self.Primary.Recoil * 0.6) or self.Primary.Recoil
@@ -284,10 +281,7 @@ function SWEP:SecondaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.HasScoped = true
     self:SetScope(not self:GetScoped())
-
-    if CLIENT then
-        self:EmitSound(self.Secondary.Sound)
-    end
+    self:EmitSound(self.Secondary.Sound)
 end
 
 function SWEP:OwnerIsSniper()
@@ -305,8 +299,8 @@ function SWEP:Think()
             self.Primary.Damage = Lerp((CurTime() - self.DamageTimerStart) / (self.DamageTimerEnd - self.DamageTimerStart), self.Primary.DamageOG, self.Primary.FullChargeDamage)
         end
 
-        if CLIENT and self.DamageTimerEnd < CurTime() + 0.025 and self.DamageTimerEnd > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
-            owner:EmitSound("player/recharged.wav", SNDLVL_75dB, PITCH_NORM, VOL_NORM, CHAN_STATIC)
+        if self.DamageTimerEnd < CurTime() + 0.025 and self.DamageTimerEnd > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
+            self:EmitSound("player/recharged.wav")
         end
 
         -- The Sniper custom role always deals max damage with the sniper rifle

@@ -134,14 +134,11 @@ function SWEP:Holster()
     self:SetIdle(false)
     self:SetIdleTimer(CurTime())
     if not IsValid(owner) then return end
+    self:StopSound(self.Primary.Sound)
+    self:StopSound("weapons/tomislav_wind_up.wav")
 
-    if SERVER then
-        owner:StopSound(self.Primary.Sound)
-        owner:StopSound("weapons/tomislav_wind_up.wav")
-
-        if not CR_VERSION then
-            owner:SetLaggedMovementValue(1)
-        end
+    if SERVER and not CR_VERSION then
+        owner:SetLaggedMovementValue(1)
     end
 
     return self.BaseClass.Holster(self)
@@ -172,10 +169,7 @@ function SWEP:PrimaryAttack()
     if not IsValid(vm) then return end
 
     if self:GetSpin() == SPIN_OFF and self:GetSpinTimer() <= CurTime() and owner:KeyDown(IN_ATTACK) and self:Clip1() > 0 then
-        if SERVER then
-            owner:EmitSound("weapons/tomislav_wind_up.wav")
-        end
-
+        self:EmitSound("weapons/tomislav_wind_up.wav")
         vm:SendViewModelMatchingSequence(vm:LookupSequence("m_spool_up"))
         self:SetSpin(SPIN_UP)
         self:SetSpinTimer(CurTime() + 0.9)
@@ -197,10 +191,7 @@ function SWEP:PrimaryAttack()
     owner:FireBullets(bullet)
 
     if not self:GetShootSound() then
-        if SERVER then
-            owner:EmitSound(self.Primary.Sound)
-        end
-
+        self:EmitSound(self.Primary.Sound)
         self:SetShootSound(true)
     end
 
@@ -221,10 +212,7 @@ function SWEP:SecondaryAttack()
     if not IsValid(vm) then return end
 
     if self:GetSpin() == SPIN_OFF and self:GetSpinTimer() <= CurTime() and owner:KeyDown(IN_ATTACK2) and self:Clip1() > 0 then
-        if SERVER then
-            owner:EmitSound("weapons/tomislav_wind_up.wav")
-        end
-
+        self:EmitSound("weapons/tomislav_wind_up.wav")
         vm:SendViewModelMatchingSequence(vm:LookupSequence("m_spool_up"))
         self:SetSpin(SPIN_UP)
         self:SetSpinTimer(CurTime() + 0.9)
@@ -264,20 +252,14 @@ function SWEP:Think()
     end
 
     if not owner:KeyDown(IN_ATTACK) then
-        if SERVER then
-            owner:StopSound(self.Primary.Sound)
-            owner:StopSound("Weapon_Minigun.ClipEmpty")
-        end
-
+        self:StopSound(self.Primary.Sound)
+        self:StopSound("Weapon_Minigun.ClipEmpty")
         self:SetShootSound(false)
     end
 
     if self:GetSpin() == SPIN_SHOOT and ((not owner:KeyDown(IN_ATTACK) and not owner:KeyDown(IN_ATTACK2)) or self:Clip1() <= 0) then
-        if SERVER then
-            owner:StopSound(self.Primary.Sound)
-            owner:EmitSound("weapons/tomislav_wind_down.wav")
-        end
-
+        self:StopSound(self.Primary.Sound)
+        self:EmitSound("weapons/tomislav_wind_down.wav")
         vm:SendViewModelMatchingSequence(vm:LookupSequence("m_spool_down"))
         self:SetShootSound(false)
         self:SetSpin(SPIN_OFF)
@@ -287,12 +269,10 @@ function SWEP:Think()
     end
 
     if not self:GetIdle() and self:GetIdleTimer() <= CurTime() then
-        if SERVER then
-            if self:GetSpin() == SPIN_OFF then
-                vm:SendViewModelMatchingSequence(vm:LookupSequence("m_idle"))
-            else
-                vm:SendViewModelMatchingSequence(vm:LookupSequence("m_spool_idle"))
-            end
+        if self:GetSpin() == SPIN_OFF then
+            vm:SendViewModelMatchingSequence(vm:LookupSequence("m_idle"))
+        else
+            vm:SendViewModelMatchingSequence(vm:LookupSequence("m_spool_idle"))
         end
 
         self:SetIdle(true)

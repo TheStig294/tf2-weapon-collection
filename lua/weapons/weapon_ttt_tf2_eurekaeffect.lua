@@ -82,11 +82,7 @@ function SWEP:Teleport()
     if self:Clip1() <= 0 then return end
     self:TakePrimaryAmmo(1)
     owner:AnimRestartGesture(GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GMOD_TAUNT_CHEER, true)
-
-    if SERVER then
-        owner:EmitSound("weapons/drg_wrench_teleport.wav")
-    end
-
+    self:EmitSound("weapons/drg_wrench_teleport.wav")
     self.IsTeleporting = true
     local thirdPersonHookName = "TF2EurekaEffectThirdPerson" .. self:EntIndex()
 

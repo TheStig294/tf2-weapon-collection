@@ -14,13 +14,11 @@ function UPGRADE:Apply(SWEP)
 
     self:AddHook("EntityTakeDamage", function(ent, dmg)
         if not IsValid(ent) or IsValid(ent:GetGroundEntity()) or ent:GetGroundEntity():IsWorld() then return end
-        local attacker = dmg:GetAttacker()
-        if not IsValid(attacker) then return end
         local inflictor = dmg:GetInflictor()
 
         if self:IsValidUpgrade(inflictor) then
             dmg:SetDamage(10000)
-            attacker:EmitSound("weapons/reserve_shooter_0" .. math.random(4) .. "_crit.wav")
+            inflictor:EmitSound("weapons/reserve_shooter_0" .. math.random(4) .. "_crit.wav")
         end
     end)
 end

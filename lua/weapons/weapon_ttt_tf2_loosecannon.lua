@@ -172,6 +172,10 @@ function SWEP:Overcharge()
     util.Effect("HelicopterMegaBomb", effect, true, true)
     util.BlastDamage(self, owner, self:GetPos(), self.Primary.Radius, self.Primary.ExplosionDamage)
     self:StopParticles()
+
+    if SERVER then
+        owner:PrintMessage(HUD_PRINTCENTER, "Overcharged! Let go before 100% charge!")
+    end
 end
 
 function SWEP:FireCannon()
@@ -271,7 +275,7 @@ end
 if CLIENT then
     if not game.SinglePlayer() then
         function SWEP:DrawHUD()
-            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.Round(self.ChargeMult / 2 * 100, 0) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
+            draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.SnapTo(self.ChargeMult / 2 * 100, 10) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
         end
     end
 

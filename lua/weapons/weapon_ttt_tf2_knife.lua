@@ -162,13 +162,13 @@ function SWEP:PrimaryAttack()
 			end)
 		end
 
-		if SERVER and tr.Hit then
+		if tr.Hit then
 			if tr.Entity:IsPlayer() or tr.Entity:IsNPC() then
-				owner:EmitSound("Weapon_Knife.HitFlesh")
+				self:EmitSound("Weapon_Knife.HitFlesh")
 			end
 
 			if not (tr.Entity:IsPlayer() or tr.Entity:IsNPC()) then
-				owner:EmitSound("Weapon_Knife.HitWorld")
+				self:EmitSound("Weapon_Knife.HitWorld")
 			end
 
 			self.Attack = 2

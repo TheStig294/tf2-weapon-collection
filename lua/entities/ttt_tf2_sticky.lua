@@ -64,10 +64,10 @@ function ENT:OnRemove()
     if SERVER then
         if self.NoDamage then
             util.Effect("Sparks", effect, true, true)
-            self:EmitSound("ambient/energy/spark1.wav", 100, math.random(75, 125))
+            self:EmitSound("ambient/energy/spark1.wav", 75, math.random(75, 125))
         else
             util.Effect("HelicopterMegaBomb", effect, true, true)
-            self:EmitSound(self.ExplodeSound, 100, math.random(75, 125))
+            self:EmitSound(self.ExplodeSound, 75, math.random(75, 125))
             local inflictor = self.Weapon
 
             if not IsValid(inflictor) then

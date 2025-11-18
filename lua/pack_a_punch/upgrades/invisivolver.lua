@@ -19,7 +19,7 @@ function UPGRADE:Apply(SWEP)
         attacker.TF2InvisivolverTime = invisTime + 10
         attacker:SetMaterial("models/player/spy/cloak_3")
         inflictor:SetMaterial("models/player/spy/cloak_3")
-        attacker:EmitSound("player/spy_cloak.wav")
+        inflictor:EmitSound("player/spy_cloak.wav")
         net.Start("TF2InvisivolverInvisible")
         net.WriteUInt(attacker.TF2InvisivolverTime, 8)
         net.Send(attacker)
@@ -34,7 +34,7 @@ function UPGRADE:Apply(SWEP)
 
             if timer.RepsLeft(timername) == 0 then
                 attacker:SetMaterial("")
-                attacker:EmitSound("player/spy_uncloak.wav")
+                inflictor:EmitSound("player/spy_uncloak.wav")
                 local wep = attacker:GetActiveWeapon()
 
                 if IsValid(wep) and wep:GetMaterial() == "models/player/spy/cloak_3" then

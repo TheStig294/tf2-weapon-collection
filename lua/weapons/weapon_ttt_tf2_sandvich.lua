@@ -70,7 +70,10 @@ function SWEP:ActivateSandvich(ply)
         ply:SetHealth(ply:GetMaxHealth())
     end
 
-    self:EmitSound("player/heavy/sandvich" .. math.random(12) .. ".wav")
+    if SERVER then
+        ply:EmitSound("player/heavy/sandvich" .. math.random(12) .. ".wav")
+    end
+
     local timername = "TF2Sandvich" .. ply:SteamID64()
 
     timer.Create(timername, 1, self.Duration, function()

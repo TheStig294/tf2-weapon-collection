@@ -138,18 +138,14 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:Reload()
-    if self:Ammo1() <= 0 then return end
+    if self:Ammo1() <= 0 or self.Reloading == 1 or self:Clip1() >= self.Primary.ClipSize then return end
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
     local vm = owner:GetViewModel()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("ss_reload"))
     owner:SetAnimation(PLAYER_RELOAD)
-
-    if SERVER then
-        owner:EmitSound("weapons/short_stop_reload.wav")
-    end
-
+    self:EmitSound("weapons/short_stop_reload.wav")
     self:SetNextPrimaryFire(CurTime() + vm:SequenceDuration())
     self:SetNextSecondaryFire(CurTime() + vm:SequenceDuration())
     self.Reloading = 1

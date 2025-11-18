@@ -130,7 +130,7 @@ function SWEP:Explode()
         attacker = self
     end
 
-    attacker:EmitSound("weapons/rocket_explosion.wav")
+    self:EmitSound("weapons/rocket_explosion.wav", 75, math.random(75, 125))
     local effect = EffectData()
     effect:SetOrigin(self:GetPos())
     util.Effect("HelicopterMegaBomb", effect, true, true)

@@ -211,10 +211,7 @@ function SWEP:PrimaryAttack()
     if self.UsedUber and self:Clip1() <= 0 then
         self:SetNextPrimaryFire(CurTime() + self.Primary.NoTargetDelay)
         self:SetNextSecondaryFire(CurTime() + self.Primary.NoTargetDelay)
-
-        if CLIENT then
-            self:EmitSound("WeaponMedigun.NoTarget")
-        end
+        self:EmitSound("WeaponMedigun.NoTarget")
 
         return
     end
@@ -242,10 +239,7 @@ function SWEP:PrimaryAttack()
 
     if not self.Attack then
         if self:IsTargetBehindWall(true) or not (tr.Hit and IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer())) or tr.Entity:Health() <= 0 then
-            if CLIENT then
-                self:EmitSound("WeaponMedigun.NoTarget")
-            end
-
+            self:EmitSound("WeaponMedigun.NoTarget")
             self:SetNextPrimaryFire(CurTime() + self.Primary.NoTargetDelay)
             self:SetNextSecondaryFire(CurTime() + self.Primary.NoTargetDelay)
         else
@@ -297,11 +291,7 @@ function SWEP:SecondaryAttack()
     if self:Clip1() <= 0 and not self.Uber then
         self:SetClip1(self:GetMaxClip1())
         self.UsedUber = true
-
-        if SERVER then
-            owner:EmitSound(self.Secondary.Sound)
-        end
-
+        self:EmitSound(self.Secondary.Sound)
         self:SetInvulnerable(owner, true)
 
         if self.Attack then
