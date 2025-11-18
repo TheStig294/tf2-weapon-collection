@@ -37,8 +37,8 @@ if CLIENT then
     SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
-SWEP.ScopedTimerStart = 0
-SWEP.ScopedTimerEnd = 0
+SWEP.DamageTimerStart = 0
+SWEP.DamageTimerEnd = 0
 SWEP.Idle = false
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("weapons/sniper_shoot.wav")
@@ -48,18 +48,19 @@ SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "SniperRound"
 SWEP.Primary.Damage = 50
 SWEP.Primary.FullChargeDamage = 80
-SWEP.DamageChargeSecs = 3
+SWEP.DamageTimerLength = 3
 SWEP.Primary.DamageOG = SWEP.Primary.Damage
 SWEP.Primary.Spread = 0
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.NumberofShots = 1
 SWEP.Primary.Delay = 1.5
 SWEP.Primary.Force = 1
+SWEP.Primary.Recoil = 4
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
-SWEP.Secondary.Delay = 0.5
+SWEP.Secondary.Delay = 0.1
 SWEP.Secondary.Sound = Sound("Default.Zoom")
 SWEP.MouseSensitivity = 1
 SWEP.HasScoped = false
@@ -145,8 +146,8 @@ function SWEP:SetScope(doScope)
     self:SetScoped(doScope)
 
     if doScope then
-        self.ScopedTimerStart = CurTime()
-        self.ScopedTimerEnd = self.ScopedTimerStart + self.DamageChargeSecs
+        self.DamageTimerStart = CurTime()
+        self.DamageTimerEnd = self.DamageTimerStart + self.DamageTimerLength
         self.MouseSensitivity = 0.2
         self.AllowDrop = false
 
@@ -158,8 +159,8 @@ function SWEP:SetScope(doScope)
             owner:SetFOV(owner:GetFOV() / 5, 0.1)
         end
     else
-        self.ScopedTimerStart = 0
-        self.ScopedTimerEnd = CurTime()
+        self.DamageTimerStart = 0
+        self.DamageTimerEnd = CurTime()
         self.MouseSensitivity = 1
         self.AllowDrop = true
 
@@ -246,27 +247,23 @@ function SWEP:PrimaryAttack()
         owner:EmitSound(self.Primary.Sound, 94, 100, 1, CHAN_WEAPON)
     end
 
-    self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    if not self:GetScoped() then
+        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    end
+
     owner:SetAnimation(PLAYER_ATTACK1)
     owner:MuzzleFlash()
     self:TakePrimaryAmmo(self.Primary.TakeAmmo)
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self:SetNextSecondaryFire(CurTime() + self.Primary.Delay)
-    local shootAnimationLength = vm:SequenceDuration()
-    self.Idle = false
-    self.IdleTimer = CurTime() + shootAnimationLength
+    self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
+    self.DamageTimerStart = CurTime()
+    self.DamageTimerEnd = self.DamageTimerStart + self.DamageTimerLength
 
-    if self:GetScoped() then
-        self:SetScope(false)
-
-        timer.Simple(shootAnimationLength, function()
-            if not IsValid(self) or not IsValid(owner) or not self.HasScoped then return end
-            local activeWep = owner:GetActiveWeapon()
-
-            if IsValid(activeWep) and activeWep == self then
-                self:SetScope(true)
-            end
-        end)
+    if (game.SinglePlayer() and SERVER) or ((not game.SinglePlayer()) and CLIENT and IsFirstTimePredicted()) then
+        local recoil = self:GetScoped() and (self.Primary.Recoil * 0.6) or self.Primary.Recoil
+        local eyeang = owner:EyeAngles()
+        eyeang.pitch = eyeang.pitch - recoil
+        self:GetOwner():SetEyeAngles(eyeang)
     end
 end
 
@@ -293,16 +290,16 @@ function SWEP:Think()
     local owner = self:GetOwner()
 
     if self:GetScoped() then
-        if self.ScopedTimerEnd > CurTime() then
-            self.Primary.Damage = Lerp((CurTime() - self.ScopedTimerStart) / (self.ScopedTimerEnd - self.ScopedTimerStart), self.Primary.DamageOG, self.Primary.FullChargeDamage)
+        if self.DamageTimerEnd > CurTime() then
+            self.Primary.Damage = Lerp((CurTime() - self.DamageTimerStart) / (self.DamageTimerEnd - self.DamageTimerStart), self.Primary.DamageOG, self.Primary.FullChargeDamage)
         end
 
-        if CLIENT and self.ScopedTimerEnd < CurTime() + 0.025 and self.ScopedTimerEnd > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
+        if CLIENT and self.DamageTimerEnd < CurTime() + 0.025 and self.DamageTimerEnd > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
             owner:EmitSound("player/recharged.wav", SNDLVL_75dB, PITCH_NORM, VOL_NORM, CHAN_STATIC)
         end
 
         -- The Sniper custom role always deals max damage with the sniper rifle
-        if self.ScopedTimerEnd <= CurTime() or self:OwnerIsSniper() then
+        if self.DamageTimerEnd <= CurTime() or self:OwnerIsSniper() then
             self.Primary.Damage = self.Primary.FullChargeDamage
         end
     else
