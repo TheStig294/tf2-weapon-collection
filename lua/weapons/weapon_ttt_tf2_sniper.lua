@@ -62,10 +62,11 @@ SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 0.1
 SWEP.Secondary.Sound = Sound("Default.Zoom")
+SWEP.AllowDrop = true
 SWEP.MouseSensitivity = 1
 SWEP.HasScoped = false
 SWEP.RedDotSprite = nil
-SWEP.AllowDrop = true
+SWEP.RedDotSpriteMaterial = Material("sprites/redglow1.vmt")
 
 function SWEP:Initialize()
     TF2WC:SandboxSetup(self)
@@ -73,18 +74,20 @@ function SWEP:Initialize()
 
     if SERVER then
         self.RedDotSprite = ents.Create("env_sprite")
-        self.RedDotSprite:SetKeyValue("model", "sprites/laserdot.vmt")
+        self.RedDotSprite:SetKeyValue("model", "sprites/redglow1.vmt")
         self.RedDotSprite:SetKeyValue("rendermode", "9")
         self.RedDotSprite:SetKeyValue("scale", "0.25")
         self.RedDotSprite:Spawn()
         self.RedDotSprite:Fire("HideSprite")
+        self:SetRedDotSprite(self.RedDotSprite)
     end
 
     return self.BaseClass.Initialize(self)
 end
 
 function SWEP:SetupDataTables()
-    self:NetworkVar("Bool", 0, "Scoped")
+    self:NetworkVar("Bool", "Scoped")
+    self:NetworkVar("Entity", "RedDotSprite")
 end
 
 function SWEP:DrawHUD()
@@ -127,6 +130,10 @@ function SWEP:DrawHUD()
         end
 
         draw.WordBox(8, ScrW() / 2, ScrH() / 12, text, "TF2Font", color_black, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        cam.Start3D()
+        render.SetMaterial(self.RedDotSpriteMaterial)
+        render.DrawSprite(owner:GetEyeTrace().HitPos, 16, 16, color_white)
+        cam.End3D()
     else
         return self.BaseClass.DrawHUD(self)
     end
@@ -153,6 +160,12 @@ function SWEP:SetScope(doScope)
 
         if SERVER then
             self.RedDotSprite:Fire("ShowSprite")
+        else
+            local sprite = self:GetRedDotSprite()
+
+            if IsValid(sprite) then
+                sprite:SetRenderMode(RENDERMODE_NONE)
+            end
         end
 
         if IsValid(owner) then
@@ -247,10 +260,15 @@ function SWEP:PrimaryAttack()
         owner:EmitSound(self.Primary.Sound, 94, 100, 1, CHAN_WEAPON)
     end
 
-    if not self:GetScoped() then
-        self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+    if (game.SinglePlayer() and SERVER) or ((not game.SinglePlayer()) and CLIENT and IsFirstTimePredicted()) then
+        local recoil = self:GetScoped() and (self.Primary.Recoil * 0.6) or self.Primary.Recoil
+        local eyeang = owner:EyeAngles()
+        eyeang.pitch = eyeang.pitch - recoil
+        self:GetOwner():SetEyeAngles(eyeang)
     end
 
+    self:SetScope(false)
+    self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
     owner:SetAnimation(PLAYER_ATTACK1)
     owner:MuzzleFlash()
     self:TakePrimaryAmmo(self.Primary.TakeAmmo)
@@ -258,13 +276,6 @@ function SWEP:PrimaryAttack()
     self:SetNextSecondaryFire(CurTime() + self.Secondary.Delay)
     self.DamageTimerStart = CurTime()
     self.DamageTimerEnd = self.DamageTimerStart + self.DamageTimerLength
-
-    if (game.SinglePlayer() and SERVER) or ((not game.SinglePlayer()) and CLIENT and IsFirstTimePredicted()) then
-        local recoil = self:GetScoped() and (self.Primary.Recoil * 0.6) or self.Primary.Recoil
-        local eyeang = owner:EyeAngles()
-        eyeang.pitch = eyeang.pitch - recoil
-        self:GetOwner():SetEyeAngles(eyeang)
-    end
 end
 
 function SWEP:SecondaryAttack()
