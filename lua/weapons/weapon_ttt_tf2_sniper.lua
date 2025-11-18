@@ -37,7 +37,8 @@ if CLIENT then
     SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
-SWEP.ScopedTimer = 0
+SWEP.ScopedTimerStart = 0
+SWEP.ScopedTimerEnd = 0
 SWEP.Idle = false
 SWEP.IdleTimer = 0
 SWEP.Primary.Sound = Sound("weapons/sniper_shoot.wav")
@@ -47,6 +48,7 @@ SWEP.Primary.Automatic = true
 SWEP.Primary.Ammo = "SniperRound"
 SWEP.Primary.Damage = 50
 SWEP.Primary.FullChargeDamage = 80
+SWEP.DamageChargeSecs = 3
 SWEP.Primary.DamageOG = SWEP.Primary.Damage
 SWEP.Primary.Spread = 0
 SWEP.Primary.TakeAmmo = 1
@@ -59,8 +61,6 @@ SWEP.Secondary.Automatic = false
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.Delay = 0.5
 SWEP.Secondary.Sound = Sound("Default.Zoom")
-SWEP.ScopedLaserAlpha = 0
-SWEP.ScopedAlpha = 0
 SWEP.MouseSensitivity = 1
 SWEP.HasScoped = false
 SWEP.RedDotSprite = nil
@@ -145,7 +145,8 @@ function SWEP:SetScope(doScope)
     self:SetScoped(doScope)
 
     if doScope then
-        self.ScopedTimer = CurTime() + 3
+        self.ScopedTimerStart = CurTime()
+        self.ScopedTimerEnd = self.ScopedTimerStart + self.DamageChargeSecs
         self.MouseSensitivity = 0.2
         self.AllowDrop = false
 
@@ -157,7 +158,8 @@ function SWEP:SetScope(doScope)
             owner:SetFOV(owner:GetFOV() / 5, 0.1)
         end
     else
-        self.ScopedTimer = CurTime()
+        self.ScopedTimerStart = 0
+        self.ScopedTimerEnd = CurTime()
         self.MouseSensitivity = 1
         self.AllowDrop = true
 
@@ -291,22 +293,17 @@ function SWEP:Think()
     local owner = self:GetOwner()
 
     if self:GetScoped() then
-        if self.ScopedTimer > CurTime() then
-            self.Primary.Damage = (1.5 / (self.ScopedTimer - CurTime() + 1.5)) * self.Primary.FullChargeDamage
-
-            if SERVER then
-                self.ScopedLaserAlpha = (1 / (self.ScopedTimer - CurTime() + 1)) * 255
-            end
+        if self.ScopedTimerEnd > CurTime() then
+            self.Primary.Damage = Lerp((CurTime() - self.ScopedTimerStart) / (self.ScopedTimerEnd - self.ScopedTimerStart), self.Primary.DamageOG, self.Primary.FullChargeDamage)
         end
 
-        if CLIENT and self.ScopedTimer < CurTime() + 0.025 and self.ScopedTimer > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
+        if CLIENT and self.ScopedTimerEnd < CurTime() + 0.025 and self.ScopedTimerEnd > CurTime() and IsValid(owner) and not self:OwnerIsSniper() then
             owner:EmitSound("player/recharged.wav", SNDLVL_75dB, PITCH_NORM, VOL_NORM, CHAN_STATIC)
         end
 
         -- The Sniper custom role always deals max damage with the sniper rifle
-        if self.ScopedTimer <= CurTime() or self:OwnerIsSniper() then
+        if self.ScopedTimerEnd <= CurTime() or self:OwnerIsSniper() then
             self.Primary.Damage = self.Primary.FullChargeDamage
-            self.ScopedLaserAlpha = 255
         end
     else
         self.Primary.Damage = self.Primary.DamageOG
