@@ -66,6 +66,8 @@ SWEP.Secondary.Delay = 0.75
 SWEP.Secondary.Force = 2500
 SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
+SWEP.Secondary.Range = 600
+SWEP.Secondary.Angle = 90
 
 function SWEP:Initialize()
     TF2WC:SandboxSetup(self)
@@ -281,31 +283,7 @@ function SWEP:SecondaryAttack()
     if not IsValid(owner) then return end
     if not self.FiresUnderwater and owner:WaterLevel() == 3 then return end
 
-    local tr = util.TraceLine({
-        start = owner:GetShootPos(),
-        endpos = owner:GetShootPos() + owner:GetAimVector() * 128,
-        filter = owner,
-        mask = MASK_SHOT_HULL,
-    })
-
-    local ent = tr.Entity
-
-    if not IsValid(ent) then
-        tr = util.TraceHull({
-            start = owner:GetShootPos(),
-            endpos = owner:GetShootPos() + owner:GetAimVector() * 128,
-            filter = owner,
-            mins = Vector(-16, -16, 0),
-            maxs = Vector(16, 16, 0),
-            mask = MASK_SHOT_HULL,
-        })
-    end
-
     if SERVER then
-        if IsValid(ent) then
-            ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 200))
-        end
-
         local blast = ents.Create("info_particle_system")
         blast:SetKeyValue("effect_name", "pyro_blast")
         blast:SetOwner(owner)
@@ -317,13 +295,19 @@ function SWEP:SecondaryAttack()
         blast:Spawn()
         blast:Activate()
         blast:Fire("start", "", 0)
-    end
 
-    if SERVER and IsValid(ent) then
-        local phys = ent:GetPhysicsObject()
+        for _, ent in ipairs(ents.FindInCone(owner:GetPos(), owner:GetAimVector():GetNormalized(), self.Secondary.Range, math.rad(self.Secondary.Angle))) do
+            if not IsValid(ent) then continue end
 
-        if IsValid(phys) then
-            phys:ApplyForceOffset(owner:GetAimVector() * 16000, tr.HitPos)
+            if ent:GetClass() == "ttt_tf2_rocket" then
+                ent:SetAngles(owner:GetAngles())
+                ent:SetVelocity(owner:GetForward() * 1100 * 2)
+            else
+                ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 200))
+                local phys = ent:GetPhysicsObject()
+                if not IsValid(phys) then continue end
+                phys:ApplyForceOffset(owner:GetAimVector() * self.Secondary.Force, ent:GetPos())
+            end
         end
     end
 
