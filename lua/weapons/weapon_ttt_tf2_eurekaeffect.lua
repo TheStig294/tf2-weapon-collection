@@ -90,7 +90,10 @@ function SWEP:Teleport()
         if not IsValid(self) or not self.IsTeleporting then return end
 
         local view = {
-            origin = pos - (angles:Forward() * 100),
+            origin = util.TraceLine({
+                start = pos,
+                endPos = pos - angles:Forward() * 100
+            }).HitPos,
             angles = angles,
             fov = fov,
             drawviewer = true,
