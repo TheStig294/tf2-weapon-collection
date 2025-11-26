@@ -86,13 +86,14 @@ function SWEP:Teleport()
     self.IsTeleporting = true
     local thirdPersonHookName = "TF2EurekaEffectThirdPerson" .. self:EntIndex()
 
-    hook.Add("CalcView", thirdPersonHookName, function(_, pos, angles, fov, znear, zfar)
+    hook.Add("CalcView", thirdPersonHookName, function(ply, pos, angles, fov, znear, zfar)
         if not IsValid(self) or not self.IsTeleporting then return end
 
         local view = {
             origin = util.TraceLine({
                 start = pos,
-                endPos = pos - angles:Forward() * 100
+                endPos = pos - angles:Forward() * 100,
+                filter = ply
             }).HitPos,
             angles = angles,
             fov = fov,
