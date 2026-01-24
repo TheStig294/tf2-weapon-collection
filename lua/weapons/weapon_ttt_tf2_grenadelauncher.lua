@@ -38,7 +38,6 @@ if CLIENT then
 	SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
-SWEP.Primary.Ammo = "Grenade"
 SWEP.Primary.Sound = Sound("weapons/grenade_launcher_shoot.wav")
 SWEP.Primary.Damage = 50
 SWEP.Primary.Radius = 140

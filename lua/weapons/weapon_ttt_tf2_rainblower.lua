@@ -49,7 +49,7 @@ SWEP.Primary.Sound = Sound("weapons/rainblower/rainblower_start.wav")
 SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.Automatic = true
-SWEP.Primary.Ammo = "AR2AltFire"
+SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 8
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.Delay = 0.08

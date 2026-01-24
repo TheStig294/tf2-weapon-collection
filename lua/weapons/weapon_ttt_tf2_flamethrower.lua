@@ -50,7 +50,7 @@ SWEP.Primary.Sound = Sound("weapons/flame_thrower_start.wav")
 SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 10000
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 10000
 SWEP.Primary.Automatic = true
-SWEP.Primary.Ammo = "AR2AltFire"
+SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 6
 SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.Delay = 0.08

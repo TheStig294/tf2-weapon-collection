@@ -49,7 +49,7 @@ SWEP.Primary.Sound = Sound("weapons/tomislav_shoot.wav")
 SWEP.Primary.ClipSize = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 200 or 9999
 SWEP.Primary.Automatic = true
-SWEP.Primary.Ammo = "AR2"
+SWEP.Primary.Ammo = "none"
 SWEP.Primary.Damage = 12
 SWEP.Primary.Spread = 0
 SWEP.Primary.TakeAmmo = 1
