@@ -22,15 +22,16 @@ local isFloor = ToDictionary(floorWeapons)
 
 hook.Add("PreRegisterSWEP", "TF2WeaponCollectionCommonConvars", function(SWEP, class)
     if not class:StartsWith("weapon_ttt_tf2_") then return end
-    SWEP.CanBuy = {}
 
     if isDetective[class] then
+        SWEP.CanBuy = {} or SWEP.CanBuy
         table.insert(SWEP.CanBuy, ROLE_DETECTIVE)
         SWEP.Kind = WEAPON_EQUIP
         SWEP.Slot = 6
     end
 
     if isTraitor[class] then
+        SWEP.CanBuy = {} or SWEP.CanBuy
         table.insert(SWEP.CanBuy, ROLE_TRAITOR)
         SWEP.Kind = WEAPON_EQUIP
         SWEP.Slot = 6
