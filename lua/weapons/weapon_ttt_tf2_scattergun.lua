@@ -43,7 +43,6 @@ SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 6
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 6 or 9999
 SWEP.Primary.Spread = 0.5
 SWEP.Primary.NumberofShots = 10

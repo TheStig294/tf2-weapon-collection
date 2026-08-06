@@ -38,7 +38,6 @@ if CLIENT then
     SWEP.Instructions = SWEP.EquipMenuData.desc
 end
 
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/sticky_jumper_shoot.wav")
 SWEP.Primary.Damage = engine.ActiveGamemode() == "terrortown" and 90 or 0
 SWEP.Primary.ClipSize = 8
@@ -130,7 +129,7 @@ function SWEP:PrimaryAttack()
         if not IsValid(ent) then return end
         ent.Weapon = self
         ent.StickyOwner = owner
-        ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 16))
+        ent:SetPos(owner:EyePos() + owner:GetAimVector() * 16)
         ent:SetAngles(owner:EyeAngles())
         ent.Damage = self.Primary.Damage
         ent.SelfDamage = false
@@ -153,7 +152,7 @@ function SWEP:PrimaryAttack()
 
         local velocity = owner:GetAimVector()
         velocity = velocity * 7000
-        velocity = velocity + (VectorRand() * 10)
+        velocity = velocity + VectorRand() * 10
         phys:ApplyForceCenter(velocity)
         table.insert(self.StickyQueue, ent)
 
@@ -236,7 +235,7 @@ if CLIENT then
         local owner = self:GetOwner()
         local spectatedPlayer = client:GetObserverTarget()
 
-        if not IsValid(owner) or (IsValid(spectatedPlayer) and spectatedPlayer == owner) then
+        if not IsValid(owner) or IsValid(spectatedPlayer) and spectatedPlayer == owner then
             self:DrawModel(flags)
 
             return

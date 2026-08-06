@@ -42,7 +42,6 @@ SWEP.Primary.Damage = 6
 SWEP.Primary.ClipSize = 2
 SWEP.Primary.Ammo = "Buckshot"
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 2 or 9999
 SWEP.Primary.Spread = 0.3
 SWEP.Primary.NumberofShots = 12
@@ -210,7 +209,7 @@ if CLIENT then
         local owner = self:GetOwner()
         local spectatedPlayer = client:GetObserverTarget()
 
-        if not IsValid(owner) or (IsValid(spectatedPlayer) and spectatedPlayer == owner) then
+        if not IsValid(owner) or IsValid(spectatedPlayer) and spectatedPlayer == owner then
             self:DrawModel(flags)
 
             return

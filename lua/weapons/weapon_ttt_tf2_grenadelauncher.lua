@@ -24,7 +24,6 @@ SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.AutoSpawnable = true
 
@@ -127,7 +126,7 @@ function SWEP:ShootGrenade()
 	if not IsValid(ent) then return end
 	ent.Weapon = self
 	ent.DamageOwner = owner
-	ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 16))
+	ent:SetPos(owner:EyePos() + owner:GetAimVector() * 16)
 	ent:SetAngles(owner:EyeAngles())
 	ent.Damage = self.Primary.Damage
 	ent.Radius = self.Primary.Radius
@@ -142,7 +141,7 @@ function SWEP:ShootGrenade()
 
 	local velocity = owner:GetAimVector()
 	velocity = velocity * 7000
-	velocity = velocity + (VectorRand() * 10)
+	velocity = velocity + VectorRand() * 10
 	phys:ApplyForceCenter(velocity)
 end
 

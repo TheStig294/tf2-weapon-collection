@@ -25,7 +25,6 @@ SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.AutoSpawnable = true
 

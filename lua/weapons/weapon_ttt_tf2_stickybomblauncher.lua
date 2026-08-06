@@ -40,7 +40,6 @@ end
 
 SWEP.CanBuy = {ROLE_DETECTIVE, ROLE_TRAITOR}
 
-SWEP.WeaponID = AMMO_SHOTGUN
 SWEP.Primary.Sound = Sound("weapons/stickybomblauncher_shoot.wav")
 SWEP.Primary.Damage = 60
 SWEP.Primary.TakeAmmo = 1
@@ -148,7 +147,7 @@ function SWEP:ShootStickyBomb()
 		if not IsValid(ent) then return end
 		ent.Weapon = self
 		ent.StickyOwner = owner
-		ent:SetPos(owner:EyePos() + (owner:GetAimVector() * 16))
+		ent:SetPos(owner:EyePos() + owner:GetAimVector() * 16)
 		ent:SetAngles(owner:EyeAngles())
 		ent.Damage = self.Primary.Damage
 		ent.DamageForce = self.Primary.Force
@@ -164,7 +163,7 @@ function SWEP:ShootStickyBomb()
 
 		local velocity = owner:GetAimVector()
 		velocity = velocity * 7000
-		velocity = velocity + (VectorRand() * 10)
+		velocity = velocity + VectorRand() * 10
 		phys:ApplyForceCenter(velocity)
 		table.insert(self.StickyQueue, ent)
 
