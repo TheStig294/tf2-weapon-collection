@@ -124,7 +124,9 @@ function EVENT:Begin()
     self:DisableRoundEndSounds()
 
     -- TTTEndRound doesn't pass the win type to clients, so we have to check on the server
-    self:AddHook("TTTEndRound", function(wintype)
+    -- self:AddHook() specifically doesn't work with TTTEndRound because the hook gets automatically removed at the same time as the hook triggering
+    -- hook.Add() is used instead, with a delayed removal in EVENT:End()
+    hook.Add("TTTEndRound", "TF2RandomatWinSound", function(wintype)
         for _, ply in player.Iterator() do
             ply:ConCommand("stopsound")
 
@@ -287,6 +289,11 @@ function EVENT:End()
     SetGlobal2Bool("TF2ClassChangerDisableMusic", nil)
     timer.Remove("TF2RandomatEventStartCountdown")
     timer.Remove("TF2RandomatRoundTimeAnnouncements")
+
+    -- Wait a second for the round end music to play
+    timer.Simple(1, function()
+        hook.Remove("TTTEndRound", "TF2RandomatWinSound")
+    end)
 end
 
 -- Don't run at the same time as other gamemode randomats, since this randomat completely changes the game
