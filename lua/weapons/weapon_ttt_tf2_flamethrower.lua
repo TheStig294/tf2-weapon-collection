@@ -65,9 +65,9 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.TakeAmmo = 20
 SWEP.Secondary.Delay = 0.75
-SWEP.Secondary.Force = 2500
+SWEP.Secondary.Force = 1000
 SWEP.Secondary.Range = 400
-SWEP.Secondary.Angle = 90
+SWEP.Secondary.Angle = 45
 
 function SWEP:Initialize()
 	TF2WC:SandboxSetup(self)
@@ -191,14 +191,15 @@ function SWEP:SecondaryAttack()
 		blast:Activate()
 		blast:Fire("start", "", 0)
 
-		for _, ent in ipairs(ents.FindInCone(owner:GetPos(), owner:GetAimVector():GetNormalized(), self.Secondary.Range, math.rad(self.Secondary.Angle))) do
+		for _, ent in ipairs(ents.FindInCone(owner:GetShootPos(), owner:GetAimVector():GetNormalized(), self.Secondary.Range, math.cos(math.rad(self.Secondary.Angle)))) do
 			if not IsValid(ent) then continue end
 
 			if ent:GetClass() == "ttt_tf2_rocket" then
 				ent:SetAngles(owner:GetAngles())
 				ent:SetVelocity(owner:GetForward() * 1100 * 2)
 			else
-				ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 200))
+				ent:SetGroundEntity(NULL)
+				ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 100))
 				local phys = ent:GetPhysicsObject()
 				if not IsValid(phys) then continue end
 				phys:ApplyForceOffset(owner:GetAimVector() * self.Secondary.Force, ent:GetPos())
