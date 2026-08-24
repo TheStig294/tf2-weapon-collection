@@ -2,27 +2,25 @@ SWEP.PrintName = "Rainblower"
 SWEP.Author = ""
 SWEP.Contact = ""
 SWEP.Purpose = ""
-SWEP.Instructions = "Sends you to Pyroland..."
+SWEP.Instructions = ""
 SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.AdminOnly = false
 SWEP.ViewModelFOV = 60
+SWEP.ViewModelFlip = false
 SWEP.ViewModel = "models/weapons/c_models/c_pyro_arms.mdl"
 SWEP.WorldModel = "models/weapons/w_models/w_flamethrower.mdl"
-SWEP.ViewModelFlip = false
 SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = false
-SWEP.ViewModelBoneMods = {}
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
 SWEP.SlotPos = 0
-SWEP.UseHands = true
+SWEP.UseHands = false
 SWEP.HoldType = "crossbow"
-SWEP.FiresUnderwater = true
+SWEP.FiresUnderwater = false
 SWEP.DrawCrosshair = false
-SWEP.DrawAmmo = false
-SWEP.ReloadSound = ""
+SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
@@ -55,7 +53,7 @@ SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.Delay = 0.08
 SWEP.Primary.Force = 100
 SWEP.Primary.AmmoLossRate = 0.1
-SWEP.Primary.Range = 600
+SWEP.Primary.Range = 700
 SWEP.Secondary.Sound = Sound("weapons/flame_thrower_airblast.wav")
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
@@ -63,11 +61,11 @@ SWEP.Secondary.Automatic = true
 SWEP.Secondary.Ammo = "none"
 SWEP.Secondary.TakeAmmo = 20
 SWEP.Secondary.Delay = 0.75
-SWEP.Secondary.Force = 2500
+SWEP.Secondary.Force = 1000
+SWEP.Secondary.Range = 400
+SWEP.Secondary.Angle = 45
 SWEP.PitchMultiplier = 1.5
 SWEP.HooksSet = false
-SWEP.Secondary.Range = 600
-SWEP.Secondary.Angle = 90
 
 function SWEP:Initialize()
     TF2WC:SandboxSetup(self)
@@ -296,14 +294,15 @@ function SWEP:SecondaryAttack()
         blast:Activate()
         blast:Fire("start", "", 0)
 
-        for _, ent in ipairs(ents.FindInCone(owner:GetPos(), owner:GetAimVector():GetNormalized(), self.Secondary.Range, math.rad(self.Secondary.Angle))) do
+        for _, ent in ipairs(ents.FindInCone(owner:GetShootPos(), owner:GetAimVector():GetNormalized(), self.Secondary.Range, math.cos(math.rad(self.Secondary.Angle)))) do
             if not IsValid(ent) then continue end
 
             if ent:GetClass() == "ttt_tf2_rocket" then
                 ent:SetAngles(owner:GetAngles())
                 ent:SetVelocity(owner:GetForward() * 1100 * 2)
             else
-                ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 200))
+                ent:SetGroundEntity(NULL)
+                ent:SetVelocity(owner:GetAimVector() * Vector(self.Secondary.Force, self.Secondary.Force, 0) + Vector(0, 0, 100))
                 local phys = ent:GetPhysicsObject()
                 if not IsValid(phys) then continue end
                 phys:ApplyForceOffset(owner:GetAimVector() * self.Secondary.Force, ent:GetPos())

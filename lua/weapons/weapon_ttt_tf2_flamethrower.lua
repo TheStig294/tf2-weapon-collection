@@ -7,10 +7,8 @@ SWEP.Category = "Team Fortress 2"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.AdminOnly = false
-SWEP.HoldType = "crossbow"
 SWEP.ViewModelFOV = 70
 SWEP.ViewModelFlip = false
-SWEP.UseHands = false
 SWEP.ViewModel = "models/weapons/v_models/v_flamethrower_pyro.mdl"
 SWEP.WorldModel = "models/weapons/w_models/w_flamethrower.mdl"
 SWEP.ShowViewModel = true
@@ -23,7 +21,6 @@ SWEP.HoldType = "crossbow"
 SWEP.FiresUnderwater = false
 SWEP.DrawCrosshair = false
 SWEP.DrawAmmo = true
-SWEP.CSMuzzleFlashes = 1
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
@@ -174,8 +171,6 @@ function SWEP:SecondaryAttack()
 	if self:Clip1() < 20 then return end
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
-	local vm = owner:GetViewModel()
-	if not IsValid(vm) then return end
 	if not self.FiresUnderwater and owner:WaterLevel() == 3 then return end
 
 	if SERVER then
@@ -208,6 +203,8 @@ function SWEP:SecondaryAttack()
 	end
 
 	self:EmitSound(self.Secondary.Sound)
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
 	owner:SetAnimation(PLAYER_ATTACK1)
 	self:TakePrimaryAmmo(self.Secondary.TakeAmmo)
