@@ -109,7 +109,7 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:OnEntHit(ent)
-    if ent:IsPlayer() and ent:Alive() and not ent:IsSpec() then
+    if ent:IsNPC() or (ent:IsPlayer() and ent:Alive() and not ent:IsSpec()) then
         self:EmitSound("weapons/bottle_hit_flesh" .. math.random(3) .. ".wav")
         self:Explode()
     elseif ent:GetClass() == "prop_ragdoll" then
