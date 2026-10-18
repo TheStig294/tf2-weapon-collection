@@ -50,9 +50,32 @@ SWEP.Primary.Range = 128
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
+local addedInitHooks = false
 
 function SWEP:Initialize()
     TF2WC:SandboxSetup(self)
+
+    -- Make NPCs killed by the golden frying pan drop a server-side ragdoll on death, and actually turn gold
+    if SERVER and not addedInitHooks then
+        hook.Add("OnNPCKilled", "TF2GoldenFryingPanNPCDeath", function(npc, _, inflictor)
+            if not IsValid(npc) or not IsValid(inflictor) or inflictor:GetClass() ~= "weapon_ttt_tf2_goldenfryingpan" then return end
+            npc.TF2GoldenFryingPanEnt = inflictor
+            npc:SetShouldServerRagdoll(true)
+        end)
+
+        hook.Add("CreateEntityRagdoll", "TF2GoldenFryingPanNPCRagdoll", function(ent, rag)
+            if not ent.TF2GoldenFryingPanEnt then return end
+
+            timer.Simple(0.1, function()
+                if not IsValid(rag) then return end
+                local wep = ent.TF2GoldenFryingPanEnt
+                if not IsValid(wep) then return end
+                wep:EntToGold(rag)
+            end)
+        end)
+
+        addedInitHooks = true
+    end
 
     return self.BaseClass.Initialize(self)
 end
@@ -94,19 +117,22 @@ function SWEP:OnEntHit(ent)
     local owner = self:GetOwner()
     if not IsValid(owner) then return end
 
+    -- Catch NPCs here because we handle them as a special case
     if ent:IsNPC() or ent:IsPlayer() then
         self:EmitSound("FryingPan.HitFlesh")
 
-        timer.Simple(0, function()
-            if ent:IsPlayer() and (not ent:Alive() or ent:IsSpec()) then
-                local rag = ent.server_ragdoll or ent:GetRagdollEntity()
-                self:EntToGold(rag)
-            end
-        end)
+        if ent:IsPlayer() then
+            timer.Simple(0, function()
+                if IsValid(ent) and (not ent:Alive() or ent:IsSpec()) then
+                    local rag = ent.server_ragdoll or ent:GetRagdollEntity()
+                    self:EntToGold(rag)
+                end
+            end)
+        end
     elseif ent:GetClass() == "prop_ragdoll" then
         self:EmitSound("FryingPan.HitFlesh")
         self:EntToGold(ent)
-    elseif not ent:IsPlayer() then
+    else
         self:EmitSound("FryingPan.HitWorld")
         self:EntToGold(ent)
     end
@@ -115,8 +141,6 @@ end
 local addedBodySearchHook = false
 
 function SWEP:EntToGold(ent)
-    local owner = self:GetOwner()
-    if not IsValid(owner) then return end
     if not IsValid(ent) or ent:GetMaterial() == "models/player/shared/gold_player" then return end
     ent:EmitSound("weapons/pan/pan_turn_to_gold.wav")
     ent:SetMaterial("models/player/shared/gold_player")
