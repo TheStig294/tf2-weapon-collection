@@ -13,15 +13,13 @@ SWEP.WorldModel = "models/weapons/c_models/c_demo_cannon/c_demo_cannon.mdl"
 SWEP.ViewModelFlip = false
 SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = false
-SWEP.ViewModelBoneMods = {}
 SWEP.AutoSwitchTo = false
 SWEP.AutoSwitchFrom = false
-SWEP.SlotPos = 0
+SWEP.SlotPos = 1
 SWEP.UseHands = true
 SWEP.HoldType = "shotgun"
-SWEP.FiresUnderwater = true
-SWEP.DrawCrosshair = false
-SWEP.DrawAmmo = false
+SWEP.DrawCrosshair = true
+SWEP.DrawAmmo = true
 SWEP.Base = engine.ActiveGamemode() == "terrortown" and "weapon_tttbase" or "weapon_base"
 SWEP.Kind = WEAPON_HEAVY
 SWEP.Slot = 2
@@ -41,15 +39,15 @@ SWEP.Primary.Sound = Sound("weapons/loose_cannon_shoot.wav")
 SWEP.Primary.Damage = 60
 SWEP.Primary.ExplosionDamage = 40
 SWEP.Primary.Radius = 200
-SWEP.Primary.ClipSize = 1
+SWEP.Primary.ClipSize = 4
 SWEP.Primary.Ammo = "CombineCannon"
-SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 3 or 9999
+SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 8 or 9999
 SWEP.Primary.Spread = 0
 SWEP.Primary.Automatic = false
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.5
 SWEP.Primary.ChargeTime = 1
-SWEP.ReloadAnimDelay = 1
+SWEP.ReloadAnimDelay = 2
 SWEP.ChargeMult = 1
 SWEP.MaxChargeMult = 2
 SWEP.Secondary.ClipSize = -1
@@ -80,9 +78,6 @@ function SWEP:Initialize()
     end)
 
     return self.BaseClass.Initialize(self)
-end
-
-function SWEP:SecondaryAttack()
 end
 
 function SWEP:SetupDataTables()
@@ -117,6 +112,7 @@ function SWEP:Deploy()
     if not IsValid(vm) then return end
     vm:SendViewModelMatchingSequence(vm:LookupSequence("g_draw"))
     self:ResetAnimations()
+    self.StartReload = false
     self:SetNextPrimaryFire(CurTime() + 0.5)
     self:SetNextSecondaryFire(CurTime() + 0.5)
 
@@ -140,9 +136,11 @@ function SWEP:PrimaryAttack()
     vm:SendViewModelMatchingSequence(vm:LookupSequence("g_auto_fire"))
     self:EmitSound("weapons/loose_cannon_charge.wav")
     self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self.StartReload = false
     self:SetReloading(false)
     self.LastFireTime = CurTime()
+end
+
+function SWEP:SecondaryAttack()
 end
 
 function SWEP:Reload()

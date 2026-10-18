@@ -25,8 +25,6 @@ SWEP.Kind = WEAPON_EQUIP
 SWEP.Slot = 6
 SWEP.SandboxSlot = 4
 SWEP.AutoSpawnable = false
-SWEP.Primary.Ammo = "Buckshot"
-SWEP.AmmoEnt = "item_box_buckshot_ttt"
 
 if CLIENT then
 	SWEP.EquipMenuData = {
@@ -42,25 +40,27 @@ SWEP.CanBuy = {ROLE_DETECTIVE, ROLE_TRAITOR}
 
 SWEP.Primary.Sound = Sound("weapons/stickybomblauncher_shoot.wav")
 SWEP.Primary.Damage = 60
-SWEP.Primary.TakeAmmo = 1
 SWEP.Primary.ClipSize = 8
+SWEP.Primary.Ammo = "Buckshot"
+SWEP.AmmoEnt = "item_box_buckshot_ttt"
 SWEP.Primary.DefaultClip = engine.ActiveGamemode() == "terrortown" and 32 or 9999
 SWEP.Primary.Spread = 0.05
-SWEP.Primary.NumberofShots = 0
 SWEP.Primary.Automatic = false
 SWEP.Primary.Recoil = 0
 SWEP.Primary.Delay = 0.6
+SWEP.Primary.ChargeTime = 3
 SWEP.Primary.Force = 750
-SWEP.ReloadTimer = 0
-SWEP.Reloading = false
 SWEP.StickyQueue = {}
 SWEP.MaxStickyCount = SWEP.Primary.ClipSize
-SWEP.ReloadAnimDelay = 1
-SWEP.ReloadHoldType = "revolver"
+SWEP.ReloadAnimDelay = 3
+SWEP.ChargeMult = 1
+SWEP.MaxChargeMult = 2
 SWEP.Secondary.ClipSize = -1
 SWEP.Secondary.DefaultClip = -1
 SWEP.Secondary.Ammo = "none"
 SWEP.AutoReloadCvar = GetConVar("tf2_weapon_collection_auto_reload")
+SWEP.StartReload = false
+SWEP.LastFireTime = CurTime()
 
 function SWEP:Initialize()
 	TF2WC:SandboxSetup(self)
@@ -76,6 +76,8 @@ function SWEP:SetupDataTables()
 	self:NetworkVar("Float", "ReloadTimer")
 	self:NetworkVar("Bool", "Reloading")
 	self:NetworkVar("Float", "ReloadingTimer")
+	self:NetworkVar("Bool", "Attacking")
+	self:NetworkVar("Float", "AttackingTimer")
 end
 
 function SWEP:ResetAnimations()
@@ -83,18 +85,20 @@ function SWEP:ResetAnimations()
 	if not IsValid(owner) then return end
 	self:SetIdle(false)
 	self:SetReload(false)
+	self:SetAttacking(false)
 	local vm = owner:GetViewModel()
 	if not IsValid(vm) then return end
 	local animDelay = vm:SequenceDuration()
 	self:SetIdleTimer(CurTime() + animDelay)
 	self:SetReloadTimer(CurTime() + self.ReloadAnimDelay)
+	self:SetAttackingTimer(CurTime() + self.Primary.ChargeTime)
 end
 
 function SWEP:Deploy()
-	self:SetNextPrimaryFire(CurTime() + 0.5)
-	self:SetNextSecondaryFire(CurTime() + 0.5)
 	self:ResetAnimations()
 	self.StartReload = false
+	self:SetNextPrimaryFire(CurTime() + 0.5)
+	self:SetNextSecondaryFire(CurTime() + 0.5)
 
 	return self.BaseClass.Deploy(self)
 end
@@ -109,13 +113,15 @@ function SWEP:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
 	self:ResetAnimations()
-	self.StartReload = false
+	self:SetAttacking(true)
+	self:SendWeaponAnim(ACT_VM_IDLE)
+	self:EmitSound("weapons/loose_cannon_charge.wav")
+	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
 	self:SetReloading(false)
-	self:SetNextPrimaryFire(CurTime() + 0.6)
-	self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
-	self:ShootStickyBomb()
-	self:TakePrimaryAmmo(self.Primary.TakeAmmo)
+	self.LastFireTime = CurTime()
 end
 
 function SWEP:SecondaryAttack()
@@ -136,50 +142,6 @@ function SWEP:SecondaryAttack()
 	end
 end
 
-function SWEP:ShootStickyBomb()
-	local owner = self:GetOwner()
-	if not IsValid(owner) then return end
-	owner:SetAnimation(PLAYER_ATTACK1)
-	self:EmitSound("weapons/stickybomblauncher_shoot.wav")
-
-	if SERVER then
-		local ent = ents.Create("ttt_tf2_sticky")
-		if not IsValid(ent) then return end
-		ent.Weapon = self
-		ent.StickyOwner = owner
-		ent:SetPos(owner:EyePos() + owner:GetAimVector() * 16)
-		ent:SetAngles(owner:EyeAngles())
-		ent.Damage = self.Primary.Damage
-		ent.DamageForce = self.Primary.Force
-		ent:SetStickyJumper(false)
-		ent:Spawn()
-		local phys = ent:GetPhysicsObject()
-
-		if not IsValid(phys) then
-			ent:Remove()
-
-			return
-		end
-
-		local velocity = owner:GetAimVector()
-		velocity = velocity * 7000
-		velocity = velocity + VectorRand() * 10
-		phys:ApplyForceCenter(velocity)
-		table.insert(self.StickyQueue, ent)
-
-		if #self.StickyQueue > self.MaxStickyCount then
-			local oldestSticky = self.StickyQueue[1]
-
-			if IsValid(oldestSticky) then
-				oldestSticky:Remove()
-				owner:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
-			end
-
-			table.remove(self.StickyQueue, 1)
-		end
-	end
-end
-
 function SWEP:Reload()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
@@ -194,11 +156,78 @@ function SWEP:Reload()
 	end
 end
 
+function SWEP:Overcharge()
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+	self:SetAttacking(false)
+	self:EmitSound("weapons/loose_cannon_explode.wav")
+	self:ShootStickyBomb()
+end
+
+function SWEP:ShootStickyBomb()
+	local owner = self:GetOwner()
+	if not IsValid(owner) then return end
+	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+	self.StartReload = false
+	self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+	self:SetAttacking(false)
+	self:EmitSound("weapons/stickybomblauncher_shoot.wav")
+	self:TakePrimaryAmmo(1)
+	owner:SetAnimation(PLAYER_ATTACK1)
+	owner:ViewPunch(Angle(-1, 0, 0))
+	if CLIENT then return end
+	local ent = ents.Create("ttt_tf2_sticky")
+	if not IsValid(ent) then return end
+	ent.Weapon = self
+	ent.StickyOwner = owner
+	ent:SetPos(owner:EyePos() + owner:GetAimVector() * 16)
+	ent:SetAngles(owner:EyeAngles())
+	ent.Damage = self.Primary.Damage
+	ent.DamageForce = self.Primary.Force
+	ent:SetStickyJumper(false)
+	ent:Spawn()
+	local phys = ent:GetPhysicsObject()
+
+	if not IsValid(phys) then
+		ent:Remove()
+
+		return
+	end
+
+	local velocity = owner:GetAimVector()
+	velocity = velocity * 7000 * math.max(self.ChargeMult, 0.5)
+	velocity = velocity + (VectorRand() * 10)
+	phys:ApplyForceCenter(velocity)
+	table.insert(self.StickyQueue, ent)
+
+	if #self.StickyQueue > self.MaxStickyCount then
+		local oldestSticky = self.StickyQueue[1]
+
+		if IsValid(oldestSticky) then
+			oldestSticky:Remove()
+			owner:EmitSound("Weapon_StickyBombLauncher.ModeSwitch")
+		end
+
+		table.remove(self.StickyQueue, 1)
+	end
+end
+
 function SWEP:Think()
 	local owner = self:GetOwner()
 	if not IsValid(owner) then return end
+	local vm = owner:GetViewModel()
+	if not IsValid(vm) then return end
+	self.ChargeMult = 0
 
-	if self:GetReloading() then
+	if self:GetAttacking() then
+		self.ChargeMult = self.MaxChargeMult * (CurTime() - self.LastFireTime)
+
+		if self:GetAttackingTimer() < CurTime() then
+			self:Overcharge()
+		elseif not owner:KeyDown(IN_ATTACK) then
+			self:ShootStickyBomb()
+		end
+	elseif self:GetReloading() then
 		if not self.StartReload then
 			self.StartReload = true
 			self.CanReload = false
@@ -236,5 +265,11 @@ function SWEP:Think()
 		if not self:GetReload() and self:GetReloadTimer() <= CurTime() and self:Clip1() < self:GetMaxClip1() and self.AutoReloadCvar:GetBool() then
 			self:Reload()
 		end
+	end
+end
+
+if CLIENT and not game.SinglePlayer() then
+	function SWEP:DrawHUD()
+		draw.WordBox(8, TF2WC:GetXHUDOffset(), ScrH() - 50, "Charge: " .. math.SnapTo(self.ChargeMult / 6 * 100, 10) .. "%", "TF2Font", color_black, color_white, TEXT_ALIGN_LEFT)
 	end
 end
